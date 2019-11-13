@@ -27,6 +27,11 @@
             <version>${jira.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>jta</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.0.1b</version>
+        </dependency>
         <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
         <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
         <!--
@@ -131,6 +136,13 @@
                         <!-- Ensure plugin is spring powered -->
                         <Spring-Context>*</Spring-Context>
                     </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>maven</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>1.8.1</version>
+                <configuration>
                     <archive>
                         <index>true</index>
                         <manifest>
@@ -168,6 +180,19 @@
     </build>
     <pluginRepositories>
         <pluginRepository>
+            <id>central</id>
+            <url>http://repo1.maven.org/maven2/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </pluginRepository>
+        <pluginRepository>
             <id>atlassian-public</id>
             <url>https://packages.atlassian.com/mvn/maven-external/</url>
             <snapshots>
@@ -182,6 +207,19 @@
         </pluginRepository>
     </pluginRepositories>
     <repositories>
+        <repository>
+            <id>central</id>
+            <url>http://repo1.maven.org/maven2/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </repository>
         <repository>
             <id>atlassian-public</id>
             <url>https://packages.atlassian.com/mvn/maven-external/</url>
