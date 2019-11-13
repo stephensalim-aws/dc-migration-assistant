@@ -11,9 +11,9 @@
   <!-- add our i18n resource -->  
   <resource type="i18n" name="i18n" location="aws-datacenter-jira-plugin2"/>  
   <!-- add our web resources -->  
-  <web-resource key="aws-datacenter-jira-plugin2-resources" name="aws-datacenter-jira-plugin2 Web Resources"> 
+  <web-resource key="aws-datacenter-jira-plugin2-resources" name="AWS Data Migration Web Resources">
     <dependency>com.atlassian.auiplugin:ajs</dependency>  
-    <resource type="download" name="aws-datacenter-jira-plugin2.css" location="/css/aws-datacenter-jira-plugin2.css"/>  
+    <resource type="download" name="aws-datacenter-jira-plugin2.css" location="/css/aws-datacenter-jira-plugin2.css"/>
     <resource type="download" name="aws-datacenter-jira-plugin2.js" location="/js/aws-datacenter-jira-plugin2.js"/>  
     <resource type="download" name="images/" location="/images"/>  
     <context>aws-datacenter-jira-plugin2</context> 
@@ -21,8 +21,8 @@
   <web-section name="AWS Data Migration" i18n-name-key="aws-data-migration.name" key="aws-data-migration" location="aws-data-migration" weight="1000"> 
     <description key="aws-data-migration.description">The AWS Data Migration Plugin</description>  
     <label key="aws-data-migration.label"/>
-  </web-section>  
+  </web-section>
   <web-item name="Migration Items" i18n-name-key="migration-items.name" key="migration-items" section="system.top.navigation.bar" weight="1000"> 
-    <description key="migration-items.description">The Migration Items Plugin</description> 
+    <description key="migration-items.description">The Migration Items Plugin</description>
   </web-item>
 </atlassian-plugin>

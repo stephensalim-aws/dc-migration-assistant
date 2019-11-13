@@ -5,6 +5,24 @@
     <groupId>com.aws.awsdatacenterjiraplugin2</groupId>
     <artifactId>aws-datacenter-jira-plugin2</artifactId>
     <version>1.0.0</version>
+    <configuration>
+        <archive>
+            <index>true</index>
+            <manifest>
+                <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+                <Built-By>Amazon Web Service</Built-By>
+            </manifestEntries>
+        </archive>
+    </configuration>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
     <organization>
         <name>Amazon Web Services</name>
         <url>https://aws.amazon.com/</url>
@@ -150,6 +168,7 @@
     <properties>
         <jira.version>7.13.0</jira.version>
         <amps.version>8.0.2</amps.version>
+        <allowGoogleTracking>false</allowGoogleTracking>
         <plugin.testrunner.version>2.0.1</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
         <!-- This property ensures consistency between the key in atlassian-plugin.xml and the OSGi bundle's key. -->
