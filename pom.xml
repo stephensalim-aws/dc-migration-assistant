@@ -181,7 +181,7 @@
     <pluginRepositories>
         <pluginRepository>
             <id>central</id>
-            <url>http://repo1.maven.org/maven2/</url>
+            <url>https://repo1.maven.org/maven2/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
@@ -194,7 +194,7 @@
         </pluginRepository>
         <pluginRepository>
             <id>atlassian-public</id>
-            <url>https://packages.atlassian.com/mvn/maven-external/</url>
+            <url>https://maven.atlassian.com/repository/public/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
@@ -209,7 +209,7 @@
     <repositories>
         <repository>
             <id>central</id>
-            <url>http://repo1.maven.org/maven2/</url>
+            <url>https://repo1.maven.org/maven2/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
@@ -222,7 +222,7 @@
         </repository>
         <repository>
             <id>atlassian-public</id>
-            <url>https://packages.atlassian.com/mvn/maven-external/</url>
+            <url>https://maven.atlassian.com/repository/public/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
