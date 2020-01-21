@@ -41,23 +41,21 @@ public class ConfigResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response get(@Context HttpServletRequest request) {
-        String username = userManager.getRemoteUsername(request);
-        if (username == null || !userManager.isSystemAdmin(username)) {
+        String username = userManager.getRemoteUser(request).getUsername();
+        if (username == null || !userManager.isSystemAdmin(userManager.getRemoteUserKey(request))) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
-        return Response.ok(transactionTemplate.execute(new TransactionCallback() {
-            public Object doInTransaction() {
-                PluginSettings settings = pluginSettingsFactory.createGlobalSettings();
-                Config config = new Config();
-                config.setName((String) settings.get(Config.class.getName() + ".name"));
+        return Response.ok(transactionTemplate.execute((TransactionCallback) () -> {
+            PluginSettings settings = pluginSettingsFactory.createGlobalSettings();
+            Config config = new Config();
+            config.setName((String) settings.get(Config.class.getName() + ".name"));
 
-                String time = (String) settings.get(Config.class.getName() + ".time");
-                if (time != null) {
-                    config.setTime(Integer.parseInt(time));
-                }
-                return config;
+            String time = (String) settings.get(Config.class.getName() + ".time");
+            if (time != null) {
+                config.setTime(Integer.parseInt(time));
             }
+            return config;
         })).build();
     }
 
