@@ -1,4 +1,4 @@
-package com.aws.awsdatacenterjiraplugin2.api;
+package com.aws.apn.migration.serverPlugin.api;
 
 public interface MyPluginComponent
 {

@@ -1,9 +1,9 @@
-package com.aws.awsdatacenterjiraplugin2.impl;
+package com.aws.apn.migration.serverPlugin.impl;
 
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.ApplicationProperties;
-import com.aws.awsdatacenterjiraplugin2.api.MyPluginComponent;
+import com.aws.apn.migration.serverPlugin.api.MyPluginComponent;
 
 import javax.inject.Inject;
 import javax.inject.Named;

@@ -1,10 +1,10 @@
 package it.com.aws.awsdatacenterjiraplugin2;
 
+import com.atlassian.plugins.osgi.test.AtlassianPluginsTestRunner;
+import com.atlassian.sal.api.ApplicationProperties;
+import com.aws.apn.migration.serverPlugin.api.MyPluginComponent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import com.atlassian.plugins.osgi.test.AtlassianPluginsTestRunner;
-import com.aws.awsdatacenterjiraplugin2.api.MyPluginComponent;
-import com.atlassian.sal.api.ApplicationProperties;
 
 import static org.junit.Assert.assertEquals;
 

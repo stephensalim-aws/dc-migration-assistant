@@ -9,31 +9,33 @@
         <param name="plugin-logo">images/AWS_logo.png</param>
     </plugin-info>
     <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="aws-datacenter-jira-plugin2"/>
+    <resource type="i18n" name="i18n" location="serverPlugin"/>
     <!-- add our web resources -->
-    <web-resource key="aws-datacenter-jira-plugin2-resources" name="AWS Data Migration Web Resources">
+    <web-resource key="serverPlugin-resources" name="AWS Data Migration Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <resource type="download" name="aws-datacenter-jira-plugin2.css"
-                  location="/css/aws-datacenter-jira-plugin2.css"/>
-        <resource type="download" name="aws-datacenter-jira-plugin2.js" location="/js/aws-datacenter-jira-plugin2.js"/>
+        <resource type="download" name="serverPlugin.css" location="/css/serverPlugin.css"/>
+        <resource type="download" name="serverPlugin.js" location="/js/serverPlugin.js"/>
+        <resource type="download" name="admin-ui-plugin.css" location="/css/admin-ui-plugin.css"/>
+        <resource type="download" name="admin-ui-plugin.js" location="/js/admin-ui-plugin.js"/>
         <resource type="download" name="images/" location="/images"/>
-        <context>aws-datacenter-jira-plugin2</context>
+        <context>serverPlugin</context>
     </web-resource>
-    <web-section name="AWS Data Migration" i18n-name-key="aws-data-migration.name" key="aws-data-migration"
-                 location="aws-data-migration" weight="1000">
-        <description key="aws-data-migration.description">The AWS Data Migration Plugin</description>
-        <label key="aws-data-migration.label"/>
+    <web-section name="migrationSection" i18n-name-key="migration-section.name" key="migration-section"
+                 location="migration-item-link" weight="1000">
+        <description key="migration-section.description">The Migration Plugin</description>
+        <label key="migration-section.label"/>
     </web-section>
-    <web-item name="Migration Items" i18n-name-key="migration-items.name" key="migration-items"
-              section="system.top.navigation.bar" weight="1000">
-        <description key="migration-items.description">The Migration Items Plugin</description>
+    <web-item name="Migrate to Jira DC on AWS" i18n-name-key="migration-item.name" key="migration-item"
+              section="top_system_section/import_export_section" weight="1000">
+        <description key="migration-item.description">The AWS Migration Plugin</description>
+        <label key="migration-item.label"/>
+        <link linkId="migration-admin-link">/plugins/servlet/aws/admin</link>
     </web-item>
-    <web-item name="Migrate to AWS"
-              i18n-name-key="start-migration.name"
-              key="start-migration"
-              section="admin_system_menu/top_system_section/import_export_section">
-        <description key="start-migration.description">The Start Migration Plugin</description>
-        <label key="start-migration.label"/>
 
-    </web-item>
+    <rest key="rest" path="/migration-admin" version="1.0">
+        <description>Provides REST resources for the admin UI.</description>
+    </rest>
+    <servlet key="admin-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.AdminServlet">
+        <url-pattern>/aws/admin</url-pattern>
+    </servlet>
 </atlassian-plugin>

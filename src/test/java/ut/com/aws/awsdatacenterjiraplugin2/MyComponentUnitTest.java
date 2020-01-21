@@ -1,8 +1,8 @@
 package ut.com.aws.awsdatacenterjiraplugin2;
 
+import com.aws.apn.migration.serverPlugin.api.MyPluginComponent;
+import com.aws.apn.migration.serverPlugin.impl.MyPluginComponentImpl;
 import org.junit.Test;
-import com.aws.awsdatacenterjiraplugin2.api.MyPluginComponent;
-import com.aws.awsdatacenterjiraplugin2.impl.MyPluginComponentImpl;
 
 import static org.junit.Assert.assertEquals;
 
