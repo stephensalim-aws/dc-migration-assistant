@@ -164,6 +164,15 @@
             <div class="description">Minumum number of nodes in the cluster.</div>
         </div>
 
+        <div class="field-group">
+            <aui-label for="cluster-node-volume-size">Cluster node instance volume size</aui-label>
+            <input class="text" type="number" min="50" id="cluster-node-volume-size" name="cluster-node-volume-size"
+                   title="Cluster node instance volume size">
+            <div class="description">Size of cluster node root volume in Gb (note - size based upon Application indexes
+                x 4)
+            </div>
+        </div>
+
     </div>
 </form>
 </body>
