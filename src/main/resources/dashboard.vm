@@ -1,0 +1,25 @@
+<html>
+<head>
+    <title>$i18n.getText("migration.page.label")</title>
+    <meta name="decorator" content="atl.admin">
+    <script src="https://kit.fontawesome.com/b52cf41e08.js" crossorigin="anonymous"></script>
+    $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+    $webResourceManager.requireResource("com.atlassian.auiplugin:aui-progress-tracker")
+    $webResourceManager.requireResource("com.aws.apn.migration.serverPlugin:resources")
+</head>
+<body>
+<h2>Migration Progress</h2>
+<ol class="aui-progress-tracker">
+    <li class="aui-progress-tracker-step aui-progress-tracker-step-current" style="width:25%">
+        <span>Setup Infrastructure</span></li>
+    <li class="aui-progress-tracker-step" style="width:25%"><span>Migrate Data</span>
+    </li>
+    <li class="aui-progress-tracker-step" style="width:25%"><span>Migrate Files</span></li>
+    <li class="aui-progress-tracker-step" style="width:25%"><span>Operate</span></li>
+</ol>
+<p>&nbsp; </p>
+<p>
+    <a href="../dashboard" class="aui-button aui-button-primary">Go To First Step</a>
+</p>
+</body>
+</html>

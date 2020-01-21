@@ -59,7 +59,6 @@ public class ConfigResource {
         })).build();
     }
 
-
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response put(final Config config, @Context HttpServletRequest request) {

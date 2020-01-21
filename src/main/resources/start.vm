@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>$i18n.getText("migration.admin.label")</title>
+    <title>$i18n.getText("migration.page.label")</title>
     <meta name="decorator" content="atl.admin">
     <script src="https://kit.fontawesome.com/b52cf41e08.js" crossorigin="anonymous"></script>
     $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
@@ -24,7 +24,7 @@
     AWS account.</p>
 <p>&nbsp; </p>
 <p>
-    <button class="aui-button aui-button-primary">Begin Migration</button>
+    <a href="./dashboard" class="aui-button aui-button-primary">Begin Migration</a>
 </p>
 </body>
 </html>

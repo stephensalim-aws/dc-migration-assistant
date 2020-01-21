@@ -14,8 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 
+
 @Scanned
-public class AdminServlet extends HttpServlet {
+public class DeployCloudformationServlet extends HttpServlet {
+
     @ComponentImport
     private final UserManager userManager;
     @ComponentImport
@@ -24,7 +26,7 @@ public class AdminServlet extends HttpServlet {
     private final TemplateRenderer renderer;
 
     @Inject
-    public AdminServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer) {
+    public DeployCloudformationServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer) {
         this.userManager = userManager;
         this.loginUriProvider = loginUriProvider;
         this.renderer = renderer;
@@ -39,7 +41,7 @@ public class AdminServlet extends HttpServlet {
         }
 
         response.setContentType("text/html;charset=utf-8");
-        renderer.render("start.vm", response.getWriter());
+        renderer.render("cloudformation.vm", response.getWriter());
     }
 
     private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {

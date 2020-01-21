@@ -29,13 +29,25 @@
               section="top_system_section/import_export_section" weight="1000">
         <description key="migration-item.description">The AWS Migration Plugin</description>
         <label key="migration-item.label"/>
-        <link linkId="migration-admin-link">/plugins/servlet/aws/admin</link>
+        <link linkId="migration-admin-link">/plugins/servlet/aws/start</link>
     </web-item>
 
     <rest key="rest" path="/migration-admin" version="1.0">
         <description>Provides REST resources for the admin UI.</description>
     </rest>
     <servlet key="admin-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.AdminServlet">
-        <url-pattern>/aws/admin</url-pattern>
+        <url-pattern>/aws/start</url-pattern>
     </servlet>
+    <servlet key="dashboard-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.DashboardServlet">
+        <url-pattern>/aws/dashboard</url-pattern>
+    </servlet>
+
+    <webwork1 key="cloudformationDeployment" name="Deploy CloudFormation Environment" class="java.lang.Object">
+        <actions>
+            <action name="com.aws.apn.migration.serverPlugin.action.CreateCloudFormation" alias="QuickCreateUserIssue">
+                <view name="createenvironment">cloudformation.vm</view>
+            </action>
+        </actions>
+    </webwork1>
+
 </atlassian-plugin>
