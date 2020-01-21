@@ -4,11 +4,167 @@
     <meta name="decorator" content="atl.admin">
     <script src="https://kit.fontawesome.com/b52cf41e08.js" crossorigin="anonymous"></script>
     $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+    $webResourceManager.requireResource("com.atlassian.auiplugin:aui-forms")
     $webResourceManager.requireResource("com.atlassian.auiplugin:aui-progress-tracker")
     $webResourceManager.requireResource("com.aws.apn.migration.serverPlugin:resources")
+
+
 </head>
 <body>
 <h2>Deploy Infrastructure</h2>
+<form class="aui">
+    <div class="field-group">
+        <aui-label><strong>Jira Setup</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="jira-product">Jira Product<span class="aui-icon icon-required">required</span></aui-label>
+            <select class="select" id="jira-product" name="jira-product">
+                <option>Core</option>
+                <option selected>Software</option>
+                <option>ServiceDesk</option>
+            </select>
+            <div class="description">The Jira product to install.</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="jira-version">Version<span class="aui-icon icon-required">required</span></aui-label>
+            <input class="text" type="text" id="jira-version" name="jira-version" title="Version">
+            <div class="description">The version of Jira Software or Jira Service Desk to install. Find valid versions
+                at <a
+                        href="https://confluence.atlassian.com/x/TVlNLg">Jira Software</a>, <a
+                        href="https://confluence.atlassian.com/x/jh9-Lg">Jira Service Desk</a>, or <a
+                        href="https://confluence.atlassian.com/x/XM2EO">Atlassian Enterprise Releases</a>.
+            </div>
+        </div>
+    </div>
 
+    <div class="field-group">
+        <aui-label><strong>Cluster Nodes</strong></aui-label>
+
+
+        <div class="field-group">
+            <aui-label for="cloudwatch-integration">CloudWatch Integration</aui-label>
+            <select class="select" id="cloudwatch-integration" name="cloudwatch-integration">
+                <option>Off</option>
+                <option>Metrics Only</option>
+                <option selected>Metrics and Logs</option>
+            </select>
+            <div class="description">Enables CloudWatch metrics with or without log gathering. If cost is an issue,
+                you can disable this altogether.
+            </div>
+        </div>
+
+
+        <div class="field-group">
+            <aui-label for="cluster-node-instance-type">Cluster Node Instance Type</aui-label>
+            <select class="select" id="cluster-node-instance-type" name="cluster-node-instance-type">
+                <option>c4.large</option>
+                <option>c4.xlarge</option>
+                <option>c4.2xlarge</option>
+                <option>c4.4xlarge</option>
+                <option>c4.8xlarge</option>
+                <option>c5.large</option>
+                <option selected>c5.xlarge</option>
+                <option>c5.2xlarge</option>
+                <option>c5.4xlarge</option>
+                <option>c5.9xlarge</option>
+                <option>c5.18xlarge</option>
+                <option>c5d.large</option>
+                <option>c5d.xlarge</option>
+                <option>c5d.2xlarge</option>
+                <option>c5d.4xlarge</option>
+                <option>c5d.9xlarge</option>
+                <option>c5d.18xlarge</option>
+                <option>d2.xlarge</option>
+                <option>d2.2xlarge</option>
+                <option>d2.4xlarge</option>
+                <option>d2.8xlarge</option>
+                <option>h1.2xlarge</option>
+                <option>h1.4xlarge</option>
+                <option>h1.8xlarge</option>
+                <option>h1.16xlarge</option>
+                <option>i3.large</option>
+                <option>i3.xlarge</option>
+                <option>i3.2xlarge</option>
+                <option>i3.4xlarge</option>
+                <option>i3.8xlarge</option>
+                <option>i3.16xlarge</option>
+                <option>i3.metal</option>
+                <option>m4.large</option>
+                <option>m4.xlarge</option>
+                <option>m4.2xlarge</option>
+                <option>m4.4xlarge</option>
+                <option>m4.10xlarge</option>
+                <option>m4.16xlarge</option>
+                <option>m5.large</option>
+                <option>m5.xlarge</option>
+                <option>m5.2xlarge</option>
+                <option>m5.4xlarge</option>
+                <option>m5.12xlarge</option>
+                <option>m5.24xlarge</option>
+                <option>m5d.large</option>
+                <option>m5d.xlarge</option>
+                <option>m5d.2xlarge</option>
+                <option>m5d.4xlarge</option>
+                <option>m5d.12xlarge</option>
+                <option>m5d.24xlarge</option>
+                <option>r4.large</option>
+                <option>r4.xlarge</option>
+                <option>r4.2xlarge</option>
+                <option>r4.4xlarge</option>
+                <option>r4.8xlarge</option>
+                <option>r4.16xlarge</option>
+                <option>r5.large</option>
+                <option>r5.xlarge</option>
+                <option>r5.2xlarge</option>
+                <option>r5.4xlarge</option>
+                <option>r5.12xlarge</option>
+                <option>r5.24xlarge</option>
+                <option>r5d.large</option>
+                <option>r5d.xlarge</option>
+                <option>r5d.2xlarge</option>
+                <option>r5d.4xlarge</option>
+                <option>r5d.12xlarge</option>
+                <option>r5d.24xlarge</option>
+                <option>t2.medium</option>
+                <option>t2.large</option>
+                <option>t2.xlarge</option>
+                <option>t2.2xlarge</option>
+                <option>t3.medium</option>
+                <option>t3.large</option>
+                <option>t3.xlarge</option>
+                <option>t3.2xlarge</option>
+                <option>x1.16xlarge</option>
+                <option>x1.32xlarge</option>
+                <option>x1e.xlarge</option>
+                <option>x1e.2xlarge</option>
+                <option>x1e.4xlarge</option>
+                <option>x1e.8xlarge</option>
+                <option>x1e.16xlarge</option>
+                <option>x1e.32xlarge</option>
+                <option>z1d.large</option>
+                <option>z1d.xlarge</option>
+                <option>z1d.2xlarge</option>
+                <option>z1d.3xlarge</option>
+                <option>z1d.6xlarge</option>
+                <option>z1d.12xlarge</option>
+            </select>
+            <div class="description">Instance type for the cluster application nodes.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="cluster-node-max">Maximum number of cluster nodes</aui-label>
+            <input class="text" type="number" min="1" max="20" id="cluster-node-max" name="cluster-node-max"
+                   title="Maximum number of cluster nodes">
+            <div class="description">Maximum number of nodes in the cluster.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="cluster-node-min">Minimum number of cluster nodes</aui-label>
+            <input class="text" type="number" min="1" max="20" id="cluster-node-min" name="cluster-node-min"
+                   title="Minumum number of cluster nodes">
+            <div class="description">Minumum number of nodes in the cluster.</div>
+        </div>
+
+    </div>
+</form>
 </body>
 </html>

@@ -41,6 +41,10 @@
     <servlet key="dashboard-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.DashboardServlet">
         <url-pattern>/aws/dashboard</url-pattern>
     </servlet>
+    <servlet key="cloudformation-servlet"
+             class="com.aws.apn.migration.serverPlugin.adminUI.DeployCloudformationServlet">
+        <url-pattern>/aws/cloudformation</url-pattern>
+    </servlet>
 
     <webwork1 key="cloudformationDeployment" name="Deploy CloudFormation Environment" class="java.lang.Object">
         <actions>
