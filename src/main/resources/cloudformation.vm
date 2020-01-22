@@ -334,7 +334,105 @@
             </select>
             <div class="description">Database storage type (not used for Aurora).</div>
         </div>
+    </div>
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>Networking</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="AccessCIDR">Trusted IP range</aui-label>
+            <input class="text" type="text" id="AccessCIDR" name="AccessCIDR"
+                   title="Trusted IP range"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR Block allowed to access the Atlassian product. This should be set to a trusted
+                IP range; if you want to give public access use '0.0.0.0/0'.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="AvailabilityZones">Availability Zones</aui-label>
+            <select class="multi-select" size="$availabilityZones.size()" multiple="multiple" id="AvailabilityZones"
+                    name="AvailabilityZones">
+                #foreach( $zone in $availabilityZones )
+                    <option>$zone</option>
+                #end
+            </select>
+            <div class="description">List of Availability Zones to use for the subnets in the VPC. Note: You must
+                specify 2 AZs here; if more are specified only the first 2 will be used.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="InternetFacingLoadBalancer">Make instance internet facing</aui-label>
+            <aui-toggle id="InternetFacingLoadBalancer" label="Make instance internet facing"></aui-toggle>
+            <div class="description">Controls whether the load balancer should be visible to the internet (true) or only
+                within the VPC (false).
+            </div>
+        </div>
 
+        <div class="field-group">
+            <aui-label for="KeyPairName">SSH Key Pair Name<span
+                    class="aui-icon icon-optional">optional</span></aui-label>
+            <input class="text" type="text" id="KeyPairName" name="KeyPairName"
+                   title="SSH keyname to use with the repository">
+            <div class="description">The EC2 Key Pair to allow SSH access to the instances. If you don't provide one,
+                the Atlassian Standard Infrastructure stack's key pair will be used.
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="PrivateSubnet1CIDR">AZ1 private IP address block</aui-label>
+            <input class="text" type="text" id="PrivateSubnet1CIDR" name="PrivateSubnet1CIDR"
+                   title="AZ1 private IP address block"
+                   value="10.0.0.0/19"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR block for private subnet 1 located in Availability Zone 1.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="PrivateSubnet2CIDR">AZ2 private IP address block</aui-label>
+            <input class="text" type="text" id="PrivateSubnet2CIDR" name="PrivateSubnet2CIDR"
+                   title="AZ2 private IP address block"
+                   value="10.0.32.0/19"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR block for private subnet 2 located in Availability Zone 2.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="PublicSubnet1CIDR">AZ1 public IP address block</aui-label>
+            <input class="text" type="text" id="PublicSubnet1CIDR" name="PublicSubnet1CIDR"
+                   title="AZ1 public IP address block"
+                   value="10.0.128.0/19"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR Block for the public DMZ subnet 1 located in Availability Zone 1
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="PublicSubnet2CIDR">AZ2 public IP address block</aui-label>
+            <input class="text" type="text" id="PublicSubnet2CIDR" name="PublicSubnet2CIDR"
+                   title="AZ2 public IP address block"
+                   value="10.0.144.0/19"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR Block for the public DMZ subnet 2 located in Availability Zone 2
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="SSLCertificateARN">SSL Certificate ARN<span
+                    class="aui-icon icon-optional">optional</span></aui-label>
+            <input class="text" type="text" id="SSLCertificateARN" name="SSLCertificateARN"
+                   title="SSL Certificate ARN">
+            <div class="description">Amazon Resource Name (ARN) of your SSL certificate. Supplying this will
+                automatically enable HTTPS on the product and load balancer, configured to use the corresponding
+                certificate. If you want to use your own certificate that you generated outside of Amazon, you need to
+                first import it to AWS Certificate Manager. After a successful import, you’ll receive the ARN. If you
+                want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN
+                after it’s successfully created.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="VPCCIDR">IP address block for the VPC</aui-label>
+            <input class="text" type="text" id="VPCCIDR" name="VPCCIDR"
+                   title="IP address block for the VPC"
+                   value="10.0.0.0/16"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR Block for the VPC</div>
+        </div>
     </div>
 </form>
 </body>

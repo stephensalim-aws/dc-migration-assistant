@@ -23,8 +23,52 @@
     requires that you have an AWS Key / AWS Secret pair that has the proper permissions to create resources in your
     AWS account.</p>
 <p>&nbsp; </p>
+<form class="aui" action="./dashboard" method="post" enctype="application/json">
+    <div class="field-group">
+        <aui-label for="AccessKey">AWS Access Key<span class="aui-icon icon-required">required</span></aui-label>
+        <input class="text" type="text" id="AccessKey" name="AccessKey" title="AWS Access Key">
+        <div class="description">The AWS Access Key of the IAM user you wish to use to create the Jira Data Center
+            Infrastructure and execute the migration.
+        </div>
+    </div>
+    <div class="field-group">
+        <aui-label for="SecretKey">AWS Secret Key<span class="aui-icon icon-required">required</span></aui-label>
+        <input class="text" type="text" id="SecretKey" name="SecretKey" title="AWS Secret Key">
+        <div class="description">The AWS Secret Key of the IAM user you wish to use to create the Jira Data Center
+            Infrastructure and execute the migration.
+        </div>
+    </div>
+    <div class="field-group">
+        <aui-label for="AWSRegion">AWS Region<span class="aui-icon icon-required">required</span></aui-label>
+        <select class="select" id="AWSRegion" name="AWSRegion">
+            <option value="us-east-1">US East (N. Virginia)</option>
+            <option value="us-east-2">US East (Ohio)</option>
+            <option value="us-west-1">US West (N. California)</option>
+            <option value="us-west-2">US West (Oregon)</option>
+            <option value="ap-east-1">Asia Pacific (Hong Kong)</option>
+            <option value="ap-south-1">Asia Pacific (Mumbai)</option>
+            <option value="ap-northeast-3">Asia Pacific (Osaka-Local)</option>
+            <option value="ap-northeast-2">Asia Pacific (Seoul)</option>
+            <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+            <option value="ap-southeast-2">Asia Pacific (Sydney)</option>
+            <option value="ap-northeast-1">Asia Pacific (Tokyo)</option>
+            <option value="ca-central-1">Canada (Central)</option>
+            <option value="eu-central-1">Europe (Frankfurt)</option>
+            <option value="eu-west-1">Europe (Ireland)</option>
+            <option value="eu-west-2">Europe (London)</option>
+            <option value="eu-west-3">Europe (Paris)</option>
+            <option value="eu-north-1">Europe (Stockholm)</option>
+            <option value="me-south-1">Middle East (Bahrain)</option>
+            <option value="sa-east-1">South America (Sao Paulo)</option>
+        </select>
+        <div class="description">The AWS region to use for Jira Data Center deployment.</div>
+    </div>
+
+    <button type="submit" class="aui-button aui-button-primary">Begin Migration</button>
+
+</form>
 <p>
-    <a href="./dashboard" class="aui-button aui-button-primary">Begin Migration</a>
+
 </p>
 </body>
 </html>
