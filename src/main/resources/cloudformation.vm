@@ -15,7 +15,7 @@
 <h2>Deploy Infrastructure</h2>
 <form class="aui">
     <div class="field-group">
-        <aui-label><strong>Jira Setup</strong></aui-label>
+        <aui-label style="text-align: left;"><strong>Jira Setup</strong></aui-label>
         <div class="field-group">
             <aui-label for="JiraProduct">Jira Product<span class="aui-icon icon-required">required</span></aui-label>
             <select class="select" id="JiraProduct" name="JiraProduct">
@@ -38,9 +38,7 @@
     </div>
 
     <div class="field-group">
-        <aui-label><strong>Cluster Nodes</strong></aui-label>
-
-
+        <aui-label style="text-align: left;"><strong>Cluster Nodes</strong></aui-label>
         <div class="field-group">
             <aui-label for="CloudWatchIntegration">CloudWatch Integration</aui-label>
             <select class="select" id="CloudWatchIntegration" name="CloudWatchIntegration">
@@ -226,7 +224,7 @@
         </div>
     </div>
     <div class="field-group">
-        <aui-label><strong>Database</strong></aui-label>
+        <aui-label style="text-align: left;"><strong>Database</strong></aui-label>
         <div class="field-group">
             <aui-label for="DBEngine">The database engine to deploy with</aui-label>
             <select class="select" id="DBEngine" name="DBEngine">
@@ -302,6 +300,41 @@
             <aui-toggle id="DBMultiAZ" label="Enable RDS Multi-AZ deployment"></aui-toggle>
             <div class="description">Whether to provision a multi-AZ RDS instance.</div>
         </div>
+
+        <div class="field-group">
+            <aui-label for="DBPassword">Application user database password<span
+                    class="aui-icon icon-required">required</span></aui-label>
+            <input class="text" type="text" id="DBPassword" name="DBPassword"
+                   title="Application user database password">
+            <div class="description">Password for the master ('postgres') account. Must be at least 8 characters and
+                include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol.
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBStorage">Database storage</aui-label>
+            <input class="text" type="number" min="100" max="6144" value="200" id="DBStorage" name="DBStorage"
+                   title="Database storage">
+            <div class="description">Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS,
+                storage should be between 100 and 6144 (not used for Aurora).
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBStorageEncrypted">Database encryption</aui-label>
+            <aui-toggle id="DBStorageEncrypted" label="Database encryption"></aui-toggle>
+            <div class="description">Whether or not to encrypt the database.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBStorageType">Database storage type</aui-label>
+            <select class="select" id="DBStorageType" name="DBStorageType">
+                <option selected>General Purpose (SSD)</option>
+                <option>Provisioned IOPS</option>
+            </select>
+            <div class="description">Database storage type (not used for Aurora).</div>
+        </div>
+
     </div>
 </form>
 </body>
