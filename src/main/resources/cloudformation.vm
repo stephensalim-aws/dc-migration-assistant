@@ -434,6 +434,24 @@
             <div class="description">CIDR Block for the VPC</div>
         </div>
     </div>
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>DNS (Optional)</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="CustomDnsName">Existing DNS name</aui-label>
+            <input class="text" type="text" id="CustomDnsName" name="CustomDnsName"
+                   title="Existing DNS name">
+            <div class="description">Use custom existing DNS name for your Data Center instance. This will take
+                precedence over HostedZone. Please note: you must own the domain and configure it to point at the load
+                balancer.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="HostedZone">Route 53 Hosted Zone</aui-label>
+            <input class="text" type="text" id="HostedZone" name="HostedZone"
+                   title="Route 53 Hosted Zone">
+            <div class="description">The domain name of the Route53 PRIVATE Hosted Zone in which to create CNAMEs</div>
+        </div>
+    </div>
 </form>
 </body>
 </html>
