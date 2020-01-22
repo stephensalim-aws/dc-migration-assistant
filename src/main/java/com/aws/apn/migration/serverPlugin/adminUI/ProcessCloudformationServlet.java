@@ -6,6 +6,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
+import com.amazonaws.services.cloudformation.model.Capability;
 import com.amazonaws.services.cloudformation.model.CreateStackRequest;
 import com.amazonaws.services.cloudformation.model.CreateStackResult;
 import com.amazonaws.services.cloudformation.model.Parameter;
@@ -68,19 +69,32 @@ public class ProcessCloudformationServlet extends HttpServlet {
         String secretKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".secretKey");
         String accessKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".accessKey");
 
-        AmazonCloudFormation cloudFormation = this.getCloudFormation(region, accessKey, secretKey);
-        CreateStackRequest createStackRequest = new CreateStackRequest().withStackName("Jira DC Autocreated")
-                .withTemplateURL(TEMPLATE_URL)
-                .withParameters(this.buildParameterList(request.getParameterNames(), request));
-
-        LOGGER.info(gson.toJson(createStackRequest));
-
-        CreateStackResult createStackResult = cloudFormation.createStack(createStackRequest);
-
-        pluginSettings.put(PLUGIN_STORAGE_KEY + ".cloudformationStackId", createStackResult.getStackId());
-
         response.setContentType("text/html;charset=utf-8");
-        renderer.render("cfnstatus.vm", response.getWriter());
+
+        try {
+
+            AmazonCloudFormation cloudFormation = this.getCloudFormation(region, accessKey, secretKey);
+            CreateStackRequest createStackRequest = new CreateStackRequest().withStackName("Jira DC Autocreated")
+                    .withTemplateURL(TEMPLATE_URL)
+                    .withParameters(this.buildParameterList(request.getParameterNames(), request))
+                    .withCapabilities(Capability.CAPABILITY_AUTO_EXPAND, Capability.CAPABILITY_NAMED_IAM)
+                    .withDisableRollback(false)
+                    .withEnableTerminationProtection(false);
+
+            LOGGER.info(gson.toJson(createStackRequest));
+
+            CreateStackResult createStackResult = cloudFormation.createStack(createStackRequest);
+
+            pluginSettings.put(PLUGIN_STORAGE_KEY + ".cloudformationStackId", createStackResult.getStackId());
+
+            context.put("cloudformationStackId", createStackResult.getStackId());
+
+            renderer.render("cfnstatus.vm", context, response.getWriter());
+        } catch (Exception e) {
+            LOGGER.error(e.getLocalizedMessage());
+            renderer.render("error.vm", response.getWriter());
+        }
+
     }
 
     private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {

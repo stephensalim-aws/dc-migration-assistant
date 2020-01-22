@@ -12,7 +12,6 @@
 
 </head>
 <body>
-<h1>Processing Cloudformation Quickstart</h1>
-<p>Stack ID:  $cloudformationStackId</p>
+<h1>Error Processing Cloudformation Quickstart</h1>
 </body>
 </html>
