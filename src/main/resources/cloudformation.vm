@@ -1,0 +1,739 @@
+<html>
+<head>
+    <title>$i18n.getText("migration.page.label")</title>
+    <meta name="decorator" content="atl.admin">
+    <script src="https://kit.fontawesome.com/b52cf41e08.js" crossorigin="anonymous"></script>
+    $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+    $webResourceManager.requireResource("com.atlassian.auiplugin:aui-forms")
+    $webResourceManager.requireResource("com.atlassian.auiplugin:aui-progress-tracker")
+    $webResourceManager.requireResource("com.aws.apn.migration.serverPlugin:resources")
+    $webResourceManager.requireResource("com.atlassian.auiplugin:aui-toggle")
+
+
+</head>
+<body>
+<h2>Deploy Infrastructure</h2>
+<form class="aui" action="./cfnstatus" method="post" enctype="application/json">
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>Jira Setup</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="JiraProduct">Jira Product<span class="aui-icon icon-required">required</span></aui-label>
+            <select class="select" id="JiraProduct" name="JiraProduct">
+                <option>Core</option>
+                <option selected>Software</option>
+                <option>ServiceDesk</option>
+            </select>
+            <div class="description">The Jira product to install.</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="JiraVersion">Version<span class="aui-icon icon-required">required</span></aui-label>
+            <input class="text" type="text" id="JiraVersion" value="8.5.3" name="JiraVersion" title="Version">
+            <div class="description">The version of Jira Software or Jira Service Desk to install. Find valid versions
+                at <a
+                        href="https://confluence.atlassian.com/x/TVlNLg">Jira Software</a>, <a
+                        href="https://confluence.atlassian.com/x/jh9-Lg">Jira Service Desk</a>, or <a
+                        href="https://confluence.atlassian.com/x/XM2EO">Atlassian Enterprise Releases</a>.
+            </div>
+        </div>
+    </div>
+
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>Cluster Nodes</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="CloudWatchIntegration">CloudWatch Integration</aui-label>
+            <select class="select" id="CloudWatchIntegration" name="CloudWatchIntegration">
+                <option>Off</option>
+                <option>Metrics Only</option>
+                <option selected>Metrics and Logs</option>
+            </select>
+            <div class="description">Enables CloudWatch metrics with or without log gathering. If cost is an issue,
+                you can disable this altogether.
+            </div>
+        </div>
+
+
+        <div class="field-group">
+            <aui-label for="ClusterNodeInstanceType">Cluster Node Instance Type</aui-label>
+            <select class="select" id="ClusterNodeInstanceType" name="ClusterNodeInstanceType">
+                <option>c4.large</option>
+                <option>c4.xlarge</option>
+                <option>c4.2xlarge</option>
+                <option>c4.4xlarge</option>
+                <option>c4.8xlarge</option>
+                <option>c5.large</option>
+                <option selected>c5.xlarge</option>
+                <option>c5.2xlarge</option>
+                <option>c5.4xlarge</option>
+                <option>c5.9xlarge</option>
+                <option>c5.18xlarge</option>
+                <option>c5d.large</option>
+                <option>c5d.xlarge</option>
+                <option>c5d.2xlarge</option>
+                <option>c5d.4xlarge</option>
+                <option>c5d.9xlarge</option>
+                <option>c5d.18xlarge</option>
+                <option>d2.xlarge</option>
+                <option>d2.2xlarge</option>
+                <option>d2.4xlarge</option>
+                <option>d2.8xlarge</option>
+                <option>h1.2xlarge</option>
+                <option>h1.4xlarge</option>
+                <option>h1.8xlarge</option>
+                <option>h1.16xlarge</option>
+                <option>i3.large</option>
+                <option>i3.xlarge</option>
+                <option>i3.2xlarge</option>
+                <option>i3.4xlarge</option>
+                <option>i3.8xlarge</option>
+                <option>i3.16xlarge</option>
+                <option>i3.metal</option>
+                <option>m4.large</option>
+                <option>m4.xlarge</option>
+                <option>m4.2xlarge</option>
+                <option>m4.4xlarge</option>
+                <option>m4.10xlarge</option>
+                <option>m4.16xlarge</option>
+                <option>m5.large</option>
+                <option>m5.xlarge</option>
+                <option>m5.2xlarge</option>
+                <option>m5.4xlarge</option>
+                <option>m5.12xlarge</option>
+                <option>m5.24xlarge</option>
+                <option>m5d.large</option>
+                <option>m5d.xlarge</option>
+                <option>m5d.2xlarge</option>
+                <option>m5d.4xlarge</option>
+                <option>m5d.12xlarge</option>
+                <option>m5d.24xlarge</option>
+                <option>r4.large</option>
+                <option>r4.xlarge</option>
+                <option>r4.2xlarge</option>
+                <option>r4.4xlarge</option>
+                <option>r4.8xlarge</option>
+                <option>r4.16xlarge</option>
+                <option>r5.large</option>
+                <option>r5.xlarge</option>
+                <option>r5.2xlarge</option>
+                <option>r5.4xlarge</option>
+                <option>r5.12xlarge</option>
+                <option>r5.24xlarge</option>
+                <option>r5d.large</option>
+                <option>r5d.xlarge</option>
+                <option>r5d.2xlarge</option>
+                <option>r5d.4xlarge</option>
+                <option>r5d.12xlarge</option>
+                <option>r5d.24xlarge</option>
+                <option>t2.medium</option>
+                <option>t2.large</option>
+                <option>t2.xlarge</option>
+                <option>t2.2xlarge</option>
+                <option>t3.medium</option>
+                <option>t3.large</option>
+                <option>t3.xlarge</option>
+                <option>t3.2xlarge</option>
+                <option>x1.16xlarge</option>
+                <option>x1.32xlarge</option>
+                <option>x1e.xlarge</option>
+                <option>x1e.2xlarge</option>
+                <option>x1e.4xlarge</option>
+                <option>x1e.8xlarge</option>
+                <option>x1e.16xlarge</option>
+                <option>x1e.32xlarge</option>
+                <option>z1d.large</option>
+                <option>z1d.xlarge</option>
+                <option>z1d.2xlarge</option>
+                <option>z1d.3xlarge</option>
+                <option>z1d.6xlarge</option>
+                <option>z1d.12xlarge</option>
+            </select>
+            <div class="description">Instance type for the cluster application nodes.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="ClusterNodeMax">Maximum number of cluster nodes</aui-label>
+            <input class="text" type="number" min="1" max="20" value="1" id="ClusterNodeMax" name="ClusterNodeMax"
+                   title="Maximum number of cluster nodes">
+            <div class="description">Maximum number of nodes in the cluster.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="ClusterNodeMin">Minimum number of cluster nodes</aui-label>
+            <input class="text" type="number" min="1" max="20" value="1" id="ClusterNodeMin" name="ClusterNodeMin"
+                   title="Minumum number of cluster nodes">
+            <div class="description">Minumum number of nodes in the cluster.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="ClusterNodeVolumeSize">Cluster node instance volume size</aui-label>
+            <input class="text" type="number" min="50" value="50" id="ClusterNodeVolumeSize"
+                   name="ClusterNodeVolumeSize"
+                   title="Cluster node instance volume size">
+            <div class="description">Size of cluster node root volume in Gb (note
+                <option>size based upon Application indexes
+                    x 4)
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationRepository">Deployment Automation Git Repository URL</aui-label>
+            <input class="text" type="text" id="DeploymentAutomationRepository" name="DeploymentAutomationRepository"
+                   title="Deployment Automation Git Repository URL" style="max-width: 500px;"
+                   value="https://bitbucket.org/atlassian/dc-deployments-automation.git">
+            <div class="description">The deployment automation repository to use for per-node initialization. Leave this
+                as default unless you have customizations.
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationBranch">Deployment Automation Branch</aui-label>
+            <input class="text" type="text" id="DeploymentAutomationBranch" name="DeploymentAutomationBranch"
+                   title="Deployment Automation Branch"
+                   value="master">
+            <div class="description">The deployment automation repository branch to pull from.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationPlaybook">The Ansible playbook to invoke to initialize the instance
+            </aui-label>
+            <input class="text" type="text" id="DeploymentAutomationPlaybook" name="DeploymentAutomationPlaybook"
+                   title="The Ansible playbook to invoke to initialize the instance"
+                   value="aws_jira_dc_node.yml">
+            <div class="description">The Ansible playbook to invoke to initialise the Jira node on first start.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationKeyName">SSH keyname to use with the repository<span
+                    class="aui-icon icon-optional">optional</span></aui-label>
+            <input class="text" type="text" id="DeploymentAutomationKeyName" name="DeploymentAutomationKeyName"
+                   title="SSH keyname to use with the repository">
+            <div class="description">Named Key Pair name to use with this repository. The key should be imported into
+                the SSM parameter store. (Optional)
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationCustomParams">Custom command-line parameters for Ansible<span
+                    class="aui-icon icon-optional">optional</span></aui-label>
+            <input class="text" type="text" id="DeploymentAutomationCustomParams"
+                   name="DeploymentAutomationCustomParams"
+                   title="Custom command-line parameters for Ansible">
+            <div class="description">Additional command-line options for the `ansible-playbook` command. See <a
+                    href="https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md">here</a> for
+                more information about overriding parameters. (Optional)
+            </div>
+        </div>
+    </div>
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>Database</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="DBEngine">The database engine to deploy with</aui-label>
+            <select class="select" id="DBEngine" name="DBEngine">
+                <option selected>PostgreSQL</option>
+                <option>Amazon Aurora PostgreSQL</option>
+            </select>
+            <div class="description">Database Engine to use for the application. PostgreSQL or Amazon Aurora
+                PostgreSQL.
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBInstanceClass">Database instance class</aui-label>
+            <select class="select" id="DBInstanceClass" name="DBInstanceClass">
+                <option selected>db.m5.large</option>
+                <option>db.m5.xlarge</option>
+                <option>db.m5.2xlarge</option>
+                <option>db.m5.4xlarge</option>
+                <option>db.m5.12xlarge</option>
+                <option>db.m5.24xlarge</option>
+                <option>db.r5.large</option>
+                <option>db.r5.xlarge</option>
+                <option>db.r5.2xlarge</option>
+                <option>db.r5.4xlarge</option>
+                <option>db.r5.12xlarge</option>
+                <option>db.r5.24xlarge</option>
+                <option>db.r4.large</option>
+                <option>db.r4.xlarge</option>
+                <option>db.r4.2xlarge</option>
+                <option>db.r4.4xlarge</option>
+                <option>db.r4.8xlarge</option>
+                <option>db.r4.16xlarge</option>
+                <option>db.m4.large</option>
+                <option>db.m4.xlarge</option>
+                <option>db.m4.2xlarge</option>
+                <option>db.m4.4xlarge</option>
+                <option>db.m4.10xlarge</option>
+                <option>db.m4.16xlarge</option>
+                <option>db.t3.medium</option>
+                <option>db.t3.large</option>
+                <option>db.t3.xlarge</option>
+                <option>db.t3.2xlarge</option>
+                <option>db.t2.medium</option>
+                <option>db.t2.large</option>
+                <option>db.t2.xlarge</option>
+                <option>db.t2.2xlarge</option>
+            </select>
+            <div class="description">RDS instance type (must be r family if using Aurora).</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBIops">RDS Provisioned IOPS</aui-label>
+            <input class="text" type="number" min="1000" value="1000" id="DBIops" name="DBIops"
+                   title="RDS Provisioned IOPS">
+            <div class="description">Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only
+                used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00
+                (not used for Aurora).
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBMasterUserPassword">Master (admin) password<span
+                    class="aui-icon icon-required">required</span></aui-label>
+            <input class="text" type="password" id="DBMasterUserPassword" name="DBMasterUserPassword"
+                   title="RDS Provisioned IOPS">
+            <div class="description">Password for the master ('postgres') account. Must be at least 8 characters and
+                include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBMultiAZ">Enable RDS Multi-AZ deployment</aui-label>
+            <aui-toggle id="DBMultiAZToggle" label="Enable RDS Multi-AZ deployment" checked></aui-toggle>
+            <input id="DBMultiAZ" type="hidden" value="true"/>
+            <div class="description">Whether to provision a multi-AZ RDS instance.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBPassword">Application user database password<span
+                    class="aui-icon icon-required">required</span></aui-label>
+            <input class="text" type="password" id="DBPassword" name="DBPassword"
+                   title="Application user database password">
+            <div class="description">Password for the master ('postgres') account. Must be at least 8 characters and
+                include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol.
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBStorage">Database storage</aui-label>
+            <input class="text" type="number" min="100" max="6144" value="200" id="DBStorage" name="DBStorage"
+                   title="Database storage">
+            <div class="description">Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS,
+                storage should be between 100 and 6144 (not used for Aurora).
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBStorageEncrypted">Database encryption</aui-label>
+            <aui-toggle id="DBStorageEncryptedToggle" label="Database encryption"></aui-toggle>
+            <input id="DBStorageEncrypted" type="hidden" value="false"/>
+            <div class="description">Whether or not to encrypt the database.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBStorageType">Database storage type</aui-label>
+            <select class="select" id="DBStorageType" name="DBStorageType">
+                <option selected>General Purpose (SSD)</option>
+                <option>Provisioned IOPS</option>
+            </select>
+            <div class="description">Database storage type (not used for Aurora).</div>
+        </div>
+    </div>
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>Networking</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="AccessCIDR">Trusted IP range</aui-label>
+            <input class="text" type="text" id="AccessCIDR" name="AccessCIDR"
+                   title="Trusted IP range"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR Block allowed to access the Atlassian product. This should be set to a trusted
+                IP range; if you want to give public access use '0.0.0.0/0'.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="AvailabilityZones">Availability Zones</aui-label>
+            <select class="multi-select" size="$availabilityZones.size()" multiple="multiple" id="AvailabilityZones"
+                    name="AvailabilityZones">
+                #foreach( $zone in $availabilityZones )
+                    <option>$zone</option>
+                #end
+            </select>
+            <div class="description">List of Availability Zones to use for the subnets in the VPC. Note: You must
+                specify 2 AZs here; if more are specified only the first 2 will be used.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="InternetFacingLoadBalancer">Make instance internet facing</aui-label>
+            <aui-toggle id="InternetFacingLoadBalancerToggle" label="Make instance internet facing"
+                        checked></aui-toggle>
+            <input id="InternetFacingLoadBalancer" type="hidden" value="true"/>
+            <div class="description">Controls whether the load balancer should be visible to the internet (true) or only
+                within the VPC (false).
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="KeyPairName">SSH Key Pair Name<span
+                    class="aui-icon icon-optional">optional</span></aui-label>
+            <input class="text" type="text" id="KeyPairName" name="KeyPairName"
+                   title="SSH keyname to use with the repository">
+            <div class="description">The EC2 Key Pair to allow SSH access to the instances. If you don't provide one,
+                the Atlassian Standard Infrastructure stack's key pair will be used.
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="PrivateSubnet1CIDR">AZ1 private IP address block</aui-label>
+            <input class="text" type="text" id="PrivateSubnet1CIDR" name="PrivateSubnet1CIDR"
+                   title="AZ1 private IP address block"
+                   value="10.0.0.0/19"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR block for private subnet 1 located in Availability Zone 1.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="PrivateSubnet2CIDR">AZ2 private IP address block</aui-label>
+            <input class="text" type="text" id="PrivateSubnet2CIDR" name="PrivateSubnet2CIDR"
+                   title="AZ2 private IP address block"
+                   value="10.0.32.0/19"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR block for private subnet 2 located in Availability Zone 2.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="PublicSubnet1CIDR">AZ1 public IP address block</aui-label>
+            <input class="text" type="text" id="PublicSubnet1CIDR" name="PublicSubnet1CIDR"
+                   title="AZ1 public IP address block"
+                   value="10.0.128.0/19"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR Block for the public DMZ subnet 1 located in Availability Zone 1
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="PublicSubnet2CIDR">AZ2 public IP address block</aui-label>
+            <input class="text" type="text" id="PublicSubnet2CIDR" name="PublicSubnet2CIDR"
+                   title="AZ2 public IP address block"
+                   value="10.0.144.0/19"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR Block for the public DMZ subnet 2 located in Availability Zone 2
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="SSLCertificateARN">SSL Certificate ARN<span
+                    class="aui-icon icon-optional">optional</span></aui-label>
+            <input class="text" type="text" id="SSLCertificateARN" name="SSLCertificateARN"
+                   title="SSL Certificate ARN">
+            <div class="description">Amazon Resource Name (ARN) of your SSL certificate. Supplying this will
+                automatically enable HTTPS on the product and load balancer, configured to use the corresponding
+                certificate. If you want to use your own certificate that you generated outside of Amazon, you need to
+                first import it to AWS Certificate Manager. After a successful import, you’ll receive the ARN. If you
+                want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN
+                after it’s successfully created.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="VPCCIDR">IP address block for the VPC</aui-label>
+            <input class="text" type="text" id="VPCCIDR" name="VPCCIDR"
+                   title="IP address block for the VPC"
+                   value="10.0.0.0/16"
+                   pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
+            <div class="description">CIDR Block for the VPC</div>
+        </div>
+    </div>
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>DNS (Optional)</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="CustomDnsName">Existing DNS name</aui-label>
+            <input class="text" type="text" id="CustomDnsName" name="CustomDnsName"
+                   title="Existing DNS name">
+            <div class="description">Use custom existing DNS name for your Data Center instance. This will take
+                precedence over HostedZone. Please note: you must own the domain and configure it to point at the load
+                balancer.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="HostedZone">Route 53 Hosted Zone</aui-label>
+            <input class="text" type="text" id="HostedZone" name="HostedZone"
+                   title="Route 53 Hosted Zone">
+            <div class="description">The domain name of the Route53 PRIVATE Hosted Zone in which to create CNAMEs</div>
+        </div>
+    </div>
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>Application Tuning (Optional)</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="TomcatContextPath">Tomcat Context Path</aui-label>
+            <input class="text" type="text" id="TomcatContextPath" name="TomcatContextPath"
+                   title="Tomcat Context Path">
+            <div class="description">The context path of this web application, which is matched against the beginning of
+                each request URI to select the appropriate web application for processing. If used, must include leading
+                "/"
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatContextPath">Tomcat Context Path</aui-label>
+            <input class="text" type="text" id="TomcatContextPath" name="TomcatContextPath"
+                   title="Tomcat Context Path">
+            <div class="description">The context path of this web application, which is matched against the beginning of
+                each request URI to select the appropriate web application for processing. If used, must include leading
+                "/"
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="CatalinaOpts">Catalina options</aui-label>
+            <input class="text" type="text" id="CatalinaOpts" name="CatalinaOpts"
+                   title="Catalina options">
+            <div class="description">Pass in any additional jvm options to tune Catalina</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="JvmHeapOverride">JVM Heap Size Override</aui-label>
+            <input class="text" type="text" id="JvmHeapOverride" name="JvmHeapOverride"
+                   title="JVM Heap Size Override">
+            <div class="description">Override the default amount of memory to allocate to the JVM for your instance type
+                - set size in meg or gig e.g. 1024m or 1g
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBPoolMaxSize">DB Pool Maximum Size</aui-label>
+            <input class="text" type="number" min="5" value="20" id="DBPoolMaxSize" name="DBPoolMaxSize"
+                   title="DB Pool Maximum Size">
+            <div class="description">The maximum number of database connections that can be opened at any time.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBPoolMinSize">DB Pool Minimum Size</aui-label>
+            <input class="text" type="number" min="5" value="20" id="DBPoolMinSize" name="DBPoolMinSize"
+                   title="DB Pool Minimum Size">
+            <div class="description">The maximum number of database connections that can be opened at any time.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBMaxIdle">DB Maximum Idle</aui-label>
+            <input class="text" type="number" min="5" value="20" id="DBMaxIdle" name="DBMaxIdle"
+                   title="DB Maximum Idle">
+            <div class="description">The maximum number of database connections that are allowed to remain idle in the
+                pool
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBMaxWaitMillis">DB Maximum Wait</aui-label>
+            <input class="text" type="number" min="5" value="10000" id="DBMaxWaitMillis" name="DBMaxWaitMillis"
+                   title="DB Maximum Wait">
+            <div class="description">The length of time (in milliseconds) that Jira is allowed to wait for a database
+                connection to become available (while there are no free ones available in the pool), before returning an
+                error
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBMinEvictableIdleTimeMillis">DB Minimum Evictable Idle Time</aui-label>
+            <input class="text" type="number" min="5" value="180000" id="DBMinEvictableIdleTimeMillis"
+                   name="DBMinEvictableIdleTimeMillis"
+                   title="DB Minimum Evictable Idle Time">
+            <div class="description">The minimum amount of time an object may sit idle in the database connection pool
+                before it is eligible for eviction by the idle object eviction
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBMinIdle">DB Minimum Idle Connections</aui-label>
+            <input class="text" type="number" min="1" value="10" id="DBMinIdle" name="DBMinIdle"
+                   title="DB Minimum Idle Connections">
+            <div class="description">The minimum number of idle database connections that are kept open at any time
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBRemoveAbandoned">DB Remove Abandoned?</aui-label>
+            <aui-toggle id="DBRemoveAbandonedToggle" label="DB Remove Abandoned?" checked></aui-toggle>
+            <input id="DBRemoveAbandoned" type="hidden" value="true"/>
+            <div class="description">Flag to remove abandoned database connections if they exceed the Removed Abandoned
+                Timeout.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBRemoveAbandonedTimeout">DB Remove Abandoned Timeout</aui-label>
+            <input class="text" type="number" min="1" value="60" id="DBRemoveAbandonedTimeout"
+                   name="DBRemoveAbandonedTimeout"
+                   title="DB Remove Abandoned Timeout">
+            <div class="description">The length of time (in seconds) that a database connection can be idle before it is
+                considered abandoned
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBTestOnBorrow">DB Test On Borrow?</aui-label>
+            <aui-toggle id="DBTestOnBorrowToggle" label="DB Test On Borrow?"></aui-toggle>
+            <input id="DBTestOnBorrow" type="hidden" value="false"/>
+            <div class="description">Tests if the database connection is valid when it is borrowed from the database
+                connection pool by Jira
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBTestWhileIdle">DB Test While Idle?</aui-label>
+            <aui-toggle id="DBTestWhileIdleToggle" label="DB Test While Idle?" checked></aui-toggle>
+            <input id="DBTestWhileIdle" type="hidden" value="true"/>
+            <div class="description">Periodically tests if the database connection is valid when it is idle</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBTimeBetweenEvictionRunsMillis">DB Time Between Eviction Runs</aui-label>
+            <input class="text" type="number" min="1000" value="60000" id="DBTimeBetweenEvictionRunsMillis"
+                   name="DBTimeBetweenEvictionRunsMillis"
+                   title="DB Time Between Eviction Runs">
+            <div class="description">The number of milliseconds to sleep between runs of the idle object eviction
+                thread. When non-positive, no idle object eviction thread will be run.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="MailEnabled">Enable App to Process Email</aui-label>
+            <aui-toggle id="MailEnabledToggle" label="Enable App to Process Email" checked></aui-toggle>
+            <input id="MailEnabled" type="hidden" value="true"/>
+            <div class="description">Enable mail processing and sending</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatAcceptCount">Tomcat Accept Count</aui-label>
+            <input class="text" type="number" min="1" value="10" id="TomcatAcceptCount"
+                   name="TomcatAcceptCount"
+                   title="Tomcat Accept Count">
+            <div class="description">The maximum queue length for incoming connection requests when all possible request
+                processing threads are in use.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatConnectionTimeout">Tomcat Connection Timeout</aui-label>
+            <input class="text" type="number" min="1" value="2000" id="TomcatConnectionTimeout"
+                   name="TomcatConnectionTimeout"
+                   title="Tomcat Connection Timeout">
+            <div class="description">The number of milliseconds this Connector will wait, after accepting a connection,
+                for the request URI line to be presented.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatDefaultConnectorPort">Tomcat Default Connector Port</aui-label>
+            <input class="text" type="number" min="80" value="8080" id="TomcatDefaultConnectorPort"
+                   name="TomcatDefaultConnectorPort"
+                   title="Tomcat Default Connector Port">
+            <div class="description">The port on which to serve the application.</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatEnableLookups">Tomcat Enable DNS Lookups</aui-label>
+            <aui-toggle id="TomcatEnableLookupsToggle" label="Tomcat Enable DNS Lookups"></aui-toggle>
+            <input id="TomcatEnableLookups" type="hidden" value="false"/>
+            <div class="description">Set to true if you want calls to request.getRemoteHost() to perform DNS lookups in
+                order to return the actual host name of the remote client.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatMaxThreads">Tomcat Maximum Threads</aui-label>
+            <input class="text" type="number" min="1" value="200" id="TomcatMaxThreads"
+                   name="TomcatMaxThreads"
+                   title="Tomcat Maximum Threads">
+            <div class="description">The maximum number of request processing threads to be created by this Connector,
+                which therefore determines the maximum number of simultaneous requests that can be handled.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatMinSpareThreads">Tomcat Minimum Spare Threads</aui-label>
+            <input class="text" type="number" min="1" value="10" id="TomcatMinSpareThreads"
+                   name="TomcatMinSpareThreads"
+                   title="Tomcat Minimum Spare Threads">
+            <div class="description">The minimum number of threads always kept running.</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatProtocol">Tomcat Protocol</aui-label>
+            <input class="text" id="TomcatProtocol"
+                   name="TomcatProtocol"
+                   value="HTTP/1.1"
+                   title="Tomcat Protocol">
+            <div class="description">Sets the protocol to handle incoming traffic.</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatRedirectPort">Tomcat Redirect Port</aui-label>
+            <input class="text" type="number" min="80" value="8443" id="TomcatRedirectPort"
+                   name="TomcatRedirectPort"
+                   title="Tomcat Redirect Port">
+            <div class="description">The port number for Catalina to use when automatically redirecting a non-SSL
+                connector actioning a redirect to a SSL URI.
+            </div>
+        </div>
+    </div>
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>AWS Quick Start Configuration</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="QSS3BucketName">Quick Start S3 Bucket Name</aui-label>
+            <input class="text"
+                   type="text"
+                   id="QSS3BucketName"
+                   name="QSS3BucketName"
+                   value="aws-quickstart"
+                   title="Quick Start S3 Bucket Name">
+            <div class="description">S3 bucket name for the Quick Start assets. Quick Start bucket name can include
+                numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+                (-).
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="QSS3KeyPrefix">Quick Start S3 Key Prefix</aui-label>
+            <input class="text"
+                   type="text"
+                   id="QSS3KeyPrefix"
+                   name="QSS3KeyPrefix"
+                   value="quickstart-atlassian-jira/"
+                   title="Quick Start S3 Key Prefix">
+            <div class="description">S3 key prefix for the Quick Start assets. Quick Start key prefix can include
+                numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="ExportPrefix">ASI Identifier</aui-label>
+            <input class="text"
+                   type="text"
+                   id="ExportPrefix"
+                   name="ExportPrefix"
+                   value="ATL-"
+                   title="ASI Identifier">
+            <div class="description">Identifier used in all variables (VPCID, SubnetIDs, KeyName) exported from this
+                deployment's Atlassian Standard Infrastructure. Use different identifiers if you're deploying multiple
+                Atlassian Standard Infrastructures in the same AWS region.
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="aui-button aui-button-primary">Build Infrastructure</button>
+</form>
+<script type="text/javascript">
+
+    $("#DBMultiAZToggle").change(function () {
+        var isChecked = $("#DBMultiAZToggle").attr('checked') === 'checked';
+        $("#DBMultiAZ").val(isChecked);
+    });
+
+    $("#DBStorageEncryptedToggle").change(function () {
+        var isChecked = $("#DBStorageEncryptedToggle").attr('checked') === 'checked';
+        $("#DBStorageEncrypted").val(isChecked);
+    });
+
+    $("#InternetFacingLoadBalancerToggle").change(function () {
+        var isChecked = $("#InternetFacingLoadBalancerToggle").attr('checked') === 'checked';
+        $("#InternetFacingLoadBalancer").val(isChecked);
+    });
+
+    $("#DBRemoveAbandonedToggle").change(function () {
+        var isChecked = $("#DBRemoveAbandonedToggle").attr('checked') === 'checked';
+        $("#DBRemoveAbandoned").val(isChecked);
+    });
+
+    $("#DBTestOnBorrowToggle").change(function () {
+        var isChecked = $("#DBTestOnBorrowToggle").attr('checked') === 'checked';
+        $("#DBTestOnBorrow").val(isChecked);
+    });
+
+    $("#DBTestWhileIdleToggle").change(function () {
+        var isChecked = $("#DBTestWhileIdleToggle").attr('checked') === 'checked';
+        $("#DBTestWhileIdle").val(isChecked);
+    });
+
+    $("#MailEnabledToggle").change(function () {
+        var isChecked = $("#MailEnabledToggle").attr('checked') === 'checked';
+        $("#MailEnabled").val(isChecked);
+    });
+
+    $("#TomcatEnableLookupsToggle").change(function () {
+        var isChecked = $("#TomcatEnableLookupsToggle").attr('checked') === 'checked';
+        $("#TomcatEnableLookups").val(isChecked);
+    });
+</script>
+</body>
+</html>
