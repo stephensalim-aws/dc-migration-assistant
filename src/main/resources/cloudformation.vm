@@ -7,6 +7,7 @@
     $webResourceManager.requireResource("com.atlassian.auiplugin:aui-forms")
     $webResourceManager.requireResource("com.atlassian.auiplugin:aui-progress-tracker")
     $webResourceManager.requireResource("com.aws.apn.migration.serverPlugin:resources")
+    $webResourceManager.requireResource("com.atlassian.auiplugin:aui-toggle")
 
 
 </head>
@@ -16,8 +17,8 @@
     <div class="field-group">
         <aui-label><strong>Jira Setup</strong></aui-label>
         <div class="field-group">
-            <aui-label for="jira-product">Jira Product<span class="aui-icon icon-required">required</span></aui-label>
-            <select class="select" id="jira-product" name="jira-product">
+            <aui-label for="JiraProduct">Jira Product<span class="aui-icon icon-required">required</span></aui-label>
+            <select class="select" id="JiraProduct" name="JiraProduct">
                 <option>Core</option>
                 <option selected>Software</option>
                 <option>ServiceDesk</option>
@@ -25,8 +26,8 @@
             <div class="description">The Jira product to install.</div>
         </div>
         <div class="field-group">
-            <aui-label for="jira-version">Version<span class="aui-icon icon-required">required</span></aui-label>
-            <input class="text" type="text" id="jira-version" name="jira-version" title="Version">
+            <aui-label for="JiraVersion">Version<span class="aui-icon icon-required">required</span></aui-label>
+            <input class="text" type="text" id="JiraVersion" name="JiraVersion" title="Version">
             <div class="description">The version of Jira Software or Jira Service Desk to install. Find valid versions
                 at <a
                         href="https://confluence.atlassian.com/x/TVlNLg">Jira Software</a>, <a
@@ -41,8 +42,8 @@
 
 
         <div class="field-group">
-            <aui-label for="cloudwatch-integration">CloudWatch Integration</aui-label>
-            <select class="select" id="cloudwatch-integration" name="cloudwatch-integration">
+            <aui-label for="CloudWatchIntegration">CloudWatch Integration</aui-label>
+            <select class="select" id="CloudWatchIntegration" name="CloudWatchIntegration">
                 <option>Off</option>
                 <option>Metrics Only</option>
                 <option selected>Metrics and Logs</option>
@@ -54,8 +55,8 @@
 
 
         <div class="field-group">
-            <aui-label for="cluster-node-instance-type">Cluster Node Instance Type</aui-label>
-            <select class="select" id="cluster-node-instance-type" name="cluster-node-instance-type">
+            <aui-label for="ClusterNodeInstanceType">Cluster Node Instance Type</aui-label>
+            <select class="select" id="ClusterNodeInstanceType" name="ClusterNodeInstanceType">
                 <option>c4.large</option>
                 <option>c4.xlarge</option>
                 <option>c4.2xlarge</option>
@@ -151,28 +152,156 @@
         </div>
 
         <div class="field-group">
-            <aui-label for="cluster-node-max">Maximum number of cluster nodes</aui-label>
-            <input class="text" type="number" min="1" max="20" id="cluster-node-max" name="cluster-node-max"
+            <aui-label for="ClusterNodeMax">Maximum number of cluster nodes</aui-label>
+            <input class="text" type="number" min="1" max="20" value="1" id="ClusterNodeMax" name="ClusterNodeMax"
                    title="Maximum number of cluster nodes">
             <div class="description">Maximum number of nodes in the cluster.</div>
         </div>
 
         <div class="field-group">
-            <aui-label for="cluster-node-min">Minimum number of cluster nodes</aui-label>
-            <input class="text" type="number" min="1" max="20" id="cluster-node-min" name="cluster-node-min"
+            <aui-label for="ClusterNodeMin">Minimum number of cluster nodes</aui-label>
+            <input class="text" type="number" min="1" max="20" value="1" id="ClusterNodeMin" name="ClusterNodeMin"
                    title="Minumum number of cluster nodes">
             <div class="description">Minumum number of nodes in the cluster.</div>
         </div>
 
         <div class="field-group">
-            <aui-label for="cluster-node-volume-size">Cluster node instance volume size</aui-label>
-            <input class="text" type="number" min="50" id="cluster-node-volume-size" name="cluster-node-volume-size"
+            <aui-label for="ClusterNodeVolumeSize">Cluster node instance volume size</aui-label>
+            <input class="text" type="number" min="50" value="50" id="ClusterNodeVolumeSize"
+                   name="ClusterNodeVolumeSize"
                    title="Cluster node instance volume size">
-            <div class="description">Size of cluster node root volume in Gb (note - size based upon Application indexes
-                x 4)
+            <div class="description">Size of cluster node root volume in Gb (note
+                <option>size based upon Application indexes
+                    x 4)
             </div>
         </div>
 
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationRepository">Deployment Automation Git Repository URL</aui-label>
+            <input class="text" type="text" id="DeploymentAutomationRepository" name="DeploymentAutomationRepository"
+                   title="Deployment Automation Git Repository URL" style="max-width: 500px;"
+                   value="https://bitbucket.org/atlassian/dc-deployments-automation.git">
+            <div class="description">The deployment automation repository to use for per-node initialization. Leave this
+                as default unless you have customizations.
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationBranch">Deployment Automation Branch</aui-label>
+            <input class="text" type="text" id="DeploymentAutomationBranch" name="DeploymentAutomationBranch"
+                   title="Deployment Automation Branch"
+                   value="master">
+            <div class="description">The deployment automation repository branch to pull from.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationPlaybook">The Ansible playbook to invoke to initialize the instance
+            </aui-label>
+            <input class="text" type="text" id="DeploymentAutomationPlaybook" name="DeploymentAutomationPlaybook"
+                   title="The Ansible playbook to invoke to initialize the instance"
+                   value="aws_jira_dc_node.yml">
+            <div class="description">The Ansible playbook to invoke to initialise the Jira node on first start.</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationKeyName">SSH keyname to use with the repository<span
+                    class="aui-icon icon-optional">optional</span></aui-label>
+            <input class="text" type="text" id="DeploymentAutomationKeyName" name="DeploymentAutomationKeyName"
+                   title="SSH keyname to use with the repository">
+            <div class="description">Named Key Pair name to use with this repository. The key should be imported into
+                the SSM parameter store. (Optional)
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DeploymentAutomationCustomParams">Custom command-line parameters for Ansible<span
+                    class="aui-icon icon-optional">optional</span></aui-label>
+            <input class="text" type="text" id="DeploymentAutomationCustomParams"
+                   name="DeploymentAutomationCustomParams"
+                   title="Custom command-line parameters for Ansible">
+            <div class="description">Additional command-line options for the `ansible-playbook` command. See <a
+                    href="https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md">here</a> for
+                more information about overriding parameters. (Optional)
+            </div>
+        </div>
+    </div>
+    <div class="field-group">
+        <aui-label><strong>Database</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="DBEngine">The database engine to deploy with</aui-label>
+            <select class="select" id="DBEngine" name="DBEngine">
+                <option selected>PostgreSQL</option>
+                <option>Amazon Aurora PostgreSQL</option>
+            </select>
+            <div class="description">Database Engine to use for the application. PostgreSQL or Amazon Aurora
+                PostgreSQL.
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBInstanceClass">Database instance class</aui-label>
+            <select class="select" id="DBInstanceClass" name="DBInstanceClass">
+                <option selected>db.m5.large</option>
+                <option>db.m5.xlarge</option>
+                <option>db.m5.2xlarge</option>
+                <option>db.m5.4xlarge</option>
+                <option>db.m5.12xlarge</option>
+                <option>db.m5.24xlarge</option>
+                <option>db.r5.large</option>
+                <option>db.r5.xlarge</option>
+                <option>db.r5.2xlarge</option>
+                <option>db.r5.4xlarge</option>
+                <option>db.r5.12xlarge</option>
+                <option>db.r5.24xlarge</option>
+                <option>db.r4.large</option>
+                <option>db.r4.xlarge</option>
+                <option>db.r4.2xlarge</option>
+                <option>db.r4.4xlarge</option>
+                <option>db.r4.8xlarge</option>
+                <option>db.r4.16xlarge</option>
+                <option>db.m4.large</option>
+                <option>db.m4.xlarge</option>
+                <option>db.m4.2xlarge</option>
+                <option>db.m4.4xlarge</option>
+                <option>db.m4.10xlarge</option>
+                <option>db.m4.16xlarge</option>
+                <option>db.t3.medium</option>
+                <option>db.t3.large</option>
+                <option>db.t3.xlarge</option>
+                <option>db.t3.2xlarge</option>
+                <option>db.t2.medium</option>
+                <option>db.t2.large</option>
+                <option>db.t2.xlarge</option>
+                <option>db.t2.2xlarge</option>
+            </select>
+            <div class="description">RDS instance type (must be r family if using Aurora).</div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBIops">RDS Provisioned IOPS</aui-label>
+            <input class="text" type="number" min="1000" value="1000" id="DBIops" name="DBIops"
+                   title="RDS Provisioned IOPS">
+            <div class="description">Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only
+                used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00
+                (not used for Aurora).
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBMasterUserPassword">Master (admin) password<span
+                    class="aui-icon icon-required">required</span></aui-label>
+            <input class="text" type="text" id="DBMasterUserPassword" name="DBMasterUserPassword"
+                   title="RDS Provisioned IOPS">
+            <div class="description">Password for the master ('postgres') account. Must be at least 8 characters and
+                include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+            </div>
+        </div>
+
+        <div class="field-group">
+            <aui-label for="DBMultiAZ">Enable RDS Multi-AZ deployment</aui-label>
+            <aui-toggle id="DBMultiAZ" label="Enable RDS Multi-AZ deployment"></aui-toggle>
+            <div class="description">Whether to provision a multi-AZ RDS instance.</div>
+        </div>
     </div>
 </form>
 </body>
