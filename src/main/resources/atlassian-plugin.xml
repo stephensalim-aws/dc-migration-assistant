@@ -45,6 +45,10 @@
              class="com.aws.apn.migration.serverPlugin.adminUI.DeployCloudformationServlet">
         <url-pattern>/aws/cloudformation</url-pattern>
     </servlet>
+    <servlet key="cloudformation-deployment-servlet"
+             class="com.aws.apn.migration.serverPlugin.adminUI.ProcessCloudformationServlet">
+        <url-pattern>/aws/cfnstatus</url-pattern>
+    </servlet>
 
     <webwork1 key="cloudformationDeployment" name="Deploy CloudFormation Environment" class="java.lang.Object">
         <actions>

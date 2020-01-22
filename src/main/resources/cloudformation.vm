@@ -13,7 +13,7 @@
 </head>
 <body>
 <h2>Deploy Infrastructure</h2>
-<form class="aui">
+<form class="aui" action="./cfnstatus" method="post" enctype="application/json">
     <div class="field-group">
         <aui-label style="text-align: left;"><strong>Jira Setup</strong></aui-label>
         <div class="field-group">
@@ -27,7 +27,7 @@
         </div>
         <div class="field-group">
             <aui-label for="JiraVersion">Version<span class="aui-icon icon-required">required</span></aui-label>
-            <input class="text" type="text" id="JiraVersion" name="JiraVersion" title="Version">
+            <input class="text" type="text" id="JiraVersion" value="8.5.3" name="JiraVersion" title="Version">
             <div class="description">The version of Jira Software or Jira Service Desk to install. Find valid versions
                 at <a
                         href="https://confluence.atlassian.com/x/TVlNLg">Jira Software</a>, <a
@@ -288,7 +288,7 @@
         <div class="field-group">
             <aui-label for="DBMasterUserPassword">Master (admin) password<span
                     class="aui-icon icon-required">required</span></aui-label>
-            <input class="text" type="text" id="DBMasterUserPassword" name="DBMasterUserPassword"
+            <input class="text" type="password" id="DBMasterUserPassword" name="DBMasterUserPassword"
                    title="RDS Provisioned IOPS">
             <div class="description">Password for the master ('postgres') account. Must be at least 8 characters and
                 include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
@@ -297,14 +297,15 @@
 
         <div class="field-group">
             <aui-label for="DBMultiAZ">Enable RDS Multi-AZ deployment</aui-label>
-            <aui-toggle id="DBMultiAZ" label="Enable RDS Multi-AZ deployment"></aui-toggle>
+            <aui-toggle id="DBMultiAZToggle" label="Enable RDS Multi-AZ deployment" checked></aui-toggle>
+            <input id="DBMultiAZ" type="hidden" value="true"/>
             <div class="description">Whether to provision a multi-AZ RDS instance.</div>
         </div>
 
         <div class="field-group">
             <aui-label for="DBPassword">Application user database password<span
                     class="aui-icon icon-required">required</span></aui-label>
-            <input class="text" type="text" id="DBPassword" name="DBPassword"
+            <input class="text" type="password" id="DBPassword" name="DBPassword"
                    title="Application user database password">
             <div class="description">Password for the master ('postgres') account. Must be at least 8 characters and
                 include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol.
@@ -322,7 +323,8 @@
 
         <div class="field-group">
             <aui-label for="DBStorageEncrypted">Database encryption</aui-label>
-            <aui-toggle id="DBStorageEncrypted" label="Database encryption"></aui-toggle>
+            <aui-toggle id="DBStorageEncryptedToggle" label="Database encryption"></aui-toggle>
+            <input id="DBStorageEncrypted" type="hidden" value="false"/>
             <div class="description">Whether or not to encrypt the database.</div>
         </div>
 
@@ -360,7 +362,9 @@
         </div>
         <div class="field-group">
             <aui-label for="InternetFacingLoadBalancer">Make instance internet facing</aui-label>
-            <aui-toggle id="InternetFacingLoadBalancer" label="Make instance internet facing"></aui-toggle>
+            <aui-toggle id="InternetFacingLoadBalancerToggle" label="Make instance internet facing"
+                        checked></aui-toggle>
+            <input id="InternetFacingLoadBalancer" type="hidden" value="true"/>
             <div class="description">Controls whether the load balancer should be visible to the internet (true) or only
                 within the VPC (false).
             </div>
@@ -452,6 +456,284 @@
             <div class="description">The domain name of the Route53 PRIVATE Hosted Zone in which to create CNAMEs</div>
         </div>
     </div>
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>Application Tuning (Optional)</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="TomcatContextPath">Tomcat Context Path</aui-label>
+            <input class="text" type="text" id="TomcatContextPath" name="TomcatContextPath"
+                   title="Tomcat Context Path">
+            <div class="description">The context path of this web application, which is matched against the beginning of
+                each request URI to select the appropriate web application for processing. If used, must include leading
+                "/"
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatContextPath">Tomcat Context Path</aui-label>
+            <input class="text" type="text" id="TomcatContextPath" name="TomcatContextPath"
+                   title="Tomcat Context Path">
+            <div class="description">The context path of this web application, which is matched against the beginning of
+                each request URI to select the appropriate web application for processing. If used, must include leading
+                "/"
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="CatalinaOpts">Catalina options</aui-label>
+            <input class="text" type="text" id="CatalinaOpts" name="CatalinaOpts"
+                   title="Catalina options">
+            <div class="description">Pass in any additional jvm options to tune Catalina</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="JvmHeapOverride">JVM Heap Size Override</aui-label>
+            <input class="text" type="text" id="JvmHeapOverride" name="JvmHeapOverride"
+                   title="JVM Heap Size Override">
+            <div class="description">Override the default amount of memory to allocate to the JVM for your instance type
+                - set size in meg or gig e.g. 1024m or 1g
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBPoolMaxSize">DB Pool Maximum Size</aui-label>
+            <input class="text" type="number" min="5" value="20" id="DBPoolMaxSize" name="DBPoolMaxSize"
+                   title="DB Pool Maximum Size">
+            <div class="description">The maximum number of database connections that can be opened at any time.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBPoolMinSize">DB Pool Minimum Size</aui-label>
+            <input class="text" type="number" min="5" value="20" id="DBPoolMinSize" name="DBPoolMinSize"
+                   title="DB Pool Minimum Size">
+            <div class="description">The maximum number of database connections that can be opened at any time.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBMaxIdle">DB Maximum Idle</aui-label>
+            <input class="text" type="number" min="5" value="20" id="DBMaxIdle" name="DBMaxIdle"
+                   title="DB Maximum Idle">
+            <div class="description">The maximum number of database connections that are allowed to remain idle in the
+                pool
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBMaxWaitMillis">DB Maximum Wait</aui-label>
+            <input class="text" type="number" min="5" value="10000" id="DBMaxWaitMillis" name="DBMaxWaitMillis"
+                   title="DB Maximum Wait">
+            <div class="description">The length of time (in milliseconds) that Jira is allowed to wait for a database
+                connection to become available (while there are no free ones available in the pool), before returning an
+                error
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBMinEvictableIdleTimeMillis">DB Minimum Evictable Idle Time</aui-label>
+            <input class="text" type="number" min="5" value="180000" id="DBMinEvictableIdleTimeMillis"
+                   name="DBMinEvictableIdleTimeMillis"
+                   title="DB Minimum Evictable Idle Time">
+            <div class="description">The minimum amount of time an object may sit idle in the database connection pool
+                before it is eligible for eviction by the idle object eviction
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBMinIdle">DB Minimum Idle Connections</aui-label>
+            <input class="text" type="number" min="1" value="10" id="DBMinIdle" name="DBMinIdle"
+                   title="DB Minimum Idle Connections">
+            <div class="description">The minimum number of idle database connections that are kept open at any time
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBRemoveAbandoned">DB Remove Abandoned?</aui-label>
+            <aui-toggle id="DBRemoveAbandonedToggle" label="DB Remove Abandoned?" checked></aui-toggle>
+            <input id="DBRemoveAbandoned" type="hidden" value="true"/>
+            <div class="description">Flag to remove abandoned database connections if they exceed the Removed Abandoned
+                Timeout.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBRemoveAbandonedTimeout">DB Remove Abandoned Timeout</aui-label>
+            <input class="text" type="number" min="1" value="60" id="DBRemoveAbandonedTimeout"
+                   name="DBRemoveAbandonedTimeout"
+                   title="DB Remove Abandoned Timeout">
+            <div class="description">The length of time (in seconds) that a database connection can be idle before it is
+                considered abandoned
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBTestOnBorrow">DB Test On Borrow?</aui-label>
+            <aui-toggle id="DBTestOnBorrowToggle" label="DB Test On Borrow?"></aui-toggle>
+            <input id="DBTestOnBorrow" type="hidden" value="false"/>
+            <div class="description">Tests if the database connection is valid when it is borrowed from the database
+                connection pool by Jira
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBTestWhileIdle">DB Test While Idle?</aui-label>
+            <aui-toggle id="DBTestWhileIdleToggle" label="DB Test While Idle?" checked></aui-toggle>
+            <input id="DBTestWhileIdle" type="hidden" value="true"/>
+            <div class="description">Periodically tests if the database connection is valid when it is idle</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="DBTimeBetweenEvictionRunsMillis">DB Time Between Eviction Runs</aui-label>
+            <input class="text" type="number" min="1000" value="60000" id="DBTimeBetweenEvictionRunsMillis"
+                   name="DBTimeBetweenEvictionRunsMillis"
+                   title="DB Time Between Eviction Runs">
+            <div class="description">The number of milliseconds to sleep between runs of the idle object eviction
+                thread. When non-positive, no idle object eviction thread will be run.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="MailEnabled">Enable App to Process Email</aui-label>
+            <aui-toggle id="MailEnabledToggle" label="Enable App to Process Email" checked></aui-toggle>
+            <input id="MailEnabled" type="hidden" value="true"/>
+            <div class="description">Enable mail processing and sending</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatAcceptCount">Tomcat Accept Count</aui-label>
+            <input class="text" type="number" min="1" value="10" id="TomcatAcceptCount"
+                   name="TomcatAcceptCount"
+                   title="Tomcat Accept Count">
+            <div class="description">The maximum queue length for incoming connection requests when all possible request
+                processing threads are in use.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatConnectionTimeout">Tomcat Connection Timeout</aui-label>
+            <input class="text" type="number" min="1" value="2000" id="TomcatConnectionTimeout"
+                   name="TomcatConnectionTimeout"
+                   title="Tomcat Connection Timeout">
+            <div class="description">The number of milliseconds this Connector will wait, after accepting a connection,
+                for the request URI line to be presented.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatDefaultConnectorPort">Tomcat Default Connector Port</aui-label>
+            <input class="text" type="number" min="80" value="8080" id="TomcatDefaultConnectorPort"
+                   name="TomcatDefaultConnectorPort"
+                   title="Tomcat Default Connector Port">
+            <div class="description">The port on which to serve the application.</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatEnableLookups">Tomcat Enable DNS Lookups</aui-label>
+            <aui-toggle id="TomcatEnableLookupsToggle" label="Tomcat Enable DNS Lookups"></aui-toggle>
+            <input id="TomcatEnableLookups" type="hidden" value="false"/>
+            <div class="description">Set to true if you want calls to request.getRemoteHost() to perform DNS lookups in
+                order to return the actual host name of the remote client.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatMaxThreads">Tomcat Maximum Threads</aui-label>
+            <input class="text" type="number" min="1" value="200" id="TomcatMaxThreads"
+                   name="TomcatMaxThreads"
+                   title="Tomcat Maximum Threads">
+            <div class="description">The maximum number of request processing threads to be created by this Connector,
+                which therefore determines the maximum number of simultaneous requests that can be handled.
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatMinSpareThreads">Tomcat Minimum Spare Threads</aui-label>
+            <input class="text" type="number" min="1" value="10" id="TomcatMinSpareThreads"
+                   name="TomcatMinSpareThreads"
+                   title="Tomcat Minimum Spare Threads">
+            <div class="description">The minimum number of threads always kept running.</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatProtocol">Tomcat Protocol</aui-label>
+            <input class="text" id="TomcatProtocol"
+                   name="TomcatProtocol"
+                   value="HTTP/1.1"
+                   title="Tomcat Protocol">
+            <div class="description">Sets the protocol to handle incoming traffic.</div>
+        </div>
+        <div class="field-group">
+            <aui-label for="TomcatRedirectPort">Tomcat Redirect Port</aui-label>
+            <input class="text" type="number" min="80" value="8443" id="TomcatRedirectPort"
+                   name="TomcatRedirectPort"
+                   title="Tomcat Redirect Port">
+            <div class="description">The port number for Catalina to use when automatically redirecting a non-SSL
+                connector actioning a redirect to a SSL URI.
+            </div>
+        </div>
+    </div>
+    <div class="field-group">
+        <aui-label style="text-align: left;"><strong>AWS Quick Start Configuration</strong></aui-label>
+        <div class="field-group">
+            <aui-label for="QSS3BucketName">Quick Start S3 Bucket Name</aui-label>
+            <input class="text"
+                   type="text"
+                   id="QSS3BucketName"
+                   name="QSS3BucketName"
+                   value="aws-quickstart"
+                   title="Quick Start S3 Bucket Name">
+            <div class="description">S3 bucket name for the Quick Start assets. Quick Start bucket name can include
+                numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+                (-).
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="QSS3KeyPrefix">Quick Start S3 Key Prefix</aui-label>
+            <input class="text"
+                   type="text"
+                   id="QSS3KeyPrefix"
+                   name="QSS3KeyPrefix"
+                   value="quickstart-atlassian-jira/"
+                   title="Quick Start S3 Key Prefix">
+            <div class="description">S3 key prefix for the Quick Start assets. Quick Start key prefix can include
+                numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
+            </div>
+        </div>
+        <div class="field-group">
+            <aui-label for="ExportPrefix">ASI Identifier</aui-label>
+            <input class="text"
+                   type="text"
+                   id="ExportPrefix"
+                   name="ExportPrefix"
+                   value="ATL-"
+                   title="ASI Identifier">
+            <div class="description">Identifier used in all variables (VPCID, SubnetIDs, KeyName) exported from this
+                deployment's Atlassian Standard Infrastructure. Use different identifiers if you're deploying multiple
+                Atlassian Standard Infrastructures in the same AWS region.
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="aui-button aui-button-primary">Build Infrastructure</button>
 </form>
+<script type="text/javascript">
+
+    $("#DBMultiAZToggle").change(function () {
+        var isChecked = $("#DBMultiAZToggle").attr('checked') === 'checked';
+        $("#DBMultiAZ").val(isChecked);
+    });
+
+    $("#DBStorageEncryptedToggle").change(function () {
+        var isChecked = $("#DBStorageEncryptedToggle").attr('checked') === 'checked';
+        $("#DBStorageEncrypted").val(isChecked);
+    });
+
+    $("#InternetFacingLoadBalancerToggle").change(function () {
+        var isChecked = $("#InternetFacingLoadBalancerToggle").attr('checked') === 'checked';
+        $("#InternetFacingLoadBalancer").val(isChecked);
+    });
+
+    $("#DBRemoveAbandonedToggle").change(function () {
+        var isChecked = $("#DBRemoveAbandonedToggle").attr('checked') === 'checked';
+        $("#DBRemoveAbandoned").val(isChecked);
+    });
+
+    $("#DBTestOnBorrowToggle").change(function () {
+        var isChecked = $("#DBTestOnBorrowToggle").attr('checked') === 'checked';
+        $("#DBTestOnBorrow").val(isChecked);
+    });
+
+    $("#DBTestWhileIdleToggle").change(function () {
+        var isChecked = $("#DBTestWhileIdleToggle").attr('checked') === 'checked';
+        $("#DBTestWhileIdle").val(isChecked);
+    });
+
+    $("#MailEnabledToggle").change(function () {
+        var isChecked = $("#MailEnabledToggle").attr('checked') === 'checked';
+        $("#MailEnabled").val(isChecked);
+    });
+
+    $("#TomcatEnableLookupsToggle").change(function () {
+        var isChecked = $("#TomcatEnableLookupsToggle").attr('checked') === 'checked';
+        $("#TomcatEnableLookups").val(isChecked);
+    });
+</script>
 </body>
 </html>
