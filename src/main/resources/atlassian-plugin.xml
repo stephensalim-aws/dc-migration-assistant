@@ -31,7 +31,6 @@
         <label key="migration-item.label"/>
         <link linkId="migration-admin-link">/plugins/servlet/aws/start</link>
     </web-item>
-
     <rest key="rest" path="/migration-admin" version="1.0">
         <description>Provides REST resources for the admin UI.</description>
     </rest>
@@ -49,13 +48,4 @@
              class="com.aws.apn.migration.serverPlugin.adminUI.ProcessCloudformationServlet">
         <url-pattern>/aws/cfnstatus</url-pattern>
     </servlet>
-
-    <webwork1 key="cloudformationDeployment" name="Deploy CloudFormation Environment" class="java.lang.Object">
-        <actions>
-            <action name="com.aws.apn.migration.serverPlugin.action.CreateCloudFormation" alias="QuickCreateUserIssue">
-                <view name="createenvironment">cloudformation.vm</view>
-            </action>
-        </actions>
-    </webwork1>
-
 </atlassian-plugin>

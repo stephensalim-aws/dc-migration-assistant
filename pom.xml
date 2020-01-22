@@ -102,6 +102,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
             <version>4.0.6</version>
@@ -110,6 +116,11 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.2.2-atlassian-1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.1.1</version>
         </dependency>
         <!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
         <!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
@@ -159,12 +170,17 @@
                         <!-- Add package import here -->
                         <Import-Package>org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
-                            org.w3c.dom.*;resolution:="optional",
                             *;version="0";resolution:=optional
                         </Import-Package>
                         <!-- Ensure plugin is spring powered -->
                         <Spring-Context>*</Spring-Context>
                     </instructions>
+                    <systemProperties>
+                        <property>
+                            <name>atlassian.org.osgi.framework.bootdelegation</name>
+                            <value>sun.*,com.sun.*</value>
+                        </property>
+                    </systemProperties>
                 </configuration>
             </plugin>
             <plugin>
@@ -264,7 +280,7 @@
         </repository>
     </repositories>
     <properties>
-        <jira.version>7.13.0</jira.version>
+        <jira.version>8.5.3</jira.version>
         <amps.version>8.0.2</amps.version>
         <allowGoogleTracking>false</allowGoogleTracking>
         <aws.api.version>1.11.710</aws.api.version>
