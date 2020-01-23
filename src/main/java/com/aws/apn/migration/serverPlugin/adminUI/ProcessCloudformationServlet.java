@@ -118,10 +118,7 @@ public class ProcessCloudformationServlet extends HttpServlet {
 
             Gson gson = new Gson();
 
-
             try {
-
-
                 CreateStackRequest createStackRequest = new CreateStackRequest().withStackName("jira-dc-autocreated")
                         .withTemplateURL(TEMPLATE_URL)
                         .withParameters(this.buildParameterList(request.getParameterNames(), request))
@@ -149,9 +146,14 @@ public class ProcessCloudformationServlet extends HttpServlet {
             }
         } else {
             context.put("cloudformationStackId", pluginSettings.get(PLUGIN_STORAGE_KEY + ".cloudformationStackId"));
+            context.put("region", region);
+            context.put("accessKey", accessKey);
+            context.put("secretKey", secretKey);
             targetTemplate = "cfnstatus.vm";
         }
-
+        context.put("region", region);
+        context.put("accessKey", accessKey);
+        context.put("secretKey", secretKey);
         response.setContentType("text/html;charset=utf-8");
         renderer.render(targetTemplate, context, response.getWriter());
     }

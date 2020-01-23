@@ -64,6 +64,8 @@ public class DeployCloudformationServlet extends HttpServlet {
         String secretKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".secretKey");
         String accessKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".accessKey");
 
+        pluginSettings.remove(PLUGIN_STORAGE_KEY + ".cloudformationStackId");
+
         createAtlassianKeyPair(region, accessKey, secretKey);
         context.put("availabilityZones", this.getAvailabilityZones(region, accessKey, secretKey));
         context.put("keyPairs", this.getEC2KeyPairs(region, accessKey, secretKey));
