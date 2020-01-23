@@ -1,7 +1,6 @@
 package com.aws.apn.migration.serverPlugin.api;
 
-public interface MyPluginComponent
-{
+public interface MyPluginComponent {
     String getName();
 
 
