@@ -48,4 +48,7 @@
              class="com.aws.apn.migration.serverPlugin.adminUI.ProcessCloudformationServlet">
         <url-pattern>/aws/cfnstatus</url-pattern>
     </servlet>
+    <servlet key="dashboard-step2-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.DashboardStep2Servlet">
+        <url-pattern>/aws/dashboard-step2</url-pattern>
+    </servlet>
 </atlassian-plugin>
