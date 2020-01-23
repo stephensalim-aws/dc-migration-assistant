@@ -20,3 +20,8 @@ Manage from http://localhost:2990/jira/plugins/servlet/upm
 Full documentation is always available at:
 
 https://developer.atlassian.com/display/DOCS/Introduction+to+the+Atlassian+Plugin+SDK
+
+
+#License
+
+This library is licensed under the Apache 2.0 License. 
