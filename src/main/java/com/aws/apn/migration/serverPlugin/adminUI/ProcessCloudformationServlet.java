@@ -6,10 +6,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
-import com.amazonaws.services.cloudformation.model.Capability;
-import com.amazonaws.services.cloudformation.model.CreateStackRequest;
-import com.amazonaws.services.cloudformation.model.CreateStackResult;
-import com.amazonaws.services.cloudformation.model.Parameter;
+import com.amazonaws.services.cloudformation.model.*;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.auth.LoginUriProvider;
@@ -52,47 +49,23 @@ public class ProcessCloudformationServlet extends HttpServlet {
         this.pluginSettingsFactory = pluginSettingsFactory;
     }
 
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String username = userManager.getRemoteUser(request).getUsername();
-        if (username == null || !userManager.isSystemAdmin(userManager.getRemoteUserKey(request))) {
-            redirectToLogin(request, response);
-            return;
-        }
-
-        Gson gson = new Gson();
-
-        Map<String, Object> context = new HashMap<String, Object>();
-        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-
-        String region = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".awsRegion");
-        String secretKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".secretKey");
-        String accessKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".accessKey");
-
-        response.setContentType("text/html;charset=utf-8");
-
-        try {
-
-            AmazonCloudFormation cloudFormation = this.getCloudFormation(region, accessKey, secretKey);
-            CreateStackRequest createStackRequest = new CreateStackRequest().withStackName("Jira DC Autocreated")
-                    .withTemplateURL(TEMPLATE_URL)
-                    .withParameters(this.buildParameterList(request.getParameterNames(), request))
-                    .withCapabilities(Capability.CAPABILITY_AUTO_EXPAND, Capability.CAPABILITY_NAMED_IAM)
-                    .withDisableRollback(false)
-                    .withEnableTerminationProtection(false);
-
-            LOGGER.info(gson.toJson(createStackRequest));
-
-            CreateStackResult createStackResult = cloudFormation.createStack(createStackRequest);
-
-            pluginSettings.put(PLUGIN_STORAGE_KEY + ".cloudformationStackId", createStackResult.getStackId());
-
-            context.put("cloudformationStackId", createStackResult.getStackId());
-
-            renderer.render("cfnstatus.vm", context, response.getWriter());
-        } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
-            renderer.render("error.vm", response.getWriter());
+    public static String toCSV(String[] array) {
+        String result = "";
+        switch (array.length) {
+            case 0: {
+                return "";
+            }
+            case 1: {
+                return array[0];
+            }
+            default: {
+                StringBuilder sb = new StringBuilder();
+                for (String s : array) {
+                    sb.append(s).append(",");
+                }
+                result = sb.deleteCharAt(sb.length() - 1).toString();
+                return result;
+            }
         }
 
     }
@@ -117,15 +90,89 @@ public class ProcessCloudformationServlet extends HttpServlet {
         return cloudFormation;
     }
 
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String username = userManager.getRemoteUser(request).getUsername();
+        if (username == null || !userManager.isSystemAdmin(userManager.getRemoteUserKey(request))) {
+            redirectToLogin(request, response);
+            return;
+        }
+
+        final PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
+        final Map<String, Object> context = new HashMap<>();
+        final String region = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".awsRegion");
+        final String secretKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".secretKey");
+        final String accessKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".accessKey");
+
+        final AmazonCloudFormation cloudFormation = this.getCloudFormation(region, accessKey, secretKey);
+
+        EstimateTemplateCostResult estimateTemplateCostResult = cloudFormation.estimateTemplateCost(new EstimateTemplateCostRequest().withTemplateURL(TEMPLATE_URL)
+                .withParameters(this.buildParameterList(request.getParameterNames(), request)));
+
+        context.put("costEstimateURL", estimateTemplateCostResult.getUrl());
+
+        String targetTemplate = "";
+
+        if (pluginSettings.get(PLUGIN_STORAGE_KEY + ".cloudformationStackId") == null ||
+                pluginSettings.get(PLUGIN_STORAGE_KEY + ".cloudformationStackId").equals("")) {
+
+            Gson gson = new Gson();
+
+
+            try {
+
+
+                CreateStackRequest createStackRequest = new CreateStackRequest().withStackName("jira-dc-autocreated")
+                        .withTemplateURL(TEMPLATE_URL)
+                        .withParameters(this.buildParameterList(request.getParameterNames(), request))
+                        .withCapabilities(Capability.CAPABILITY_AUTO_EXPAND, Capability.CAPABILITY_NAMED_IAM)
+                        .withDisableRollback(false)
+                        .withEnableTerminationProtection(false);
+
+                ValidateTemplateRequest validateTemplateRequest = new ValidateTemplateRequest().withTemplateURL(TEMPLATE_URL);
+
+                ValidateTemplateResult validateTemplateResult = cloudFormation.validateTemplate(validateTemplateRequest);
+
+                LOGGER.info(validateTemplateResult.getDescription());
+
+                LOGGER.info(gson.toJson(createStackRequest));
+
+                CreateStackResult createStackResult = cloudFormation.createStack(createStackRequest);
+
+                pluginSettings.put(PLUGIN_STORAGE_KEY + ".cloudformationStackId", createStackResult.getStackId());
+
+                context.put("cloudformationStackId", createStackResult.getStackId());
+                targetTemplate = "cfncreated.vm";
+            } catch (Exception e) {
+                LOGGER.error(e.getLocalizedMessage());
+                renderer.render("error.vm", response.getWriter());
+            }
+        } else {
+            context.put("cloudformationStackId", pluginSettings.get(PLUGIN_STORAGE_KEY + ".cloudformationStackId"));
+            targetTemplate = "cfnstatus.vm";
+        }
+
+        response.setContentType("text/html;charset=utf-8");
+        renderer.render(targetTemplate, context, response.getWriter());
+    }
+
     private List<Parameter> buildParameterList(Enumeration<String> paramNames, HttpServletRequest request) {
         List<Parameter> parameters = new ArrayList<>();
         while (paramNames.hasMoreElements()) {
             String paramName = paramNames.nextElement();
             if (!paramName.contains("Toggle")) {
-                Parameter parameter = new Parameter().withParameterKey(paramName).withParameterValue(request.getParameter(paramName));
-                parameters.add(parameter);
+                if (paramName.equals("AvailabilityZones")) {
+
+                    Parameter parameter = new Parameter().withParameterKey(paramName).withParameterValue(toCSV(request.getParameterValues(paramName)));
+                    parameters.add(parameter);
+                } else {
+                    Parameter parameter = new Parameter().withParameterKey(paramName).withParameterValue(request.getParameter(paramName));
+                    parameters.add(parameter);
+                }
             }
         }
         return parameters;
     }
+
+
 }

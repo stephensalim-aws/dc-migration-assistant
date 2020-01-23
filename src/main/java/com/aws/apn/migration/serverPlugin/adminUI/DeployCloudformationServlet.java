@@ -6,8 +6,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
-import com.amazonaws.services.ec2.model.AvailabilityZone;
-import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
+import com.amazonaws.services.ec2.model.*;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.auth.LoginUriProvider;
@@ -65,8 +64,12 @@ public class DeployCloudformationServlet extends HttpServlet {
         String secretKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".secretKey");
         String accessKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".accessKey");
 
-        List<String> availabilityZones = this.getAvailabilityZones(region, accessKey, secretKey);
-        context.put("availabilityZones", availabilityZones);
+        createAtlassianKeyPair(region, accessKey, secretKey);
+        context.put("availabilityZones", this.getAvailabilityZones(region, accessKey, secretKey));
+        context.put("keyPairs", this.getEC2KeyPairs(region, accessKey, secretKey));
+        context.put("instanceTypes", this.getAvailableInstanceTypes(region, accessKey, secretKey));
+
+
         response.setContentType("text/html;charset=utf-8");
         renderer.render("cloudformation.vm", context, response.getWriter());
     }
@@ -92,6 +95,36 @@ public class DeployCloudformationServlet extends HttpServlet {
         try (Stream<AvailabilityZone> zoneStream = zones_response.getAvailabilityZones().stream()) {
             return zoneStream.map(AvailabilityZone::getZoneName).sorted().collect(Collectors.toList());
         }
+    }
 
+    private List<String> getEC2KeyPairs(final String region, final String accessKey, final String secretKey) {
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
+        AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(credentialsProvider).withRegion(region).build();
+        DescribeKeyPairsResult describeKeyPairsResult = ec2.describeKeyPairs();
+        try (Stream<KeyPairInfo> keyPairInfoStream = describeKeyPairsResult.getKeyPairs().stream()) {
+            return keyPairInfoStream.map(KeyPairInfo::getKeyName).sorted().collect(Collectors.toList());
+        }
+    }
+
+    private List<String> getAvailableInstanceTypes(final String region, final String accessKey, final String secretKey) {
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
+        AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(credentialsProvider).withRegion(region).build();
+        List<InstanceTypeInfo> typeList = ec2.describeInstanceTypes(new DescribeInstanceTypesRequest()).getInstanceTypes();
+        try (Stream<InstanceTypeInfo> typeListStream = typeList.parallelStream()) {
+            return typeListStream.map(InstanceTypeInfo::getInstanceType).distinct().sorted().collect(Collectors.toList());
+        }
+    }
+
+    private void createAtlassianKeyPair(final String region, final String accessKey, final String secretKey) {
+        final String keyName = "atl-migration-tool-".concat(region);
+        if (!this.getEC2KeyPairs(region, accessKey, secretKey).contains(keyName)) {
+            AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+            AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
+            AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(credentialsProvider).withRegion(region).build();
+            CreateKeyPairRequest keyPairRequest = new CreateKeyPairRequest().withKeyName(keyName);
+            ec2.createKeyPair(keyPairRequest);
+        }
     }
 }

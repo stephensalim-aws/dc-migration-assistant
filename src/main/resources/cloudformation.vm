@@ -55,96 +55,10 @@
         <div class="field-group">
             <aui-label for="ClusterNodeInstanceType">Cluster Node Instance Type</aui-label>
             <select class="select" id="ClusterNodeInstanceType" name="ClusterNodeInstanceType">
-                <option>c4.large</option>
-                <option>c4.xlarge</option>
-                <option>c4.2xlarge</option>
-                <option>c4.4xlarge</option>
-                <option>c4.8xlarge</option>
-                <option>c5.large</option>
-                <option selected>c5.xlarge</option>
-                <option>c5.2xlarge</option>
-                <option>c5.4xlarge</option>
-                <option>c5.9xlarge</option>
-                <option>c5.18xlarge</option>
-                <option>c5d.large</option>
-                <option>c5d.xlarge</option>
-                <option>c5d.2xlarge</option>
-                <option>c5d.4xlarge</option>
-                <option>c5d.9xlarge</option>
-                <option>c5d.18xlarge</option>
-                <option>d2.xlarge</option>
-                <option>d2.2xlarge</option>
-                <option>d2.4xlarge</option>
-                <option>d2.8xlarge</option>
-                <option>h1.2xlarge</option>
-                <option>h1.4xlarge</option>
-                <option>h1.8xlarge</option>
-                <option>h1.16xlarge</option>
-                <option>i3.large</option>
-                <option>i3.xlarge</option>
-                <option>i3.2xlarge</option>
-                <option>i3.4xlarge</option>
-                <option>i3.8xlarge</option>
-                <option>i3.16xlarge</option>
-                <option>i3.metal</option>
-                <option>m4.large</option>
-                <option>m4.xlarge</option>
-                <option>m4.2xlarge</option>
-                <option>m4.4xlarge</option>
-                <option>m4.10xlarge</option>
-                <option>m4.16xlarge</option>
-                <option>m5.large</option>
-                <option>m5.xlarge</option>
-                <option>m5.2xlarge</option>
-                <option>m5.4xlarge</option>
-                <option>m5.12xlarge</option>
-                <option>m5.24xlarge</option>
-                <option>m5d.large</option>
-                <option>m5d.xlarge</option>
-                <option>m5d.2xlarge</option>
-                <option>m5d.4xlarge</option>
-                <option>m5d.12xlarge</option>
-                <option>m5d.24xlarge</option>
-                <option>r4.large</option>
-                <option>r4.xlarge</option>
-                <option>r4.2xlarge</option>
-                <option>r4.4xlarge</option>
-                <option>r4.8xlarge</option>
-                <option>r4.16xlarge</option>
-                <option>r5.large</option>
-                <option>r5.xlarge</option>
-                <option>r5.2xlarge</option>
-                <option>r5.4xlarge</option>
-                <option>r5.12xlarge</option>
-                <option>r5.24xlarge</option>
-                <option>r5d.large</option>
-                <option>r5d.xlarge</option>
-                <option>r5d.2xlarge</option>
-                <option>r5d.4xlarge</option>
-                <option>r5d.12xlarge</option>
-                <option>r5d.24xlarge</option>
-                <option>t2.medium</option>
-                <option>t2.large</option>
-                <option>t2.xlarge</option>
-                <option>t2.2xlarge</option>
-                <option>t3.medium</option>
-                <option>t3.large</option>
-                <option>t3.xlarge</option>
-                <option>t3.2xlarge</option>
-                <option>x1.16xlarge</option>
-                <option>x1.32xlarge</option>
-                <option>x1e.xlarge</option>
-                <option>x1e.2xlarge</option>
-                <option>x1e.4xlarge</option>
-                <option>x1e.8xlarge</option>
-                <option>x1e.16xlarge</option>
-                <option>x1e.32xlarge</option>
-                <option>z1d.large</option>
-                <option>z1d.xlarge</option>
-                <option>z1d.2xlarge</option>
-                <option>z1d.3xlarge</option>
-                <option>z1d.6xlarge</option>
-                <option>z1d.12xlarge</option>
+                #foreach($instanceType in $instanceTypes)
+                    <option #if($instanceType == "c5.xlarge")selected
+                    #end>$instanceType</option>
+                #end
             </select>
             <div class="description">Instance type for the cluster application nodes.</div>
         </div>
@@ -371,10 +285,12 @@
         </div>
 
         <div class="field-group">
-            <aui-label for="KeyPairName">SSH Key Pair Name<span
-                    class="aui-icon icon-optional">optional</span></aui-label>
-            <input class="text" type="text" id="KeyPairName" name="KeyPairName"
-                   title="SSH keyname to use with the repository">
+            <aui-label for="KeyPairName">SSH Key Pair Name</aui-label>
+            <select class="select" size="$keyPairs.size()" id="KeyPairName" name="KeyPairName">
+                #foreach( $keyPair in $keyPairs )
+                    <option>$keyPair</option>
+                #end
+            </select>
             <div class="description">The EC2 Key Pair to allow SSH access to the instances. If you don't provide one,
                 the Atlassian Standard Infrastructure stack's key pair will be used.
             </div>
@@ -384,7 +300,7 @@
             <aui-label for="PrivateSubnet1CIDR">AZ1 private IP address block</aui-label>
             <input class="text" type="text" id="PrivateSubnet1CIDR" name="PrivateSubnet1CIDR"
                    title="AZ1 private IP address block"
-                   value="10.0.0.0/19"
+                   value="10.0.1.0/24"
                    pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
             <div class="description">CIDR block for private subnet 1 located in Availability Zone 1.
             </div>
@@ -393,7 +309,7 @@
             <aui-label for="PrivateSubnet2CIDR">AZ2 private IP address block</aui-label>
             <input class="text" type="text" id="PrivateSubnet2CIDR" name="PrivateSubnet2CIDR"
                    title="AZ2 private IP address block"
-                   value="10.0.32.0/19"
+                   value="10.0.2.0/24"
                    pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
             <div class="description">CIDR block for private subnet 2 located in Availability Zone 2.
             </div>
@@ -402,7 +318,7 @@
             <aui-label for="PublicSubnet1CIDR">AZ1 public IP address block</aui-label>
             <input class="text" type="text" id="PublicSubnet1CIDR" name="PublicSubnet1CIDR"
                    title="AZ1 public IP address block"
-                   value="10.0.128.0/19"
+                   value="10.0.3.0/24"
                    pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
             <div class="description">CIDR Block for the public DMZ subnet 1 located in Availability Zone 1
             </div>
@@ -411,7 +327,7 @@
             <aui-label for="PublicSubnet2CIDR">AZ2 public IP address block</aui-label>
             <input class="text" type="text" id="PublicSubnet2CIDR" name="PublicSubnet2CIDR"
                    title="AZ2 public IP address block"
-                   value="10.0.144.0/19"
+                   value="10.0.4.0/24"
                    pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$">
             <div class="description">CIDR Block for the public DMZ subnet 2 located in Availability Zone 2
             </div>
@@ -694,6 +610,41 @@
     <button type="submit" class="aui-button aui-button-primary">Build Infrastructure</button>
 </form>
 <script type="text/javascript">
+    const dbInstanceList = [
+        'db.m5.large',
+        'db.m5.xlarge',
+        'db.m5.2xlarge',
+        'db.m5.4xlarge',
+        'db.m5.12xlarge',
+        'db.m5.24xlarge',
+        'db.r5.large',
+        'db.r5.xlarge',
+        'db.r5.2xlarge',
+        'db.r5.4xlarge',
+        'db.r5.12xlarge',
+        'db.r5.24xlarge',
+        'db.r4.large',
+        'db.r4.xlarge',
+        'db.r4.2xlarge',
+        'db.r4.4xlarge',
+        'db.r4.8xlarge',
+        'db.r4.16xlarge',
+        'db.m4.large',
+        'db.m4.xlarge',
+        'db.m4.2xlarge',
+        'db.m4.4xlarge',
+        'db.m4.10xlarge',
+        'db.m4.16xlarge',
+        'db.t3.medium',
+        'db.t3.large',
+        'db.t3.xlarge',
+        'db.t3.2xlarge',
+        'db.t2.medium',
+        'db.t2.large',
+        'db.t2.xlarge',
+        'db.t2.2xlarge'
+    ];
+
 
     $("#DBMultiAZToggle").change(function () {
         var isChecked = $("#DBMultiAZToggle").attr('checked') === 'checked';
@@ -734,6 +685,32 @@
         var isChecked = $("#TomcatEnableLookupsToggle").attr('checked') === 'checked';
         $("#TomcatEnableLookups").val(isChecked);
     });
+
+    $("#DBEngine").change(function () {
+        if ($("#DBEngine").val() === 'Amazon Aurora PostgreSQL') {
+            let dbInstanceClass = $("#DBInstanceClass");
+            dbInstanceClass.empty().append(function () {
+                let output = '';
+                for (let i = 0, n = dbInstanceList.length; i < n; i++) {
+                    let key = dbInstanceList[i];
+                    if (key.startsWith("db.r")) {
+                        output += '<option>' + key + '</option>';
+                    }
+                }
+                return output;
+            });
+        } else {
+            var dbInstanceClass = $("#DBInstanceClass");
+            dbInstanceClass.empty().append(function () {
+                var output = '';
+                for (let i = 0, n = dbInstanceList.length; i < n; i++) {
+                    let key = dbInstanceList[i];
+                    output += '<option>' + key + '</option>';
+                }
+                return output;
+            });
+        }
+    })
 </script>
 </body>
 </html>

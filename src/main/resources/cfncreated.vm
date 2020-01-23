@@ -14,6 +14,5 @@
 <body>
 <h1>Processing Cloudformation Quickstart</h1>
 <p>Stack ID:  $cloudformationStackId</p>
-<p><a href="$costEstimateURL">Cost Estimate</a></p>
 </body>
 </html>
