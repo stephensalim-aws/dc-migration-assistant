@@ -38,7 +38,7 @@
                 <p>&nbsp;</p>
             </div>
             <div class="custom-card-style">
-                <button id="proceedButton" class="aui-button aui-button-primary" disabled>Proceed</button>
+                <a href="./dashboard-step2" id="proceedButton" class="aui-button aui-button-primary" hidden="true">Proceed</a>
             </div>
         </section>
     </div>
@@ -90,7 +90,7 @@
                     }
                     if (item.ResourceStatus === 'CREATE_COMPLETE' && item.LogicalResourceId === 'jira-dc-autocreated') {
                         $("#refreshBanner").hide();
-                        $("#proceedButton").prop('disabled', false);
+                        $("#proceedButton").show();
                     }
                 }
                 updateProgressBar();

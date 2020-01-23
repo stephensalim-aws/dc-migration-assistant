@@ -35,7 +35,7 @@ public class DashboardStep2Servlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String username = userManager.getRemoteUser(request).getUsername();
 
         if (username == null || !userManager.isSystemAdmin(userManager.getRemoteUserKey(request))) {
