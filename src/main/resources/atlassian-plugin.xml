@@ -7,6 +7,10 @@
         <vendor name="${project.organization.name}" url="${project.organization.url}"/>
         <param name="plugin-icon">images/AWS_logo.png</param>
         <param name="plugin-logo">images/AWS_logo.png</param>
+        <bundle-instructions>
+            <Import-Package>com.aws.apn,*;resolution:=optional</Import-Package>
+            <Import-Package>org.apache.xerces,*;resolution:=optional</Import-Package>
+        </bundle-instructions>
     </plugin-info>
     <!-- add our i18n resource -->
     <resource type="i18n" name="i18n" location="serverPlugin"/>
@@ -50,5 +54,8 @@
     </servlet>
     <servlet key="dashboard-step2-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.DashboardStep2Servlet">
         <url-pattern>/aws/dashboard-step2</url-pattern>
+    </servlet>
+    <servlet key="backup-data-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.DataBackupServlet">
+        <url-pattern>/aws/backup-data</url-pattern>
     </servlet>
 </atlassian-plugin>

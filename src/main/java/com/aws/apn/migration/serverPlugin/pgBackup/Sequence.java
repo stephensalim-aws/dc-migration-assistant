@@ -2,10 +2,7 @@
 
 package com.aws.apn.migration.serverPlugin.pgBackup;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,13 +19,23 @@ final class Sequence extends DbBackupObject {
 	private Sequence(String sequenceName, ResultSet rs, Schema schema, String owner) throws SQLException {
 		//super(rs.getString("sequence_name"), schema, owner); // postgresql bug? not always consistent with pg_class.relname
 		super(sequenceName, schema, owner);
-		this.last_value = rs.getLong("last_value");
-		this.start_value = rs.getLong("start_value");
-		this.increment_by = rs.getLong("increment_by");
-		this.max_value = rs.getLong("max_value");
-		this.min_value = rs.getLong("min_value");
-		this.is_cycled = rs.getBoolean("is_cycled");
-		this.cache_value = rs.getLong("cache_value");
+		ResultSetMetaData metaData = rs.getMetaData();
+		this.last_value = hasColumn(rs, "last_value") ? rs.getLong("last_value") : 0;
+		this.start_value = hasColumn(rs, "start_value") ? rs.getLong("start_value") : 0;
+		this.increment_by = hasColumn(rs, "increment_by") ? rs.getLong("increment_by") : 0;
+		this.max_value = hasColumn(rs, "max_value") ? rs.getLong("max_value") : 0;
+		this.min_value = hasColumn(rs, "min_value") ? rs.getLong("min_value") : 0;
+		this.is_cycled = hasColumn(rs, "is_cycled") && rs.getBoolean("is_cycled");
+		this.cache_value = hasColumn(rs, "cache_value") ? rs.getLong("cache_value") : 0;
+	}
+
+	public static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
+		try {
+			rs.findColumn(columnName);
+			return true;
+		} catch (SQLException sqlex) {
+			return false;
+		}
 	}
 
 	private static Sequence getSequence(Connection con, Schema schema, String sequenceName, String owner) throws SQLException {
@@ -36,7 +43,7 @@ final class Sequence extends DbBackupObject {
 		Sequence sequence = null;
 		try {
 			stmt = con.prepareStatement(
-					"SELECT * FROM " + schema.getName() + "." + sequenceName);
+					"SELECT * FROM " + schema.getName() + ".\"" + sequenceName + "\"");
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
 				sequence = new Sequence(sequenceName, rs, schema, owner);

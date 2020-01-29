@@ -132,6 +132,12 @@
             <artifactId>dom4j</artifactId>
             <version>2.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.9</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
         <!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
         <!--
@@ -157,10 +163,10 @@
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <skipTests>true</skipTests>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
-                    <!-- Uncomment to install TestKit backdoor in JIRA. -->
-                    <!--
+
                     <pluginArtifacts>
                         <pluginArtifact>
                             <groupId>com.atlassian.jira.tests</groupId>
@@ -168,17 +174,25 @@
                             <version>${testkit.version}</version>
                         </pluginArtifact>
                     </pluginArtifacts>
-                    -->
                     <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
+                    <enableFastdev>true</enableFastdev>
                     <!-- See here for an explanation of default instructions: -->
                     <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
                     <instructions>
+                        <Bundle-Activator>com.aws.apn.migration.serverPlugin.BundleActivator</Bundle-Activator>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <!-- Add package to export here -->
                         <Export-Package>com.aws.apn.migration.serverPlugin</Export-Package>
                         <!-- Add package import here -->
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional",
+
+                        <Import-Package>
+                            org.postgresql,
+                            org.aopalliance.aop,
+                            org.springframework.aop,
+                            org.springframework.aop.framework,
+                            javax.sql;,
+                            org.springframework.core,
+                            org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             *;version="0";resolution:=optional
                         </Import-Package>

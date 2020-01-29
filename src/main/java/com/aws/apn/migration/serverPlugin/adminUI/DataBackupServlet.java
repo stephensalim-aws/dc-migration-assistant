@@ -7,6 +7,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.Bucket;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.auth.LoginUriProvider;
@@ -14,6 +15,8 @@ import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.aws.apn.migration.serverPlugin.pgBackup.DataFilter;
+import com.aws.apn.migration.serverPlugin.pgBackup.ZipBackup;
 import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
@@ -21,8 +24,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.sql.Connection;
 import java.util.UUID;
 
 
@@ -62,15 +68,29 @@ public class DataBackupServlet extends HttpServlet {
             return;
         }
 
+        DataSource dataSource = ComponentAccessor.getOSGiComponentInstanceOfType(DataSource.class);
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String accessKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".accessKey");
         String secretKey = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".secretKey");
-        String region = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".region");
+        String region = (String) pluginSettings.get(PLUGIN_STORAGE_KEY + ".awsRegion");
 
         AmazonS3 s3 = getS3Client(accessKey, secretKey, region);
         String bucketName = UUID.randomUUID().toString();
-        Bucket bucket = s3.createBucket(bucketName);
-        pluginSettings.put(PLUGIN_STORAGE_KEY + ".backupBucket", bucket.getName());
+        File backupFile = new File("dbBackup.zip");
+        try (Connection connection = dataSource.getConnection()) {
+            Bucket bucket = s3.createBucket(bucketName);
+            pluginSettings.put(PLUGIN_STORAGE_KEY + ".backupBucket", bucket.getName());
+            ZipBackup pgBackup = new ZipBackup(backupFile, connection);
+            pgBackup.dumpAll(DataFilter.NO_DATA);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            if (e.getCause() != null) {
+                logger.error(e.getCause().getMessage());
+            }
+            s3.deleteBucket(bucketName);
+            backupFile.delete();
+        }
+
 
         response.setContentType("text/html;charset=utf-8");
         renderer.render("dashboard2.vm", response.getWriter());
