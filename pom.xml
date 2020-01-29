@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.aws.apn.migration</groupId>
     <artifactId>serverPlugin</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -52,13 +52,7 @@
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
             <version>${atlassian.spring.scanner.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.plugin</groupId>
-            <artifactId>atlassian-spring-scanner-runtime</artifactId>
-            <version>${atlassian.spring.scanner.version}</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.sal</groupId>
@@ -148,6 +142,12 @@
             <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-902.jdbc4</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -231,6 +231,17 @@
                     <verbose>false</verbose>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <pluginRepositories>
@@ -290,18 +301,21 @@
         </repository>
     </repositories>
     <properties>
-        <jira.version>8.5.3</jira.version>
+        <jira.version>8.6.1</jira.version>
         <amps.version>8.0.2</amps.version>
         <allowGoogleTracking>false</allowGoogleTracking>
-        <aws.api.version>1.11.710</aws.api.version>
+        <aws.api.version>1.11.712</aws.api.version>
         <plugin.testrunner.version>2.0.1</plugin.testrunner.version>
-        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+        <atlassian.spring.scanner.version>2.1.13</atlassian.spring.scanner.version>
+        <scope>provided</scope>
         <!-- This property ensures consistency between the key in atlassian-plugin.xml and the OSGi bundle's key. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
         <!-- TestKit version 6.x for JIRA 6.x -->
         <testkit.version>6.3.11</testkit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <!-- Java version-->
+        <java.version>1.9</java.version>
+        <!-- Maven version-->
+        <maven.compiler.version>3.8.1</maven.compiler.version>
     </properties>
 </project>

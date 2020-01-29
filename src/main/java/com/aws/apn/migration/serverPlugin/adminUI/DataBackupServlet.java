@@ -7,7 +7,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.Bucket;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
 
-
-@Scanned
 public class DataBackupServlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(DataBackupServlet.class);

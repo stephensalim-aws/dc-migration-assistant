@@ -7,7 +7,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
 import com.amazonaws.services.cloudformation.model.*;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-@Scanned
 public class ProcessCloudformationServlet extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(ProcessCloudformationServlet.class);

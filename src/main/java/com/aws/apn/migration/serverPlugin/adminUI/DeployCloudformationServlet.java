@@ -7,7 +7,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
@@ -28,8 +28,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
-@Scanned
 public class DeployCloudformationServlet extends HttpServlet {
     private static final String PLUGIN_STORAGE_KEY = "com.aws.apn.migration.serverPlugin";
     @ComponentImport
