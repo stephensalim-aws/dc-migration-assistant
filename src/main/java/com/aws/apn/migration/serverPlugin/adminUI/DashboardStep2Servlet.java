@@ -1,6 +1,5 @@
 package com.aws.apn.migration.serverPlugin.adminUI;
 
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserManager;
@@ -15,8 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 
-
-@Scanned
 public class DashboardStep2Servlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(DashboardStep2Servlet.class);

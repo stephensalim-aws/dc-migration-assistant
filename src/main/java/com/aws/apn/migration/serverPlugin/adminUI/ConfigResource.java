@@ -1,6 +1,5 @@
 package com.aws.apn.migration.serverPlugin.adminUI;
 
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
@@ -21,7 +20,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Path("/")
-@Scanned
+
 public class ConfigResource {
     @ComponentImport
     private final UserManager userManager;
