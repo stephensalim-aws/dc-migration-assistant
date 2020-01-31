@@ -9,7 +9,7 @@
         <version>5.0.21</version>
     </parent>
 
-    <groupId>com.atlassian.awsmigrationplugin</groupId>
+    <groupId>com.aws.awsmigrationplugin</groupId>
     <artifactId>aws-migration-plugin</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 

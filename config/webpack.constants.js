@@ -6,7 +6,7 @@ const srcDir = path.join(rootDir, 'src', 'main');
 const I18N_SRC_DIR = path.join(srcDir, 'resources');
 const FRONTEND_SRC_DIR = path.join(srcDir, 'aws-migration-plugin');
 const FRONTEND_OUTPUT_DIR = path.join(rootDir, 'target', 'classes');
-const PLUGIN_KEY = 'com.atlassian.aws-migration-plugin';
+const PLUGIN_KEY = 'com.aws.aws-migration-plugin';
 const ENTRY_POINT = { 'aws-migration-plugin': path.join(FRONTEND_SRC_DIR, 'index.tsx') };
 
 const MY_I18N_FILES = ['aws-migration-plugin.properties'].map(file => path.join(I18N_SRC_DIR, 'i18n', file));
