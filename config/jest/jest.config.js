@@ -1,8 +1,8 @@
 const path = require('path');
 
 const paths = {
-    mocksRoot: path.resolve('./src/main/rate-limit/atlassian/mocks'),
-    testsRoot: path.resolve('./src/main/rate-limit/components'),
+    mocksRoot: path.resolve('./src/main/aws-migration-plugin-fe/atlassian/mocks'),
+    testsRoot: path.resolve('./src/main/aws-migration-plugin-fe/components'),
 };
 
 module.exports = {
