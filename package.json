@@ -1,5 +1,5 @@
 {
-    "name": "aws-migration-plugin",
+    "name": "aws-migration-plugin-fe",
     "version": "0.1.0",
     "private": true,
     "author": "AWS and Atlassian Pty Ltd",

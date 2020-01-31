@@ -4,7 +4,7 @@ const rootDir = path.join(__dirname, '..');
 const srcDir = path.join(rootDir, 'src', 'main');
 
 const I18N_SRC_DIR = path.join(srcDir, 'resources');
-const FRONTEND_SRC_DIR = path.join(srcDir, 'aws-migration-plugin');
+const FRONTEND_SRC_DIR = path.join(srcDir, 'aws-migration-plugin-fe');
 const FRONTEND_OUTPUT_DIR = path.join(rootDir, 'target', 'classes');
 const PLUGIN_KEY = 'com.aws.apn.migration.aws-migration-plugin';
 const ENTRY_POINT = { 'aws-migration-plugin': path.join(FRONTEND_SRC_DIR, 'index.tsx') };
