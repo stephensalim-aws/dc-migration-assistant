@@ -4,6 +4,13 @@ Atlassian Jira Data Center Plugin2 for AWS EventBridge Integration
 
 ## Developing the plugin
 
+### Dependencies
+
+* [atlassian-sdk](https://developer.atlassian.com/server/framework/atlassian-sdk/downloads/)
+* Node/NPM ([NVM](https://github.com/nvm-sh/nvm) is recommended to manage
+  versions)
+* Yarn (can be installed from package or with `npm install -g yarn`)
+
 ### Frontend
 In the project directory, you can run:
 
