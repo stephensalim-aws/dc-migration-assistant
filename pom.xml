@@ -9,12 +9,22 @@
         <version>5.0.21</version>
     </parent>
 
-    <groupId>com.aws.awsmigrationplugin</groupId>
+    <groupId>com.aws.apn.migration</groupId>
     <artifactId>aws-migration-plugin</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-
-    <name>AWS Migration Plugin</name>
-    <description>Migrate your Jira instance to AWS</description>
+    <version>1.0.0</version>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization>
+        <name>Amazon Web Services</name>
+        <url>https://aws.amazon.com/</url>
+    </organization>
+    <name>AWS Data Migration Plugin</name>
+    <description>This is the officially supported AWS Data Migration plugin for Atlassian JIRA.</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>

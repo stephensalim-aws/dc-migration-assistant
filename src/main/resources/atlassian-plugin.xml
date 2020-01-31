@@ -9,7 +9,7 @@
     <resource type="i18n" name="aws-migration-plugin" location="i18n/aws-migration-plugin"/>
     
     <servlet key="aws-migration-plugin-servlet" name="AWS Migration Servlet"
-             class="com.aws.awsmigrationplugin.TemplateServlet">
+             class="com.aws.apn.migration.awsmigrationplugin.TemplateServlet">
         <url-pattern>/aws-migration-plugin</url-pattern>
     </servlet>
 

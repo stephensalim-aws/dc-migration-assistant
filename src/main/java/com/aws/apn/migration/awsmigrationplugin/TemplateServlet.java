@@ -1,4 +1,4 @@
-package com.aws.awsmigrationplugin;
+package com.aws.apn.migration.awsmigrationplugin;
 
 import java.io.IOException;
 import java.net.URI;
@@ -52,7 +52,7 @@ public class TemplateServlet extends HttpServlet {
         response.setContentType(MediaType.TEXT_HTML);
         templateRenderer.render(
             response.getWriter(),
-            "com.aws.awsmigrationplugin.aws-migration-plugin:aws-migration-plugin-templates",
+            "com.aws.apn.migration.aws-migration-plugin:aws-migration-plugin-templates",
             "awsmigrationplugin.init", 
             Collections.emptyMap()
         );
