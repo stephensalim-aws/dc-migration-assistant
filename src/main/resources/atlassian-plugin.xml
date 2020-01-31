@@ -1,61 +1,53 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
     <plugin-info>
         <description>${project.description}</description>
         <version>${project.version}</version>
         <vendor name="${project.organization.name}" url="${project.organization.url}"/>
-        <param name="plugin-icon">images/AWS_logo.png</param>
-        <param name="plugin-logo">images/AWS_logo.png</param>
-        <bundle-instructions>
-            <Import-Package>com.aws.apn,*;resolution:=optional</Import-Package>
-            <Import-Package>org.apache.xerces,*;resolution:=optional</Import-Package>
-        </bundle-instructions>
     </plugin-info>
+
     <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="serverPlugin"/>
-    <!-- add our web resources -->
-    <web-resource key="serverPlugin-resources" name="AWS Data Migration Web Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <resource type="download" name="serverPlugin.css" location="/css/serverPlugin.css"/>
-        <resource type="download" name="serverPlugin.js" location="/js/serverPlugin.js"/>
-        <resource type="download" name="admin-ui-plugin.css" location="/css/admin-ui-plugin.css"/>
-        <resource type="download" name="admin-ui-plugin.js" location="/js/admin-ui-plugin.js"/>
-        <resource type="download" name="images/" location="/images"/>
-        <context>serverPlugin</context>
+    <resource type="i18n" name="aws-migration-plugin" location="i18n/aws-migration-plugin"/>
+    
+    <servlet key="aws-migration-plugin-servlet" name="AWS Migration Servlet"
+             class="com.aws.apn.migration.awsmigrationplugin.TemplateServlet">
+        <url-pattern>/aws-migration-plugin</url-pattern>
+    </servlet>
+
+    <web-resource key="aws-migration-plugin-templates" name="AWS Migration Plugin Soy Templates">
+        <resource type="soy" name="aws-migration-plugin.soy" location="/templates/aws-migration-plugin.soy"/>
+        <dependency>com.atlassian.auiplugin:soy</dependency>
+        <dependency>com.atlassian.soy.soy-template-plugin:soy-deps</dependency>
     </web-resource>
-    <web-section name="migrationSection" i18n-name-key="migration-section.name" key="migration-section"
-                 location="migration-item-link" weight="1000">
-        <description key="migration-section.description">The Migration Plugin</description>
-        <label key="migration-section.label"/>
-    </web-section>
-    <web-item name="Migrate to Jira DC on AWS" i18n-name-key="migration-item.name" key="migration-item"
-              section="top_system_section/import_export_section" weight="1000">
-        <description key="migration-item.description">The AWS Migration Plugin</description>
-        <label key="migration-item.label"/>
-        <link linkId="migration-admin-link">/plugins/servlet/aws/start</link>
+
+    <web-item key="refapp-menu-item" name="Refapp AWS Migration Plugin" section="system.admin/general" weight="10"
+              application="refapp">
+        <label>AWS Migration Plugin</label>
+        <label key="awsmigrationplugin.title"/>
+        <link linkId="awsmigrationplugin">/plugins/servlet/aws-migration-plugin</link>
     </web-item>
-    <rest key="rest" path="/migration-admin" version="1.0">
-        <description>Provides REST resources for the admin UI.</description>
-    </rest>
-    <servlet key="admin-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.AdminServlet">
-        <url-pattern>/aws/start</url-pattern>
-    </servlet>
-    <servlet key="dashboard-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.DashboardServlet">
-        <url-pattern>/aws/dashboard</url-pattern>
-    </servlet>
-    <servlet key="cloudformation-servlet"
-             class="com.aws.apn.migration.serverPlugin.adminUI.DeployCloudformationServlet">
-        <url-pattern>/aws/cloudformation</url-pattern>
-    </servlet>
-    <servlet key="cloudformation-deployment-servlet"
-             class="com.aws.apn.migration.serverPlugin.adminUI.ProcessCloudformationServlet">
-        <url-pattern>/aws/cfnstatus</url-pattern>
-    </servlet>
-    <servlet key="dashboard-step2-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.DashboardStep2Servlet">
-        <url-pattern>/aws/dashboard-step2</url-pattern>
-    </servlet>
-    <servlet key="backup-data-servlet" class="com.aws.apn.migration.serverPlugin.adminUI.DataBackupServlet">
-        <url-pattern>/aws/backup-data</url-pattern>
-    </servlet>
+
+    <web-item key="jira-menu-item" name="Jira AWS Migration Plugin" section="advanced_menu_section/advanced_section"
+              weight="200"
+              application="jira">
+        <label key="awsmigrationplugin.title"/>
+        <description>AWS Migration Plugin</description>
+        <link linkId="awsmigrationplugin">/plugins/servlet/aws-migration-plugin</link>
+    </web-item>
+
+    <web-item key="bitbucket-menu-item" name="Bitbucket AWS Migration Plugin" section="atl.admin/admin-support-section"
+              weight="10"
+              application="bitbucket">
+        <label key="awsmigrationplugin.title"/>
+        <description>AWS Migration Plugin</description>
+        <link linkId="awsmigrationplugin">/plugins/servlet/aws-migration-plugin</link>
+    </web-item>
+
+    <web-item key="confluence-menu-item" name="Confluence AWS Migration Plugin" section="system.admin/administration"
+              weight="10"
+              application="confluence">
+        <label key="awsmigrationplugin.title"/>
+        <description>AWS Migration Plugin</description>
+        <link linkId="awsmigrationplugin">/plugins/servlet/aws-migration-plugin</link>
+    </web-item>
+
 </atlassian-plugin>
