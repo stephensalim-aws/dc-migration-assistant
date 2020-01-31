@@ -40,6 +40,7 @@ Here are the SDK commands you'll use immediately:
 * atlas-debug -- same as atlas-run, but allows a debugger to attach at port 5005
 * atlas-help  -- prints description for all commands in the SDK
 * atlas-mvn package -- build plugin package
+* atlas-mvn test -- run plugin tests
 * atlas-create-jira-plugin-module -- create plugin modules
 
 Testing:
@@ -55,6 +56,9 @@ Full documentation is always available at:
 
 https://developer.atlassian.com/display/DOCS/Introduction+to+the+Atlassian+Plugin+SDK
 
+## Deploying to remote product
+
+To deploy the plugin to a full product stack, run a build `atlas-mvn package` and upload the generated OBR to the product through the plugin manager
 
 # License
 
