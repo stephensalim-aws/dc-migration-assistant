@@ -20,7 +20,6 @@ import static javax.ws.rs.core.MediaType.TEXT_HTML;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
