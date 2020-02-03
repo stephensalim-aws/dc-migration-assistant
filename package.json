@@ -5,6 +5,7 @@
     "author": "AWS and Atlassian Pty Ltd",
     "license": "Apache 2",
     "dependencies": {
+        "@atlaskit/button": "^13.3.5",
         "@atlassian/wrm-react-i18n": "^0.4.3",
         "@babel/core": "^7.5.5",
         "@babel/plugin-proposal-class-properties": "^7.5.5",
