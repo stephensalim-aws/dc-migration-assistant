@@ -1,4 +1,4 @@
-const special = {
+const special: Record<string, string> = {
     '<': '&lt;',
     '>': '&gt;',
     '&': '&amp;',
@@ -9,8 +9,8 @@ const special = {
 
 const expr = new RegExp(`[${Object.keys(special).join('')}]`, 'g');
 
-function escapeHtml(str) {
-    return str.replace(expr, str => special[str]);
+function escapeHtml(str: string): string {
+    return str.replace(expr, substr => special[substr]);
 }
 
 export default escapeHtml;
