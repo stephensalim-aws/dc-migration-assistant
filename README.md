@@ -19,6 +19,7 @@ The frontend is built on a stack of:
 
 * [React](https://reactjs.org/)
 * [Typescript](https://www.typescriptlang.org/)
+* [styled components](https://styled-components.com/)
 * Built with [Webpack](https://webpack.js.org/) and [Babel](https://babeljs.io/)
 
 #### Executing and Testing
