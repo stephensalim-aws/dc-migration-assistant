@@ -6,5 +6,6 @@ pipelines:
         name: "Lint and run tests"
         caches:
           - maven
+          - node
         script:
           - mvn -B verify # -B batch mode makes Maven less verbose
