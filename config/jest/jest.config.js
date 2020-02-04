@@ -12,7 +12,7 @@ module.exports = {
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
     transformIgnorePatterns: ['node_modules/(?!(@atlaskit)/)'],
     moduleNameMapper: {
-        '^wrm/context-path$': path.join(paths.mocksRoot, './wrm/context-path.js'),
+        '^wrm/context-path$': path.join(paths.mocksRoot, './wrm/context-path.ts'),
         '^@atlassian/wrm-react-i18n$': path.join(paths.mocksRoot, './@atlassian/wrm-react-i18n.js'),
         '\\.(css|less)$': 'identity-obj-proxy',
     },
