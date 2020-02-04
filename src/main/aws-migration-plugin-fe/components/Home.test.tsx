@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import Home from './Home.tsx';
+import { Home } from './Home.tsx';
 
 describe('Home', () => {
     it('Should render', () => {

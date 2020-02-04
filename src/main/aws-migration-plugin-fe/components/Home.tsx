@@ -19,7 +19,7 @@ const ButtonContainer = styled.div`
     align-self: flex-end;
 `;
 
-const Home = ({ title, synopsis, exploreMigrationButtonText }: HomeProps): ReactElement => {
+export const Home = ({ title, synopsis, exploreMigrationButtonText }: HomeProps): ReactElement => {
     return (
         <HomeContainer>
             <h2>{title}</h2>
@@ -30,5 +30,3 @@ const Home = ({ title, synopsis, exploreMigrationButtonText }: HomeProps): React
         </HomeContainer>
     );
 };
-
-export default Home;
