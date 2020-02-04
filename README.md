@@ -12,6 +12,18 @@ Atlassian Jira Data Center Plugin2 for AWS EventBridge Integration
 * Yarn (can be installed from package or with `npm install -g yarn`)
 
 ### Frontend
+
+#### Stack
+
+The frontend is built on a stack of:
+
+* [React](https://reactjs.org/)
+* [Typescript](https://www.typescriptlang.org/)
+* [styled components](https://styled-components.com/)
+* Built with [Webpack](https://webpack.js.org/) and [Babel](https://babeljs.io/)
+
+#### Executing and Testing
+
 In the project directory, you can run:
 
 ##### `yarn start`

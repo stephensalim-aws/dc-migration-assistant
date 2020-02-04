@@ -124,6 +124,7 @@ out/
 # VS Code
 .project
 .settings
+.vscode
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
