@@ -33,6 +33,7 @@
         "react-hot-loader": "^4.12.11",
         "react-intl": "^2.6.0",
         "react-redux": "^5.0.7",
+        "react-router-dom": "^5.1.2",
         "react-scripts": "3.0.1",
         "react-select": "^1.2.1",
         "source-map-loader": "^0.2.4",
