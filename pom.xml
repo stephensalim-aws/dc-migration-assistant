@@ -4,10 +4,42 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.atlassian.pom</groupId>
-        <artifactId>closedsource-pom</artifactId>
-        <version>5.0.21</version>
+      <groupId>com.atlassian.pom</groupId>
+      <artifactId>public-pom</artifactId>
+      <version>6.0.2</version>
     </parent>
+
+    <repositories>
+        <repository>
+            <id>atlassian-public</id>
+            <url>https://packages.atlassian.com/mvn/maven-external/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>atlassian-public</id>
+            <url>https://packages.atlassian.com/mvn/maven-external/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
     <groupId>com.aws.apn.migration</groupId>
     <artifactId>aws-migration-plugin</artifactId>
