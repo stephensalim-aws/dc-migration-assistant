@@ -3,7 +3,7 @@ import Button from '@atlaskit/button';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-import { overviewPath } from '../utils/RoutePaths';
+import { overviewPath } from '../utils/RoutePaths.ts';
 
 type HomeProps = {
     title: string;
