@@ -6,7 +6,7 @@ Atlassian Jira Data Center Plugin2 for AWS EventBridge Integration
 
 ### Dependencies
 
-* [atlassian-sdk](https://developer.atlassian.com/server/framework/atlassian-sdk/downloads/)
+* [Maven](https://maven.apache.org/) (3.6.1 or higher)
 * Node/NPM ([NVM](https://github.com/nvm-sh/nvm) is recommended to manage
   versions)
 * Yarn (can be installed from package or with `npm install -g yarn`)
@@ -43,16 +43,12 @@ Will additionally fix any automatically-fixable issues.
 
 Here are the SDK commands you'll use immediately:
 
-* atlas-run   -- installs this plugin into the product and starts it on localhost
-* atlas-debug -- same as atlas-run, but allows a debugger to attach at port 5005
-* atlas-help  -- prints description for all commands in the SDK
-* atlas-mvn package -- build plugin package
-* atlas-mvn test -- run plugin tests
-* atlas-create-jira-plugin-module -- create plugin modules
+* Run the plugin in a product: `mvn amps:run -Dproduct=[jira|confluence|refapp] -Dproduct.version=<version e.g. 8.5.0>`
+* Build the plugin: `mvn package`
+* When in doubt, `mvn clean` it out
+* [Full atlassian maven reference](https://developer.atlassian.com/server/framework/atlassian-sdk/working-with-maven/#using-the-amps-maven-plugin-directly)
 
 Testing:
-Login from http://localhost:2990/jira
-
 | Username | Password |
 | -------- | -------- |
 | admin    | admin    |
