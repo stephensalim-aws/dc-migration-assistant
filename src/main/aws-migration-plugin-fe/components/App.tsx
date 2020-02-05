@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { I18n } from '@atlassian/wrm-react-i18n';
 
-import { homePath, overviewPath } from '../utils/RoutePaths.ts';
+import { overviewPath } from '../utils/RoutePaths.ts';
 import { MigrationOverview } from './MigrationOverview.tsx';
 import { Home } from './Home.tsx';
 
@@ -13,7 +13,7 @@ export const App: FunctionComponent = () => {
                 <Route path={overviewPath}>
                     <MigrationOverview />
                 </Route>
-                <Route path={homePath}>
+                <Route>
                     <Home
                         title={I18n.getText('aws.migration.home.title')}
                         synopsis={I18n.getText('aws.migration.home.synopsis')}
