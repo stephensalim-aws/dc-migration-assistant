@@ -10,7 +10,7 @@
     
     <servlet key="aws-migration-plugin-servlet" name="AWS Migration Servlet"
              class="com.aws.apn.migration.awsmigrationplugin.TemplateServlet">
-        <url-pattern>/aws-migration-plugin</url-pattern>
+        <url-pattern>/aws-migration-plugin*</url-pattern>
     </servlet>
 
     <web-resource key="aws-migration-plugin-templates" name="AWS Migration Plugin Soy Templates">

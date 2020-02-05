@@ -1,6 +1,9 @@
 import React, { ReactElement } from 'react';
 import Button from '@atlaskit/button';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+
+import { overviewPath } from '../utils/RoutePaths.ts';
 
 type HomeProps = {
     title: string;
@@ -19,16 +22,16 @@ const ButtonContainer = styled.div`
     align-self: flex-end;
 `;
 
-const Home = ({ title, synopsis, exploreMigrationButtonText }: HomeProps): ReactElement => {
+export const Home = ({ title, synopsis, exploreMigrationButtonText }: HomeProps): ReactElement => {
     return (
         <HomeContainer>
             <h2>{title}</h2>
             <p>{synopsis}</p>
             <ButtonContainer>
-                <Button appearance="primary">{exploreMigrationButtonText}</Button>
+                <Link to={overviewPath}>
+                    <Button appearance="primary">{exploreMigrationButtonText}</Button>
+                </Link>
             </ButtonContainer>
         </HomeContainer>
     );
 };
-
-export default Home;
