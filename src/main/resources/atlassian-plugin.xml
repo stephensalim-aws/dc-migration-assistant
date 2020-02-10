@@ -50,4 +50,7 @@
         <link linkId="awsmigrationplugin">/plugins/servlet/aws-migration-plugin</link>
     </web-item>
 
+    <rest name="AWS Migration Resource" i18n-name-key="aws.migration.rest.name" key="aws-migration-rest" path="/aws-migration" version="1.0">
+        <description key="aws.migration.rest.description">The AWS migration plugin rest API</description>
+    </rest>
 </atlassian-plugin>
