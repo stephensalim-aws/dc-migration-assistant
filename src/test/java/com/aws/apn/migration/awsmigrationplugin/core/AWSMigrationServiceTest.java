@@ -4,6 +4,7 @@ import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.STARTED;
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.UNSTARTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,5 +22,13 @@ public class AWSMigrationServiceTest {
         MigrationStage initialStage = sut.getMigrationStage();
 
         assertEquals(UNSTARTED, initialStage);
+    }
+
+    @Test
+    public void testStageIsStartedAfterStartingMigration() {
+        sut.startMigration();
+        MigrationStage currentStage = sut.getMigrationStage();
+
+        assertEquals(STARTED, currentStage);
     }
 }

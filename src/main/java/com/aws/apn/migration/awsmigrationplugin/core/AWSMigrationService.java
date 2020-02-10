@@ -3,6 +3,7 @@ package com.aws.apn.migration.awsmigrationplugin.core;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationService;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
 
+import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.STARTED;
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.UNSTARTED;
 
 public class AWSMigrationService implements MigrationService {
@@ -15,7 +16,7 @@ public class AWSMigrationService implements MigrationService {
 
     @Override
     public void startMigration() {
-
+        this.currentStage = STARTED;
     }
 
     @Override
