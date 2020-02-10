@@ -1,8 +1,11 @@
 package com.aws.apn.migration.awsmigrationplugin.spi;
 
+import com.atlassian.activeobjects.tx.Transactional;
+
 /**
  * Abstraction of an on-premise to cloud migration modeled as a finite state machine.
  */
+@Transactional
 public interface MigrationService {
 
     /**

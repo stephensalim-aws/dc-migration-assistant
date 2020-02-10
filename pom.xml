@@ -61,6 +61,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.atlassian.activeobjects</groupId>
+            <artifactId>activeobjects-plugin</artifactId>
+            <version>${ao.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.atlassian.sal</groupId>
             <artifactId>sal-api</artifactId>
             <version>${sal.version}</version>
@@ -280,7 +286,8 @@
         <yarn.cmd.build.dev>build:dev</yarn.cmd.build.dev>
         <node.modules>${project.basedir}/src/main/aws-migration-plugin-fe/node_modules</node.modules>
         <frontend.working.directory>src/main/aws-migration-plugin-fe</frontend.working.directory>
-        
+
+        <ao.version>3.2.2</ao.version>
         <sal.version>4.0.0</sal.version>
         <atlassian.spring.scanner.version>2.1.9</atlassian.spring.scanner.version>
         <spring.version>5.0.10.RELEASE</spring.version>

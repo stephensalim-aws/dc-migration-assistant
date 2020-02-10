@@ -1,12 +1,17 @@
 package com.aws.apn.migration.awsmigrationplugin.core;
 
+import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.transaction.TransactionCallback;
+import com.aws.apn.migration.awsmigrationplugin.dto.Migration;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationService;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
 import org.springframework.stereotype.Component;
 
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.STARTED;
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.UNSTARTED;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Manages a migration from on-premise to self-hosted AWS.
@@ -15,13 +20,15 @@ import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.UNSTAR
 @ExportAsService({MigrationService.class})
 public class AWSMigrationService implements MigrationService {
 
+    private ActiveObjects ao;
+
     private MigrationStage currentStage;
 
     /**
      * Creates a new, unstarted AWS Migration
      */
-    public AWSMigrationService() {
-        this.currentStage = UNSTARTED;
+    public AWSMigrationService(@ComponentImport ActiveObjects ao) {
+        this.ao = requireNonNull(ao);
     }
 
     /**
@@ -29,7 +36,14 @@ public class AWSMigrationService implements MigrationService {
      */
     @Override
     public boolean startMigration() {
-        this.currentStage = STARTED;
+        if (getMigrationStage() != UNSTARTED) {
+            return false;
+        }
+
+        final Migration migration = ao.create(Migration.class);
+        migration.setStage(STARTED);
+        migration.save();
+
         return true;
     }
 
@@ -38,6 +52,10 @@ public class AWSMigrationService implements MigrationService {
      */
     @Override
     public MigrationStage getMigrationStage() {
-        return currentStage;
+        Migration[] migrations = ao.find(Migration.class);
+        if (migrations.length == 1) {
+            return migrations[0].getStage();
+        }
+        return UNSTARTED;
     }
 }

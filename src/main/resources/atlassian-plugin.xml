@@ -5,6 +5,11 @@
         <vendor name="${project.organization.name}" url="${project.organization.url}"/>
     </plugin-info>
 
+    <ao key="ao-module">
+        <description>The module configuring the Active Objects service used by this plugin</description>
+        <entity>com.aws.apn.migration.awsmigrationplugin.dto.Migration</entity>
+    </ao>
+
     <!-- add our i18n resource -->
     <resource type="i18n" name="aws-migration-plugin" location="i18n/aws-migration-plugin"/>
     
