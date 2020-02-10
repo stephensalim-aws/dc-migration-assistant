@@ -48,11 +48,9 @@ public class AWSMigrationServiceTest {
     public void testStageOfCurrentMigrationIsReturned() {
         ao.migrate(Migration.class);
 
-        Migration migration = ao.create(Migration.class);
-        migration.setStage(STARTED);
-        migration.save();
+        createOneMigration();
 
-        assertEquals(1, ao.find(Migration.class).length);
+        assertNumberOfMigrations(1);
 
         ao.flushAll();
 
@@ -61,28 +59,37 @@ public class AWSMigrationServiceTest {
         assertEquals(STARTED, currentStage);
     }
 
+
     @Test
     public void testStageIsStartedAfterStartingMigration() {
         ao.migrate();
-        assertEquals(0, ao.find(Migration.class).length);
+        assertNumberOfMigrations(0);
 
         assertTrue(sut.startMigration());
         MigrationStage currentStage = sut.getMigrationStage();
 
         assertEquals(STARTED, currentStage);
-        assertEquals(1, ao.find(Migration.class).length);
+        assertNumberOfMigrations(1);
     }
 
     @Test
     public void testStageIsUnstartedWhenNoMigrationExists() {
         ao.migrate(Migration.class);
+        createOneMigration();
+
+        ao.flushAll();
+        assertNumberOfMigrations(1);
+
+        assertFalse(sut.startMigration());
+    }
+
+    private void assertNumberOfMigrations(int i) {
+        assertEquals(i, ao.find(Migration.class).length);
+    }
+
+    private void createOneMigration() {
         Migration migration = ao.create(Migration.class);
         migration.setStage(STARTED);
         migration.save();
-
-        ao.flushAll();
-        assertEquals(1, ao.find(Migration.class).length);
-
-        assertFalse(sut.startMigration());
     }
 }
