@@ -15,8 +15,9 @@ public class AWSMigrationService implements MigrationService {
     }
 
     @Override
-    public void startMigration() {
+    public boolean startMigration() {
         this.currentStage = STARTED;
+        return true;
     }
 
     @Override

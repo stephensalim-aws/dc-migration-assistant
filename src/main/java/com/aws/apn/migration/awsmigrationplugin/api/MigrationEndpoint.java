@@ -39,8 +39,15 @@ public class MigrationEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createMigration() {
-        return Response.
-                ok()
-                .build();
+        if (migrationService.startMigration()) {
+            return Response
+                    .ok()
+                    .build();
+        } else {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("migration already exists")
+                    .build();
+        }
     }
 }
