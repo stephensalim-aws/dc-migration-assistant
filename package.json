@@ -48,7 +48,8 @@
         "webpack-merge": "^4.2.2",
         "webpack-sources": "^1.4.3",
         "when-dom-ready": "^1.2.12",
-        "write-file-webpack-plugin": "^4.5.1"
+        "write-file-webpack-plugin": "^4.5.1",
+        "yaml": "^1.7.2"
     },
     "devDependencies": {
         "@atlassian/i18n-properties-loader": "^0.4.4",
