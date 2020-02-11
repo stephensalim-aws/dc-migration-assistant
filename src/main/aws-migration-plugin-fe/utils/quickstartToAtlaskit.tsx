@@ -2,6 +2,8 @@ import React, { FunctionComponent, ReactElement } from 'react';
 import Select from '@atlaskit/select';
 import Toggle from '@atlaskit/toggle';
 import TextField from '@atlaskit/textfield';
+import { Field } from '@atlaskit/form';
+import { string } from 'prop-types';
 
 export type QuickStartParameterYamlNode = {
     Type: string;
@@ -24,15 +26,20 @@ const createSelectFromQuickstartParam = (
         return <Toggle key={key} size="large" isDefaultChecked={param.Default as boolean} />;
     }
     return (
-        <Select
+        <Field
+            name={key}
+            label={key}
+            key={key}
             options={param.AllowedValues.map(val => ({ label: val, value: val }))}
             value={{ label: param.Default, value: param.Default }}
-        />
+        >
+            {({ fieldProps }: any): ReactElement => <Select {...fieldProps} />}
+        </Field>
     );
 };
 
 const createAZSelection = (key: string, param: QuickStartParameterYamlNode): ReactElement => {
-    return <div />;
+    return <div key={key} />;
 };
 
 const createNumberInputFromQuickstartParam = (
@@ -40,6 +47,9 @@ const createNumberInputFromQuickstartParam = (
     param: QuickStartParameterYamlNode
 ): ReactElement => {
     let textFieldProps: Record<string, string | number> = {
+        name: key,
+        label: key,
+        key,
         type: 'number',
         defaultValue: param.Default as number,
     };
@@ -58,14 +68,21 @@ const createNumberInputFromQuickstartParam = (
         };
     }
 
-    return <TextField {...textFieldProps} />;
+    return (
+        <Field {...textFieldProps}>
+            {({ fieldProps }: any): ReactElement => <TextField {...fieldProps} />}
+        </Field>
+    );
 };
 
 const createStringInputFromQuickstartParam = (
     key: string,
     param: QuickStartParameterYamlNode
 ): ReactElement => {
-    let textFieldProps: Record<string, string | number | boolean> = {
+    let textFieldProps: any = {
+        key,
+        name: key,
+        label: key,
         type: 'text',
         defaultValue: param.Default as string,
     };
@@ -85,7 +102,11 @@ const createStringInputFromQuickstartParam = (
         };
     }
 
-    return <TextField {...textFieldProps} />;
+    return (
+        <Field {...textFieldProps}>
+            {({ fieldProps }: any): ReactElement => <TextField {...fieldProps} />}
+        </Field>
+    );
 };
 
 const createInputFromQuickstartParam = (
@@ -106,27 +127,11 @@ export const quickstartParamToAtlaskitFormElement = (
     key: string,
     param: QuickStartParameterYamlNode
 ): ReactElement => {
-    let InputElement: FunctionComponent;
     if (param.AllowedValues) {
-        InputElement = (): ReactElement => {
-            return createSelectFromQuickstartParam(key, param);
-        };
+        return createSelectFromQuickstartParam(key, param);
     }
     if (param.Type === 'List<AWS::EC2::AvailabilityZone::Name>') {
-        InputElement = (): ReactElement => {
-            return createAZSelection(key, param);
-        };
+        return createAZSelection(key, param);
     }
-    InputElement = (): ReactElement => {
-        return createInputFromQuickstartParam(key, param);
-    };
-
-    return (
-        <div key={key}>
-            <span>
-                {key}
-                <InputElement />
-            </span>
-        </div>
-    );
+    return createInputFromQuickstartParam(key, param);
 };

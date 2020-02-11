@@ -25,7 +25,22 @@
     memoize-one "^5.1.0"
     tslib "^1.9.3"
 
-"@atlaskit/icon@^19.1.0":
+"@atlaskit/form@^6.3.2":
+  version "6.3.2"
+  resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/form/-/form-6.3.2.tgz#06019d0a1f4ec1ab84eb6d53fe0ad8a02ebfea68"
+  integrity sha1-BgGdCh9OwauE621T/grYoC6/6mg=
+  dependencies:
+    "@atlaskit/icon" "^19.0.6"
+    "@atlaskit/theme" "^9.2.4"
+    "@babel/runtime" "^7.0.0"
+    final-form "^4.13.0"
+    final-form-focus "^1.1.0"
+    memoize-one "^5.1.0"
+    react-uid "^2.2.0"
+    shallow-equal "^1.0.0"
+    tiny-invariant "^0.0.3"
+
+"@atlaskit/icon@^19.0.6", "@atlaskit/icon@^19.1.0":
   version "19.1.0"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/icon/-/icon-19.1.0.tgz#50e7050765a6d055cf0005f18a189f9eb80e3753"
   integrity sha1-UOcFB2Wm0FXPAAXxihifnrgON1M=
@@ -73,7 +88,7 @@
     "@emotion/core" "^10.0.9"
     tslib "^1.9.3"
 
-"@atlaskit/theme@^9.2.8", "@atlaskit/theme@^9.5.0":
+"@atlaskit/theme@^9.2.4", "@atlaskit/theme@^9.2.8", "@atlaskit/theme@^9.5.0":
   version "9.5.0"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/theme/-/theme-9.5.0.tgz#1bf6f3e39baf7a1a3c1e798d18848bedecdf2107"
   integrity sha1-G/bz45uveho8HnmNGISL7ezfIQc=
@@ -995,7 +1010,7 @@
     core-js-pure "^3.0.0"
     regenerator-runtime "^0.13.2"
 
-"@babel/runtime@7.8.4", "@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.0", "@babel/runtime@^7.4.4", "@babel/runtime@^7.4.5", "@babel/runtime@^7.5.1", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.4", "@babel/runtime@^7.7.6":
+"@babel/runtime@7.8.4", "@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.0", "@babel/runtime@^7.4.4", "@babel/runtime@^7.4.5", "@babel/runtime@^7.5.1", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.4", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.3":
   version "7.8.4"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/@babel/runtime/-/runtime-7.8.4.tgz#d79f5a2040f7caa24d53e563aad49cbc05581308"
   integrity sha1-159aIED3yqJNU+VjqtScvAVYEwg=
@@ -4866,6 +4881,18 @@ fill-range@^4.0.0:
     is-number "^3.0.0"
     repeat-string "^1.6.1"
     to-regex-range "^2.1.0"
+
+final-form-focus@^1.1.0:
+  version "1.1.2"
+  resolved "https://packages.atlassian.com/api/npm/npm-remote/final-form-focus/-/final-form-focus-1.1.2.tgz#8ea5c4bd802e220cebaa47a587bb0be164eb6806"
+  integrity sha1-jqXEvYAuIgzrqkelh7sL4WTraAY=
+
+final-form@^4.13.0:
+  version "4.18.7"
+  resolved "https://packages.atlassian.com/api/npm/npm-remote/final-form/-/final-form-4.18.7.tgz#c30239ac9154cbfbf4f6d19e831f5fc9cbc1ba78"
+  integrity sha1-wwI5rJFUy/v09tGegx9fycvBung=
+  dependencies:
+    "@babel/runtime" "^7.8.3"
 
 finalhandler@~1.1.2:
   version "1.1.2"
@@ -10871,6 +10898,11 @@ timsort@^0.3.0:
   version "0.3.0"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/timsort/-/timsort-0.3.0.tgz#405411a8e7e6339fe64db9a234de11dc31e02bd4"
   integrity sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q=
+
+tiny-invariant@^0.0.3:
+  version "0.0.3"
+  resolved "https://packages.atlassian.com/api/npm/npm-remote/tiny-invariant/-/tiny-invariant-0.0.3.tgz#4c7283c950e290889e9e94f64d3586ec9156cf44"
+  integrity sha1-THKDyVDikIienpT2TTWG7JFWz0Q=
 
 tiny-invariant@^1.0.2:
   version "1.1.0"
