@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactElement } from 'react';
+import React, { FunctionComponent, ReactElement, ReactNode } from 'react';
 import yaml from 'yaml';
 import { string } from 'prop-types';
 
@@ -27,6 +27,37 @@ type QuickStartParameterYamlNode = {
  * Type: String, AllowedPattern/MaxLength/MinLength - Input with constraints
  * Type: List<AWS::EC2::AvailabilityZone::Name> - select with AZ's for region
  */
+
+const createSelectFromQuickstartParam = (
+    key: string,
+    param: QuickStartParameterYamlNode
+): ReactNode => {
+    return <div />;
+};
+
+const createAZSelection = (key: string, param: QuickStartParameterYamlNode): ReactNode => {
+    return <div />;
+};
+
+const createInputFromQuickstartParam = (
+    key: string,
+    param: QuickStartParameterYamlNode
+): ReactNode => {
+    return <div />;
+};
+
+const quickstartParamToAtlaskitFormElement = (
+    key: string,
+    param: QuickStartParameterYamlNode
+): ReactNode => {
+    if (param.AllowedValues) {
+        return createSelectFromQuickstartParam(key, param);
+    }
+    if (param.Type === 'List<AWS::EC2::AvailabilityZone::Name>') {
+        return createAZSelection(key, param);
+    }
+    return createInputFromQuickstartParam(key, param);
+};
 
 export const QuickstartForm: FunctionComponent = (): ReactElement => {
     fetch(quickstartUrl, {
