@@ -2,6 +2,7 @@ import React, { FunctionComponent, ReactElement, ReactNode, useState, useEffect 
 import yaml from 'yaml';
 import Select from '@atlaskit/select';
 import Toggle from '@atlaskit/toggle';
+import TextField from '@atlaskit/textfield';
 
 const quickstartUrl =
     'https://dcd-slinghost-templates.s3.amazonaws.com/quickstart-jira-dc-with-vpc.template.parameters.yaml';
@@ -22,10 +23,10 @@ type QuickStartParameterYamlNode = {
 /** Quickstart param to atlaskit form component mapping
  *
  * Type: String - Input
- * Type: String, AllowedValues - Select (if values are true or false use Toggle)
- * Type: Number - Input (number)
- * Type: Number, Max/MinValue - Input with min/max
  * Type: String, AllowedPattern/MaxLength/MinLength - Input with constraints
+ * Type: Number - Input (number)
+ * Type: Number, Max/MinValue - Input (number) with min/max
+ * Type: String, AllowedValues - Select (if values are true or false use Toggle)
  * Type: List<AWS::EC2::AvailabilityZone::Name> - select with AZ's for region
  */
 
@@ -49,11 +50,51 @@ const createAZSelection = (key: string, param: QuickStartParameterYamlNode): Rea
     return <div key={key} />;
 };
 
+const createNumberInputFromQuickstartParam = (
+    key: string,
+    param: QuickStartParameterYamlNode
+): ReactElement => {
+    let textFieldProps: Record<string, any> = {
+        type: 'number',
+        value: param.Default as number,
+    };
+
+    if (param.MaxValue) {
+        textFieldProps = {
+            max: param.MaxValue,
+            ...textFieldProps,
+        };
+    }
+
+    if (param.MinValue) {
+        textFieldProps = {
+            min: param.MinValue,
+            ...textFieldProps,
+        };
+    }
+
+    return <TextField {...textFieldProps} />;
+};
+
+const createStringInputFromQuickstartParam = (
+    key: string,
+    param: QuickStartParameterYamlNode
+): ReactElement => {
+    return <div />;
+};
+
 const createInputFromQuickstartParam = (
     key: string,
     param: QuickStartParameterYamlNode
 ): ReactElement => {
-    return <div key={key} />;
+    if (param.Type === 'Number') {
+        return createNumberInputFromQuickstartParam(key, param);
+    }
+    if (param.Type === 'String') {
+        return createStringInputFromQuickstartParam(key, param);
+    }
+
+    return <div key={key}>UNRECOGNISED PARAM TYPE</div>;
 };
 
 const quickstartParamToAtlaskitFormElement = (

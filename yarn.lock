@@ -63,7 +63,17 @@
     react-transition-group "^2.2.1"
     tslib "^1.9.3"
 
-"@atlaskit/theme@^9.5.0":
+"@atlaskit/textfield@^3.1.4":
+  version "3.1.4"
+  resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/textfield/-/textfield-3.1.4.tgz#cec0b4843472937a917a261f5abfdad385715a8e"
+  integrity sha1-zsC0hDRyk3qReiYfWr/a04VxWo4=
+  dependencies:
+    "@atlaskit/analytics-next" "^6.3.3"
+    "@atlaskit/theme" "^9.2.8"
+    "@emotion/core" "^10.0.9"
+    tslib "^1.9.3"
+
+"@atlaskit/theme@^9.2.8", "@atlaskit/theme@^9.5.0":
   version "9.5.0"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/theme/-/theme-9.5.0.tgz#1bf6f3e39baf7a1a3c1e798d18848bedecdf2107"
   integrity sha1-G/bz45uveho8HnmNGISL7ezfIQc=
