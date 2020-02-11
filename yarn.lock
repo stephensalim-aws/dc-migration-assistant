@@ -48,15 +48,16 @@
   resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/type-helpers/-/type-helpers-4.2.2.tgz#fb1524ad9745e879fb051cabf3012c3a95d05407"
   integrity sha1-+xUkrZdF6Hn7BRyr8wEsOpXQVAc=
 
-"@atlassian/i18n-properties-loader@^0.4.4":
-  version "0.4.4"
-  resolved "https://packages.atlassian.com/api/npm/atlassian-npm/@atlassian/i18n-properties-loader/-/i18n-properties-loader-0.4.4.tgz#9d1dad32d8bae84d10e6a8a247dce0a081a98856"
-  integrity sha1-nR2tMti66E0Q5qiiR9zgoIGpiFY=
+"@atlassian/i18n-properties-loader@^0.7.3":
+  version "0.7.3"
+  resolved "https://packages.atlassian.com/api/npm/atlassian-npm/@atlassian/i18n-properties-loader/-/i18n-properties-loader-0.7.3.tgz#9c09ba69e9dc321e28e3db7e551ad5b45208f780"
+  integrity sha1-nAm6aencMh4o49t+VRrVtFII94A=
   dependencies:
+    java-properties "^1.0.2"
     loader-utils "^1.2.3"
     lodash.debounce "^4.0.8"
-    properties-reader "0.0.16"
     schema-utils "^1.0.0"
+    xregexp "^4.2.4"
 
 "@atlassian/wrm-react-i18n@^0.4.3":
   version "0.4.3"
@@ -928,6 +929,14 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/plugin-transform-typescript" "^7.8.3"
+
+"@babel/runtime-corejs2@^7.2.0":
+  version "7.8.4"
+  resolved "https://packages.atlassian.com/api/npm/npm-remote/@babel/runtime-corejs2/-/runtime-corejs2-7.8.4.tgz#e4ed23a8be40fa26b97fb649deaba8144c987593"
+  integrity sha1-5O0jqL5A+ia5f7ZJ3quoFEyYdZM=
+  dependencies:
+    core-js "^2.6.5"
+    regenerator-runtime "^0.13.2"
 
 "@babel/runtime-corejs3@^7.7.4":
   version "7.8.4"
@@ -3228,7 +3237,7 @@ core-js-pure@^3.0.0:
   resolved "https://packages.atlassian.com/api/npm/npm-remote/core-js-pure/-/core-js-pure-3.6.4.tgz#4bf1ba866e25814f149d4e9aaa08c36173506e3a"
   integrity sha1-S/G6hm4lgU8UnU6aqgjDYXNQbjo=
 
-core-js@^2.4.0:
+core-js@^2.4.0, core-js@^2.6.5:
   version "2.6.11"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/core-js/-/core-js-2.6.11.tgz#38831469f9922bded8ee21c9dc46985e0399308c"
   integrity sha1-OIMUafmSK97Y7iHJ3EaYXgOZMIw=
@@ -6198,6 +6207,11 @@ istanbul-reports@^2.2.6:
   dependencies:
     html-escaper "^2.0.0"
 
+java-properties@^1.0.2:
+  version "1.0.2"
+  resolved "https://packages.atlassian.com/api/npm/npm-remote/java-properties/-/java-properties-1.0.2.tgz#ccd1fa73907438a5b5c38982269d0e771fe78211"
+  integrity sha1-zNH6c5B0OKW1w4mCJp0Odx/nghE=
+
 jest-changed-files@^24.9.0:
   version "24.9.0"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/jest-changed-files/-/jest-changed-files-24.9.0.tgz#08d8c15eb79a7fa3fc98269bc14b451ee82f8039"
@@ -8972,13 +8986,6 @@ prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2,
     object-assign "^4.1.1"
     react-is "^16.8.1"
 
-properties-reader@0.0.16:
-  version "0.0.16"
-  resolved "https://packages.atlassian.com/api/npm/npm-remote/properties-reader/-/properties-reader-0.0.16.tgz#a2cc0db9cdd7b81d977d0a59c1dc10c6d1d6ab98"
-  integrity sha1-oswNuc3XuB2XfQpZwdwQxtHWq5g=
-  dependencies:
-    mkdirp "~0.5.1"
-
 proxy-addr@~2.0.5:
   version "2.0.5"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/proxy-addr/-/proxy-addr-2.0.5.tgz#34cbd64a2d81f4b1fd21e76f9f06c8a45299ee34"
@@ -11724,6 +11731,13 @@ xregexp@4.0.0:
   version "4.0.0"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/xregexp/-/xregexp-4.0.0.tgz#e698189de49dd2a18cc5687b05e17c8e43943020"
   integrity sha1-5pgYneSd0qGMxWh7BeF8jkOUMCA=
+
+xregexp@^4.2.4:
+  version "4.2.4"
+  resolved "https://packages.atlassian.com/api/npm/npm-remote/xregexp/-/xregexp-4.2.4.tgz#02a4aea056d65a42632c02f0233eab8e4d7e57ed"
+  integrity sha1-AqSuoFbWWkJjLALwIz6rjk1+V+0=
+  dependencies:
+    "@babel/runtime-corejs2" "^7.2.0"
 
 xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.2"

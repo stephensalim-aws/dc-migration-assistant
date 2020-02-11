@@ -52,7 +52,7 @@
         "yaml": "^1.7.2"
     },
     "devDependencies": {
-        "@atlassian/i18n-properties-loader": "^0.4.4",
+        "@atlassian/i18n-properties-loader": "^0.7.3",
         "@testing-library/jest-dom": "^4.2.3",
         "@typescript-eslint/eslint-plugin": "^2.9.0",
         "@typescript-eslint/parser": "^2.9.0",
@@ -77,7 +77,7 @@
     },
     "scripts": {
         "watch": "webpack --watch --display-modules --config ./config/webpack.config.js",
-        "start": "atlas-mvn package -DskipTests -Pwatch-mode && yarn dev-server ",
+        "start": "mvn package -DskipTests -Pwatch-mode && yarn dev-server ",
         "build": "webpack --config ./config/webpack.config.js",
         "build:dev": "webpack --config ./config/webpack.config.js --mode=development",
         "dev-server": "webpack-dev-server --config ./config/webpack.config.js --mode=development --env=dev-server",
