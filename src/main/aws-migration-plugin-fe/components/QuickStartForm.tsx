@@ -123,13 +123,29 @@ const quickstartParamToAtlaskitFormElement = (
     key: string,
     param: QuickStartParameterYamlNode
 ): ReactElement => {
+    let InputElement: FunctionComponent;
     if (param.AllowedValues) {
-        return createSelectFromQuickstartParam(key, param);
+        InputElement = (): ReactElement => {
+            return createSelectFromQuickstartParam(key, param);
+        };
     }
     if (param.Type === 'List<AWS::EC2::AvailabilityZone::Name>') {
-        return createAZSelection(key, param);
+        InputElement = (): ReactElement => {
+            return createAZSelection(key, param);
+        };
     }
-    return createInputFromQuickstartParam(key, param);
+    InputElement = (): ReactElement => {
+        return createInputFromQuickstartParam(key, param);
+    };
+
+    return (
+        <div key={key}>
+            <span>
+                {key}
+                <InputElement />
+            </span>
+        </div>
+    );
 };
 
 export const QuickstartForm: FunctionComponent = (): ReactElement => {
