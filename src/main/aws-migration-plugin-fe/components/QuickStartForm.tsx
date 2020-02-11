@@ -55,8 +55,9 @@ const createNumberInputFromQuickstartParam = (
     param: QuickStartParameterYamlNode
 ): ReactElement => {
     let textFieldProps: Record<string, any> = {
+        key,
         type: 'number',
-        value: param.Default as number,
+        defaultValue: param.Default as number,
     };
 
     if (param.MaxValue) {
@@ -80,7 +81,28 @@ const createStringInputFromQuickstartParam = (
     key: string,
     param: QuickStartParameterYamlNode
 ): ReactElement => {
-    return <div />;
+    let textFieldProps: Record<string, any> = {
+        key,
+        type: 'text',
+        defaultValue: param.Default as string,
+    };
+
+    if (param.MaxLength) {
+        textFieldProps = {
+            maxLength: param.MaxLength,
+            ...textFieldProps,
+        };
+    }
+
+    if (param.AllowedPattern) {
+        textFieldProps = {
+            pattern: param.AllowedPattern,
+            isRequired: true,
+            ...textFieldProps,
+        };
+    }
+
+    return <TextField {...textFieldProps} />;
 };
 
 const createInputFromQuickstartParam = (
@@ -122,14 +144,11 @@ export const QuickstartForm: FunctionComponent = (): ReactElement => {
                 .then(resp => resp.text())
                 .then(text => {
                     const paramDoc = yaml.parse(text);
-                    console.log(paramDoc);
                     setParams(paramDoc.Parameters);
                     setHasUpdatedTemplate(true);
                 });
         }
     });
-
-    // console.log(params);
 
     return (
         <div>
