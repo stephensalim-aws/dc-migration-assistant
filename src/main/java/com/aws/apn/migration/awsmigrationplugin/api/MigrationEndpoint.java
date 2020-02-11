@@ -31,7 +31,7 @@ public class MigrationEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMigrationStatus() {
-        if (migrationService.getMigrationStage() == MigrationStage.UNSTARTED) {
+        if (migrationService.getMigrationStage() == MigrationStage.NOT_STARTED) {
             return Response
                     .status(Response.Status.NOT_FOUND)
                     .build();
@@ -56,7 +56,7 @@ public class MigrationEndpoint {
                     .build();
         } else {
             return Response
-                    .status(Response.Status.BAD_REQUEST)
+                    .status(Response.Status.CONFLICT)
                     .entity("migration already exists")
                     .build();
         }

@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.STARTED;
-import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.UNSTARTED;
+import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.NOT_STARTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,7 +41,7 @@ public class AWSMigrationServiceTest {
 
         MigrationStage initialStage = sut.getMigrationStage();
 
-        assertEquals(UNSTARTED, initialStage);
+        assertEquals(NOT_STARTED, initialStage);
     }
 
     @Test

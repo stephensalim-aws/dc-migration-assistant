@@ -3,14 +3,13 @@ package com.aws.apn.migration.awsmigrationplugin.core;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.aws.apn.migration.awsmigrationplugin.dto.Migration;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationService;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
 import org.springframework.stereotype.Component;
 
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.STARTED;
-import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.UNSTARTED;
+import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.NOT_STARTED;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -36,7 +35,7 @@ public class AWSMigrationService implements MigrationService {
      */
     @Override
     public boolean startMigration() {
-        if (getMigrationStage() != UNSTARTED) {
+        if (getMigrationStage() != NOT_STARTED) {
             return false;
         }
 
@@ -56,6 +55,6 @@ public class AWSMigrationService implements MigrationService {
         if (migrations.length == 1) {
             return migrations[0].getStage();
         }
-        return UNSTARTED;
+        return NOT_STARTED;
     }
 }

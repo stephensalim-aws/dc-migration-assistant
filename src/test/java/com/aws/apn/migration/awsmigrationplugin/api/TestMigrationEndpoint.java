@@ -33,7 +33,7 @@ public class TestMigrationEndpoint {
 
     @Test
     public void testNotFoundWhenMigrationDoesNotExist() {
-        when(mockMigrationService.getMigrationStage()).thenReturn(MigrationStage.UNSTARTED);
+        when(mockMigrationService.getMigrationStage()).thenReturn(MigrationStage.NOT_STARTED);
 
         Response response = sut.getMigrationStatus();
 
@@ -55,7 +55,7 @@ public class TestMigrationEndpoint {
 
         Response response = sut.createMigration();
 
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
     }
 
 }
