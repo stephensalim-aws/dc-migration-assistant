@@ -2,8 +2,9 @@ import React, { FunctionComponent } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { I18n } from '@atlassian/wrm-react-i18n';
 
-import { overviewPath } from '../utils/RoutePaths.ts';
+import { overviewPath, quickstartPath } from '../utils/RoutePaths.ts';
 import { MigrationOverview } from './MigrationOverview.tsx';
+import { QuickstartForm } from './QuickStartForm.tsx';
 import { Home } from './Home.tsx';
 
 export const App: FunctionComponent = () => {
@@ -12,6 +13,9 @@ export const App: FunctionComponent = () => {
             <Switch>
                 <Route path={overviewPath}>
                     <MigrationOverview />
+                </Route>
+                <Route path={quickstartPath}>
+                    <QuickstartForm />
                 </Route>
                 <Route>
                     <Home
