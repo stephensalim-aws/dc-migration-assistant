@@ -6,7 +6,6 @@ import com.aws.apn.migration.awsmigrationplugin.dto.Migration;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
 import net.java.ao.EntityManager;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
