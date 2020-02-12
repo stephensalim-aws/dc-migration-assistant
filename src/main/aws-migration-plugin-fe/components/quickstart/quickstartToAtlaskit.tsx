@@ -29,7 +29,7 @@ const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
     const promiseOptions = (): Promise<Array<OptionType>> =>
         new Promise(resolve => {
             setTimeout(() => {
-                resolve(AZsForRegion.map(az => ({ label: az, value: az })));
+                resolve(AZsForRegion.map(az => ({ label: az, value: az, key: az })));
             }, 1000);
         });
 
@@ -37,7 +37,7 @@ const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
         paramProperties: { Description },
     } = param;
 
-    const validate = (value: Array<OptionType>) => {
+    const validate = (value: Array<OptionType>): string => {
         if (value.length !== 2) {
             return 'INCORRECT_NUM_AZ';
         }
@@ -201,7 +201,7 @@ const createSelectFromQuickstartParam: FormElementGenerator = (defaultFieldProps
         );
     }
 
-    const options = AllowedValues.map(val => ({ label: val as string, value: val }));
+    const options = AllowedValues.map(val => ({ label: val as string, value: val, key: val }));
     const defaultOption = options.find(option => option.value === Default);
 
     const overrideFieldProps = {
