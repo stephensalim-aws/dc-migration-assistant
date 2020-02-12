@@ -1,6 +1,8 @@
 package com.aws.apn.migration.awsmigrationplugin.spi;
 
 import com.atlassian.activeobjects.tx.Transactional;
+import com.aws.apn.migration.awsmigrationplugin.core.fs.FilesystemMigrationConfig;
+import com.aws.apn.migration.awsmigrationplugin.core.fs.FilesystemMigrationProgress;
 
 /**
  * Abstraction of an on-premise to cloud migration modeled as a finite state machine.
@@ -20,4 +22,8 @@ public interface MigrationService {
      */
     MigrationStage getMigrationStage();
 
+    /**
+     * Start migration of local files to remote destination
+     */
+    FilesystemMigrationProgress startFilesystemMigration(FilesystemMigrationConfig config);
 }
