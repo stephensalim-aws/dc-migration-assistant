@@ -2,6 +2,7 @@ import React, { FunctionComponent, ReactElement, useState, useEffect } from 'rea
 import yaml from 'yaml';
 import Form from '@atlaskit/form';
 import Button from '@atlaskit/button';
+import Spinner from '@atlaskit/spinner';
 
 import {
     createQuickstartFormField,
@@ -50,15 +51,19 @@ export const QuickStartDeploy: FunctionComponent = (): ReactElement => {
 
     return (
         <div>
-            <QuickstartForm
-                quickstartParams={Object.entries(params).map(entry => {
-                    const [key, value] = entry;
-                    return {
-                        key,
-                        paramProperties: value as QuickStartParameterYamlNode,
-                    };
-                })}
-            />
+            {hasUpdatedTemplate ? (
+                <QuickstartForm
+                    quickstartParams={Object.entries(params).map(entry => {
+                        const [key, value] = entry;
+                        return {
+                            key,
+                            paramProperties: value as QuickStartParameterYamlNode,
+                        };
+                    })}
+                />
+            ) : (
+                <Spinner />
+            )}
         </div>
     );
 };
