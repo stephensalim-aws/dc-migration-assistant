@@ -2,7 +2,7 @@ import React, { FunctionComponent, ReactElement, ReactNode } from 'react';
 import Select from '@atlaskit/select';
 import Toggle from '@atlaskit/toggle';
 import TextField from '@atlaskit/textfield';
-import { ErrorMessage, Field } from '@atlaskit/form';
+import { ErrorMessage, Field, HelperMessage } from '@atlaskit/form';
 
 export type QuickStartParameterYamlNode = {
     Type: string;
@@ -30,12 +30,24 @@ type FormElementGenerator = (
 type InputProps = Record<string, boolean | number | string>;
 
 const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
-    return <Field {...defaultFieldProps}>{({ fieldProps }: any): ReactElement => <div />}</Field>;
+    const {
+        paramProperties: { Description },
+    } = param;
+    return (
+        <Field {...defaultFieldProps}>
+            {({ fieldProps }: any): ReactElement => (
+                <>
+                    <HelperMessage>{Description}</HelperMessage>
+                    <div />
+                </>
+            )}
+        </Field>
+    );
 };
 
 const createNumberInputFromQuickstartParam: FormElementGenerator = (defaultFieldProps, param) => {
     const {
-        paramProperties: { Default, MaxValue, MinValue },
+        paramProperties: { Default, Description, MaxValue, MinValue },
     } = param;
 
     let overrideInputProps: InputProps = {
@@ -58,7 +70,12 @@ const createNumberInputFromQuickstartParam: FormElementGenerator = (defaultField
     return (
         <Field {...defaultFieldProps} defaultValue={Default as number}>
             {({ fieldProps }: any): ReactElement => {
-                return <TextField {...fieldProps} {...overrideInputProps} />;
+                return (
+                    <>
+                        <HelperMessage>{Description}</HelperMessage>
+                        <TextField width="medium" {...fieldProps} {...overrideInputProps} />
+                    </>
+                );
             }}
         </Field>
     );
@@ -66,7 +83,14 @@ const createNumberInputFromQuickstartParam: FormElementGenerator = (defaultField
 
 const createStringInputFromQuickstartParam: FormElementGenerator = (defaultFieldProps, param) => {
     const {
-        paramProperties: { AllowedPattern, ConstraintDescription, Default, MaxLength, NoEcho },
+        paramProperties: {
+            AllowedPattern,
+            ConstraintDescription,
+            Description,
+            Default,
+            MaxLength,
+            NoEcho,
+        },
     } = param;
 
     let overrideInputProps: Record<string, string | number | boolean | Function> = {
@@ -106,7 +130,8 @@ const createStringInputFromQuickstartParam: FormElementGenerator = (defaultField
         <Field {...defaultFieldProps} {...overrideFieldProps}>
             {({ fieldProps, error }: any): ReactElement => (
                 <>
-                    <TextField {...fieldProps} {...overrideInputProps} />
+                    <HelperMessage>{Description}</HelperMessage>
+                    <TextField width="xlarge" {...fieldProps} {...overrideInputProps} />
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </>
             )}
@@ -131,12 +156,19 @@ const createInputFromQuickstartParam: FormElementGenerator = (defaultFieldProps,
 
 const createSelectFromQuickstartParam: FormElementGenerator = (defaultFieldProps, param) => {
     const { paramProperties } = param;
-    const { AllowedValues, Default } = paramProperties;
+    const { AllowedValues, Default, Description } = paramProperties;
     if (AllowedValues.length === 2 && typeof AllowedValues[0] === 'boolean') {
         return (
             <Field {...defaultFieldProps}>
                 {({ fieldProps }: any): ReactElement => (
-                    <Toggle {...fieldProps} size="large" isDefaultChecked={Default as boolean} />
+                    <>
+                        <HelperMessage>{Description}</HelperMessage>
+                        <Toggle
+                            {...fieldProps}
+                            size="large"
+                            isDefaultChecked={Default as boolean}
+                        />
+                    </>
                 )}
             </Field>
         );
@@ -152,7 +184,10 @@ const createSelectFromQuickstartParam: FormElementGenerator = (defaultFieldProps
     return (
         <Field {...defaultFieldProps} defaultValue={defaultOption}>
             {({ fieldProps }: any): ReactElement => (
-                <Select {...fieldProps} {...overrideFieldProps} />
+                <>
+                    <HelperMessage>{Description}</HelperMessage>
+                    <Select {...fieldProps} {...overrideFieldProps} />
+                </>
             )}
         </Field>
     );
