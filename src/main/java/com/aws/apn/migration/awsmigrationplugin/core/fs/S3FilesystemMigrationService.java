@@ -36,7 +36,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     }
 
     private boolean verifyDirectory(Path directoryToMigrate) {
-        // Simple check for now, that can be extended to verify home structure
+        // Simple check for now, can be extended to verify home structure for different products
         return directoryToMigrate.toFile().exists();
     }
 
