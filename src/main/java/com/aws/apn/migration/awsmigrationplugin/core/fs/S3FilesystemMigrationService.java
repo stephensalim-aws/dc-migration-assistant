@@ -3,6 +3,7 @@ package com.aws.apn.migration.awsmigrationplugin.core.fs;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationConfig;
@@ -24,11 +25,12 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         boolean canMigrate = verifyDirectory(config.getDirectoryToMigrate());
 
         if (canMigrate) {
-            transferManager.uploadDirectory(
+            MultipleFileUpload upload = transferManager.uploadDirectory(
                     config.getS3Bucket(),
                     defaultPrefix,
                     config.getDirectoryToMigrate().toFile(),
                     defaultIncludeSubDirs);
+            upload.addProgressListener(new S3UploadListener());
             return new FilesystemMigrationProgress(FilesystemMigrationStatus.RUNNING);
         } else {
             return new FilesystemMigrationProgress(FilesystemMigrationStatus.FAILED);
