@@ -14,6 +14,9 @@ import {
     // eslint-disable-next-line import/extensions
 } from './QuickStartTypes';
 
+const QUICKSTART_PARAMS_URL =
+    'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/quickstart-jira-dc-with-vpc.template.parameters.yaml';
+
 const QuickstartForm = ({
     quickstartParamGroups,
 }: Record<string, Array<QuickstartParameterGroup>>): ReactElement => (
@@ -78,16 +81,13 @@ const buildQuickstartParams = (quickstartParamDoc: any): Array<QuickstartParamet
     });
 };
 
-const quickstartUrl =
-    'https://dcd-slinghost-templates.s3.amazonaws.com/quickstart-jira-dc-with-vpc.template.parameters.yaml';
-
 export const QuickStartDeploy: FunctionComponent = (): ReactElement => {
     const [params, setParams]: [Array<QuickstartParameterGroup>, Function] = useState([]);
     const [hasUpdatedTemplate, setHasUpdatedTemplate] = useState(false);
 
     useEffect(() => {
         if (!hasUpdatedTemplate) {
-            fetch(quickstartUrl, {
+            fetch(QUICKSTART_PARAMS_URL, {
                 method: 'GET',
             })
                 .then(resp => resp.text())

@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import Select from '@atlaskit/select';
+import Select, { AsyncSelect, OptionType } from '@atlaskit/select';
 import Toggle from '@atlaskit/toggle';
 import TextField from '@atlaskit/textfield';
 import { ErrorMessage, Field, HelperMessage } from '@atlaskit/form';
@@ -15,15 +15,40 @@ type FormElementGenerator = (
 type InputProps = Record<string, boolean | number | string>;
 
 const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
+    // TODO: This should be queried via plugin API
+    const AZsForRegion = [
+        'us-east-1a',
+        'us-east-1b',
+        'us-east-1c',
+        'us-east-1d',
+        'us-east-1e',
+        'us-east-1f',
+    ];
+
+    const promiseOptions = (): Promise<Array<OptionType>> =>
+        new Promise(resolve => {
+            setTimeout(() => {
+                resolve(AZsForRegion.map(az => ({ label: az, value: az })));
+            }, 1000);
+        });
+
     const {
         paramProperties: { Description },
     } = param;
+
     return (
         <Field {...defaultFieldProps}>
             {({ fieldProps }: any): ReactElement => (
                 <>
                     <HelperMessage>{Description}</HelperMessage>
-                    <div {...fieldProps} />
+                    <AsyncSelect
+                        cacheOptions
+                        defaultOptions
+                        isMulti
+                        isSearchable={false}
+                        loadOptions={promiseOptions}
+                        {...fieldProps}
+                    />
                 </>
             )}
         </Field>
