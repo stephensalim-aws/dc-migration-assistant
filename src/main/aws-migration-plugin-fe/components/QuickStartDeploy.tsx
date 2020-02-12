@@ -1,10 +1,10 @@
 import React, { FunctionComponent, ReactElement, useState, useEffect } from 'react';
 import yaml from 'yaml';
-import Form, { Field } from '@atlaskit/form';
+import Form from '@atlaskit/form';
 import Button from '@atlaskit/button';
 
 import {
-    quickstartParamToAtlaskitFormElement,
+    createQuickstartFormField,
     QuickStartParameterYamlNode,
     // eslint-disable-next-line import/extensions
 } from '../utils/quickstartToAtlaskit';
@@ -46,7 +46,7 @@ export const QuickStartDeploy: FunctionComponent = (): ReactElement => {
         <div>
             {Object.entries(params).map((entry: [string, QuickStartParameterYamlNode]) => {
                 const [key, value] = entry;
-                return quickstartParamToAtlaskitFormElement(key, value);
+                return createQuickstartFormField({ key, paramProperties: value });
             })}
         </div>
     );
