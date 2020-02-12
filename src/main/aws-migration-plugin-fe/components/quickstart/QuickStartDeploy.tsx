@@ -3,6 +3,7 @@ import yaml from 'yaml';
 import Form, { FormHeader, FormSection } from '@atlaskit/form';
 import Button from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
+import { OptionType } from '@atlaskit/select';
 import { I18n } from '@atlassian/wrm-react-i18n';
 
 import { createQuickstartFormField } from './quickstartToAtlaskit.tsx';
@@ -17,6 +18,14 @@ import {
 const QUICKSTART_PARAMS_URL =
     'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/quickstart-jira-dc-with-vpc.template.parameters.yaml';
 
+const isOptionType = (obj: any): obj is OptionType => {
+    return obj.label && obj.value;
+};
+
+const isArrayOfOptionType = (obj: any): obj is Array<OptionType> => {
+    return obj.length > 0 && isOptionType(obj[0]);
+};
+
 const QuickstartForm = ({
     quickstartParamGroups,
 }: Record<string, Array<QuickstartParameterGroup>>): ReactElement => (
@@ -26,13 +35,17 @@ const QuickstartForm = ({
             // console.log(data);
             const transformedCfnParams = data;
             Object.entries(data).forEach(entry => {
-                // Hoist value from Select inputs to root of form value
+                // Hoist value from Select/Multiselect inputs to root of form value
                 const [key, value] = entry;
-                if (value.label) {
+                if (isOptionType(value)) {
                     transformedCfnParams[key] = value.value;
+                } else if (isArrayOfOptionType(value)) {
+                    transformedCfnParams[key] = value.map(option => option.value);
                 }
-                return true;
             });
+
+            // TODO: Send this to the API
+            // eslint-disable-next-line no-console
             console.log(transformedCfnParams);
         }}
     >

@@ -3,6 +3,7 @@ import Select, { AsyncSelect, OptionType } from '@atlaskit/select';
 import Toggle from '@atlaskit/toggle';
 import TextField from '@atlaskit/textfield';
 import { ErrorMessage, Field, HelperMessage } from '@atlaskit/form';
+import { I18n } from '@atlassian/wrm-react-i18n';
 
 // eslint-disable-next-line import/extensions
 import { QuickstartParameter } from './QuickStartTypes';
@@ -36,9 +37,16 @@ const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
         paramProperties: { Description },
     } = param;
 
+    const validate = (value: Array<OptionType>) => {
+        if (value.length !== 2) {
+            return 'INCORRECT_NUM_AZ';
+        }
+        return undefined;
+    };
+
     return (
-        <Field {...defaultFieldProps}>
-            {({ fieldProps }: any): ReactElement => (
+        <Field validate={validate} {...defaultFieldProps}>
+            {({ fieldProps, error }: any): ReactElement => (
                 <>
                     <HelperMessage>{Description}</HelperMessage>
                     <AsyncSelect
@@ -49,6 +57,11 @@ const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
                         loadOptions={promiseOptions}
                         {...fieldProps}
                     />
+                    {error && (
+                        <ErrorMessage>
+                            {I18n.getText('aws.migration.provision.aws.form.wrongNumberAZError')}
+                        </ErrorMessage>
+                    )}
                 </>
             )}
         </Field>
@@ -131,7 +144,12 @@ const createStringInputFromQuickstartParam: FormElementGenerator = (defaultField
                 if (testSuccess) {
                     return undefined;
                 }
-                return ConstraintDescription || `${param.paramKey} must match ${AllowedPattern}`;
+                return (
+                    ConstraintDescription ||
+                    `${param.paramLabel} ${I18n.getText(
+                        'aws.migration.provision.aws.form.defaultError'
+                    )} ${AllowedPattern}`
+                );
             },
         };
     }
