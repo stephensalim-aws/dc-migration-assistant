@@ -2,9 +2,9 @@ package com.aws.apn.migration.awsmigrationplugin.core;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.test.TestActiveObjects;
-import com.aws.apn.migration.awsmigrationplugin.core.fs.FilesystemMigrationConfig;
-import com.aws.apn.migration.awsmigrationplugin.core.fs.FilesystemMigrationProgress;
-import com.aws.apn.migration.awsmigrationplugin.core.fs.FilesystemMigrationStatus;
+import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationConfig;
+import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationProgress;
+import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationStatus;
 import com.aws.apn.migration.awsmigrationplugin.dto.Migration;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
 import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationService;
@@ -95,15 +95,15 @@ public class AWSMigrationServiceTest {
     public void testFsMigrationFailsWhenNotReady() {
         // given
         ao.migrate(Migration.class);
-        // when
         FilesystemMigrationService fsService = mock(FilesystemMigrationService.class);
+        // when
         FilesystemMigrationProgress progress = sut.startFilesystemMigration(fsService, mockConfig);
         // then
         assertEquals(FilesystemMigrationStatus.FAILED, progress.getStatus());
     }
 
     @Test
-    public void testFsMigrationRunningWhenReady() {
+    public void testFsMigrationRunningWhenReadyForFsSync() {
         // given
         ao.migrate(Migration.class);
         createMigration(READY_FS_MIGRATION);

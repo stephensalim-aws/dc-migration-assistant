@@ -1,6 +1,6 @@
-package com.aws.apn.migration.awsmigrationplugin.core.fs;
+package com.aws.apn.migration.awsmigrationplugin.api.fs;
 
-import static com.aws.apn.migration.awsmigrationplugin.core.fs.FilesystemMigrationStatus.NOT_STARTED;
+import static com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationStatus.NOT_STARTED;
 
 public class FilesystemMigrationProgress {
     private FilesystemMigrationStatus status;
