@@ -1,16 +1,15 @@
 package com.aws.apn.migration.awsmigrationplugin.core.fs;
 
 import com.amazonaws.AmazonClientException;
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationConfig;
-import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationProgress;
-import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationStatus;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationConfig;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationProgress;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationStatus;
 import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

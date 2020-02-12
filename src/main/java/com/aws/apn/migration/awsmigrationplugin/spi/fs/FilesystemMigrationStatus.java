@@ -1,4 +1,4 @@
-package com.aws.apn.migration.awsmigrationplugin.api.fs;
+package com.aws.apn.migration.awsmigrationplugin.spi.fs;
 
 public enum FilesystemMigrationStatus {
     NOT_STARTED,

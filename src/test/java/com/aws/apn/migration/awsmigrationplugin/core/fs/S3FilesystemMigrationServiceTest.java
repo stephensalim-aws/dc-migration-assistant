@@ -1,8 +1,8 @@
 package com.aws.apn.migration.awsmigrationplugin.core.fs;
 
-import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationConfig;
-import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationProgress;
-import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationStatus;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationConfig;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationProgress;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationStatus;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

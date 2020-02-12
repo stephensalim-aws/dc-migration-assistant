@@ -2,9 +2,9 @@ package com.aws.apn.migration.awsmigrationplugin.core;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.test.TestActiveObjects;
-import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationConfig;
-import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationProgress;
-import com.aws.apn.migration.awsmigrationplugin.api.fs.FilesystemMigrationStatus;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationConfig;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationProgress;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationStatus;
 import com.aws.apn.migration.awsmigrationplugin.dto.Migration;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
 import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationService;
