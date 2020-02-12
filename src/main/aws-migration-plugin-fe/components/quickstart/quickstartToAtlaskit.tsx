@@ -26,6 +26,7 @@ const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
         'us-east-1f',
     ];
 
+    // This will be replaced by an API call
     const promiseOptions = (): Promise<Array<OptionType>> =>
         new Promise(resolve => {
             setTimeout(() => {

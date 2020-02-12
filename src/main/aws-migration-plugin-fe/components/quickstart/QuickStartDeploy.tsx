@@ -41,7 +41,6 @@ const QuickstartForm = ({
     /* eslint-disable @typescript-eslint/no-explicit-any */
     <Form
         onSubmit={(data: Record<string, any>): void => {
-            // console.log(data);
             const transformedCfnParams = data;
             Object.entries(data).forEach(entry => {
                 // Hoist value from Select/Multiselect inputs to root of form value
