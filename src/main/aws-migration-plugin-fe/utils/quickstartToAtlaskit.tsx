@@ -2,7 +2,7 @@ import React, { FunctionComponent, ReactElement, ReactNode } from 'react';
 import Select from '@atlaskit/select';
 import Toggle from '@atlaskit/toggle';
 import TextField from '@atlaskit/textfield';
-import { Field } from '@atlaskit/form';
+import { ErrorMessage, Field } from '@atlaskit/form';
 
 export type QuickStartParameterYamlNode = {
     Type: string;
@@ -23,100 +23,117 @@ export type QuickstartParameter = {
     paramProperties: QuickStartParameterYamlNode;
 };
 
-type SelectValue = {
-    label: string;
-    value: string | number | boolean;
-};
-type InputElementAndDefault = [FunctionComponent, string | number | boolean | SelectValue];
-type FormElementGenerator = (param: QuickstartParameter) => InputElementAndDefault;
+type FormElementGenerator = (
+    defaultProps: Record<string, string>,
+    param: QuickstartParameter
+) => ReactElement;
 type InputProps = Record<string, boolean | number | string>;
 
-const createAZSelection: FormElementGenerator = param => {
-    const input = (): ReactElement => <div />;
-    return [input, ''];
+const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
+    return <Field {...defaultFieldProps}>{({ fieldProps }: any): ReactElement => <div />}</Field>;
 };
 
-const createNumberInputFromQuickstartParam: FormElementGenerator = param => {
+const createNumberInputFromQuickstartParam: FormElementGenerator = (defaultFieldProps, param) => {
     const {
         paramProperties: { Default, MaxValue, MinValue },
     } = param;
 
-    let overrideFieldProps: InputProps = {
+    let overrideInputProps: InputProps = {
         type: 'number',
     };
 
     if (MaxValue) {
-        overrideFieldProps = {
+        overrideInputProps = {
             max: MaxValue,
-            ...overrideFieldProps,
+            ...overrideInputProps,
         };
     }
 
     if (MinValue) {
-        overrideFieldProps = {
+        overrideInputProps = {
             min: MinValue,
-            ...overrideFieldProps,
+            ...overrideInputProps,
         };
     }
-
-    const input = (props: InputProps): ReactElement => (
-        <TextField {...props} {...overrideFieldProps} />
+    return (
+        <Field {...defaultFieldProps} defaultValue={Default as number}>
+            {({ fieldProps }: any): ReactElement => {
+                // console.log(fieldProps);
+                return <TextField {...fieldProps} {...overrideInputProps} />;
+            }}
+        </Field>
     );
-    return [input, Default];
 };
 
-const createStringInputFromQuickstartParam: FormElementGenerator = param => {
+const createStringInputFromQuickstartParam: FormElementGenerator = (defaultFieldProps, param) => {
     const {
-        paramProperties: { AllowedPattern, Default, MaxLength, NoEcho },
+        paramProperties: { AllowedPattern, ConstraintDescription, Default, MaxLength, NoEcho },
     } = param;
-    let overrideFieldProps: Record<string, string | number | boolean> = {
+
+    let overrideInputProps: Record<string, string | number | boolean | Function> = {
         type: NoEcho ? 'password' : 'text',
     };
 
+    let overrideFieldProps: Record<string, string | number | boolean | Function> = {
+        defaultValue: Default as string,
+    };
+
     if (MaxLength) {
-        overrideFieldProps = {
+        overrideInputProps = {
             maxLength: MaxLength,
-            ...overrideFieldProps,
+            ...overrideInputProps,
         };
     }
 
     if (AllowedPattern) {
-        overrideFieldProps = {
+        overrideInputProps = {
             pattern: AllowedPattern,
+            ...overrideInputProps,
+        };
+        overrideFieldProps = {
             ...overrideFieldProps,
+            validate: (value: string): boolean => new RegExp(AllowedPattern).test(value),
         };
     }
 
-    const input = (props: InputProps): ReactElement => (
-        <TextField {...props} {...overrideFieldProps} />
+    return (
+        <Field {...defaultFieldProps} {...overrideFieldProps}>
+            {({ fieldProps, error }: any): ReactElement => (
+                <>
+                    <TextField {...fieldProps} {...overrideInputProps} />
+                    {error && <ErrorMessage>{ConstraintDescription}</ErrorMessage>}
+                </>
+            )}
+        </Field>
     );
-    return [input, Default];
 };
 
-const createInputFromQuickstartParam: FormElementGenerator = param => {
+const createInputFromQuickstartParam: FormElementGenerator = (defaultFieldProps, param) => {
     const {
         key,
         paramProperties: { Type },
     } = param;
     if (Type === 'Number') {
-        return createNumberInputFromQuickstartParam(param);
+        return createNumberInputFromQuickstartParam(defaultFieldProps, param);
     }
     if (Type === 'String') {
-        return createStringInputFromQuickstartParam(param);
+        return createStringInputFromQuickstartParam(defaultFieldProps, param);
     }
 
-    const input = (): ReactElement => <div key={key}>UNRECOGNISED PARAM TYPE</div>;
-    return [input, ''];
+    return <div key={key}>UNRECOGNISED PARAM TYPE</div>;
 };
 
-const createSelectFromQuickstartParam: FormElementGenerator = param => {
+const createSelectFromQuickstartParam: FormElementGenerator = (defaultFieldProps, param) => {
     const { paramProperties } = param;
     const { AllowedValues, Default } = paramProperties;
     if (AllowedValues.length === 2 && typeof AllowedValues[0] === 'boolean') {
-        const input = (props: InputProps): ReactElement => (
-            <Toggle {...props} size="large" isDefaultChecked={Default as boolean} />
+        return (
+            <Field {...defaultFieldProps}>
+                {({ fieldProps }: any): ReactElement => (
+                    <Toggle {...fieldProps} size="large" isDefaultChecked={Default as boolean} />
+                )}
+            </Field>
         );
-        return [input, Default];
     }
 
     const options = AllowedValues.map(val => ({ label: val as string, value: val }));
@@ -124,45 +141,37 @@ const createSelectFromQuickstartParam: FormElementGenerator = param => {
 
     const overrideFieldProps = {
         options,
-        deafault: defaultOption,
-    };
-
-    const input = (props: InputProps): ReactElement => {
-        return <Select {...props} {...overrideFieldProps} />;
-    };
-    return [input, defaultOption];
-};
-
-const quickstartParamToAtlaskitFormElement: FormElementGenerator = param => {
-    const { paramProperties } = param;
-    if (paramProperties.AllowedValues) {
-        return createSelectFromQuickstartParam(param);
-    }
-    if (paramProperties.Type === 'List<AWS::EC2::AvailabilityZone::Name>') {
-        return createAZSelection(param);
-    }
-    return createInputFromQuickstartParam(param);
-};
-
-export const createQuickstartFormField = (param: QuickstartParameter): ReactElement => {
-    const [FormInput, defaultValue] = quickstartParamToAtlaskitFormElement(param);
-
-    const defaultFieldProps = {
-        key: param.key,
-        label: param.key,
-        name: param.key,
-        defaultValue: defaultValue || '',
-    };
-
-    const parentFieldProps = {
-        ...defaultFieldProps,
     };
 
     return (
-        <Field {...parentFieldProps}>
-            {({ fieldProps }: any): ReactElement => {
-                return <FormInput {...fieldProps} />;
-            }}
+        <Field {...defaultFieldProps} defaultValue={defaultOption}>
+            {({ fieldProps }: any): ReactElement => (
+                <Select {...fieldProps} {...overrideFieldProps} />
+            )}
         </Field>
     );
+};
+
+const quickstartParamToAtlaskitFormElement: FormElementGenerator = (defaultFieldProps, param) => {
+    const { paramProperties } = param;
+    if (paramProperties.AllowedValues) {
+        return createSelectFromQuickstartParam(defaultFieldProps, param);
+    }
+    if (paramProperties.Type === 'List<AWS::EC2::AvailabilityZone::Name>') {
+        return createAZSelection(defaultFieldProps, param);
+    }
+    return createInputFromQuickstartParam(defaultFieldProps, param);
+};
+
+export const createQuickstartFormField = (param: QuickstartParameter): ReactElement => {
+    const { key } = param;
+
+    const defaultFieldProps = {
+        key,
+        label: key,
+        name: key,
+        defaultValue: '',
+    };
+
+    return quickstartParamToAtlaskitFormElement(defaultFieldProps, param);
 };
