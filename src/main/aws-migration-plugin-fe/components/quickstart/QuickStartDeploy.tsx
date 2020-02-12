@@ -5,6 +5,7 @@ import Button from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
 import { OptionType } from '@atlaskit/select';
 import { I18n } from '@atlassian/wrm-react-i18n';
+import styled from 'styled-components';
 
 import { createQuickstartFormField } from './quickstartToAtlaskit.tsx';
 import {
@@ -25,6 +26,14 @@ const isOptionType = (obj: any): obj is OptionType => {
 const isArrayOfOptionType = (obj: any): obj is Array<OptionType> => {
     return obj.length > 0 && isOptionType(obj[0]);
 };
+
+const QuickstartFormContainer = styled.form`
+    width: 60%;
+`;
+
+const QuickstartSubmitButton = styled(Button)`
+    margin-top: 10px;
+`;
 
 const QuickstartForm = ({
     quickstartParamGroups,
@@ -51,7 +60,7 @@ const QuickstartForm = ({
     >
         {({ formProps }: any): ReactElement => (
             /* eslint-enable @typescript-eslint/no-explicit-any */
-            <form {...formProps}>
+            <QuickstartFormContainer {...formProps}>
                 <FormHeader title={I18n.getText('aws.migration.provision.aws.form.title')} />
 
                 {quickstartParamGroups.map(group => {
@@ -63,10 +72,10 @@ const QuickstartForm = ({
                         </FormSection>
                     );
                 })}
-                <Button type="submit" appearance="primary">
+                <QuickstartSubmitButton type="submit" appearance="primary">
                     Submit
-                </Button>
-            </form>
+                </QuickstartSubmitButton>
+            </QuickstartFormContainer>
         )}
     </Form>
 );
@@ -94,6 +103,13 @@ const buildQuickstartParams = (quickstartParamDoc: any): Array<QuickstartParamet
     });
 };
 
+const QuickStartDeployContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+`;
+
 export const QuickStartDeploy: FunctionComponent = (): ReactElement => {
     const [params, setParams]: [Array<QuickstartParameterGroup>, Function] = useState([]);
     const [hasUpdatedTemplate, setHasUpdatedTemplate] = useState(false);
@@ -116,8 +132,8 @@ export const QuickStartDeploy: FunctionComponent = (): ReactElement => {
     });
 
     return (
-        <div>
+        <QuickStartDeployContainer>
             {hasUpdatedTemplate ? <QuickstartForm quickstartParamGroups={params} /> : <Spinner />}
-        </div>
+        </QuickStartDeployContainer>
     );
 };
