@@ -121,7 +121,7 @@ const createStringInputFromQuickstartParam: FormElementGenerator = (defaultField
     };
 
     let overrideFieldProps: Record<string, string | number | boolean | Function> = {
-        defaultValue: Default as string,
+        defaultValue: (Default as string) || '',
     };
 
     if (MaxLength) {
@@ -133,7 +133,6 @@ const createStringInputFromQuickstartParam: FormElementGenerator = (defaultField
 
     if (AllowedPattern) {
         overrideInputProps = {
-            pattern: AllowedPattern,
             ...overrideInputProps,
         };
         overrideFieldProps = {
