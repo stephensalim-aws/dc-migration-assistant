@@ -6,13 +6,19 @@ import Button from '@atlaskit/button';
 import {
     createQuickstartFormField,
     QuickStartParameterYamlNode,
+    QuickstartParameter,
     // eslint-disable-next-line import/extensions
 } from '../utils/quickstartToAtlaskit';
 
-const QuickstartForm = () => (
-    <Form onSubmit={(data: any) => console.log('form data', data)}>
-        {({ formProps }: any) => (
+const QuickstartForm = ({
+    quickstartParams,
+}: Record<string, Array<QuickstartParameter>>): ReactElement => (
+    <Form onSubmit={(data: FormData): void => console.log('form data', data)}>
+        {({ formProps }: any): ReactElement => (
             <form {...formProps}>
+                {quickstartParams.map(({ key, paramProperties }: QuickstartParameter) => {
+                    return createQuickstartFormField({ key, paramProperties });
+                })}
                 <Button type="submit" appearance="primary">
                     Submit
                 </Button>
@@ -44,10 +50,15 @@ export const QuickStartDeploy: FunctionComponent = (): ReactElement => {
 
     return (
         <div>
-            {Object.entries(params).map((entry: [string, QuickStartParameterYamlNode]) => {
-                const [key, value] = entry;
-                return createQuickstartFormField({ key, paramProperties: value });
-            })}
+            <QuickstartForm
+                quickstartParams={Object.entries(params).map(entry => {
+                    const [key, value] = entry;
+                    return {
+                        key,
+                        paramProperties: value as QuickStartParameterYamlNode,
+                    };
+                })}
+            />
         </div>
     );
 };
