@@ -50,8 +50,10 @@ export type QuickstartParameter = {
 const QuickstartForm = ({
     quickstartParamGroups,
 }: Record<string, Array<QuickstartParameterGroup>>): ReactElement => (
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     <Form onSubmit={(data: FormData): void => console.log('form data', data)}>
         {({ formProps }: any): ReactElement => (
+            /* eslint-enable @typescript-eslint/no-explicit-any */
             <form {...formProps}>
                 <FormHeader title={I18n.getText('aws.migration.provision.aws.form.title')} />
 
@@ -72,6 +74,7 @@ const QuickstartForm = ({
     </Form>
 );
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const buildQuickstartParams = (quickstartParamDoc: any): Array<QuickstartParameterGroup> => {
     const params: Record<string, QuickStartParameterYamlNode> = quickstartParamDoc.Parameters;
     const paramLabels: Record<string, QuickstartParamLabelYamlNode> =

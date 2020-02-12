@@ -1,12 +1,13 @@
-import React, { FunctionComponent, ReactElement, ReactNode } from 'react';
+import React, { ReactElement } from 'react';
 import Select from '@atlaskit/select';
 import Toggle from '@atlaskit/toggle';
 import TextField from '@atlaskit/textfield';
 import { ErrorMessage, Field, HelperMessage } from '@atlaskit/form';
 
 // eslint-disable-next-line import/extensions
-import { QuickstartParameter, QuickstartParameterProperties } from '../components/QuickStartDeploy';
+import { QuickstartParameter } from '../components/QuickStartDeploy';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type FormElementGenerator = (
     defaultProps: Record<string, string>,
     param: QuickstartParameter
@@ -22,7 +23,7 @@ const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
             {({ fieldProps }: any): ReactElement => (
                 <>
                     <HelperMessage>{Description}</HelperMessage>
-                    <div />
+                    <div {...fieldProps} />
                 </>
             )}
         </Field>
