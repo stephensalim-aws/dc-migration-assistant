@@ -58,7 +58,6 @@ const createNumberInputFromQuickstartParam: FormElementGenerator = (defaultField
     return (
         <Field {...defaultFieldProps} defaultValue={Default as number}>
             {({ fieldProps }: any): ReactElement => {
-                // console.log(fieldProps);
                 return <TextField {...fieldProps} {...overrideInputProps} />;
             }}
         </Field>
@@ -92,7 +91,14 @@ const createStringInputFromQuickstartParam: FormElementGenerator = (defaultField
         };
         overrideFieldProps = {
             ...overrideFieldProps,
-            validate: (value: string): boolean => new RegExp(AllowedPattern).test(value),
+            validate: (value: string): string => {
+                const regex = new RegExp(AllowedPattern);
+                const testSuccess = regex.test(value);
+                if (testSuccess) {
+                    return undefined;
+                }
+                return ConstraintDescription || `${param.key} must match ${AllowedPattern}`;
+            },
         };
     }
 
@@ -101,7 +107,7 @@ const createStringInputFromQuickstartParam: FormElementGenerator = (defaultField
             {({ fieldProps, error }: any): ReactElement => (
                 <>
                     <TextField {...fieldProps} {...overrideInputProps} />
-                    {error && <ErrorMessage>{ConstraintDescription}</ErrorMessage>}
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
                 </>
             )}
         </Field>
