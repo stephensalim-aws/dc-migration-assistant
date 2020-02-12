@@ -111,28 +111,27 @@ const QuickStartDeployContainer = styled.div`
 
 export const QuickStartDeploy: FunctionComponent = (): ReactElement => {
     const [params, setParams]: [Array<QuickstartParameterGroup>, Function] = useState([]);
-    const [hasUpdatedTemplate, setHasUpdatedTemplate] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (!hasUpdatedTemplate) {
-            fetch(QUICKSTART_PARAMS_URL, {
-                method: 'GET',
-            })
-                .then(resp => resp.text())
-                .then(text => {
-                    const paramDoc = yaml.parse(text);
+        setLoading(true);
+        fetch(QUICKSTART_PARAMS_URL, {
+            method: 'GET',
+        })
+            .then(resp => resp.text())
+            .then(text => {
+                const paramDoc = yaml.parse(text);
 
-                    const groupedParameters = buildQuickstartParams(paramDoc);
+                const groupedParameters = buildQuickstartParams(paramDoc);
 
-                    setParams(groupedParameters);
-                    setHasUpdatedTemplate(true);
-                });
-        }
-    });
+                setParams(groupedParameters);
+                setLoading(false);
+            });
+    }, []);
 
     return (
         <QuickStartDeployContainer>
-            {hasUpdatedTemplate ? <QuickstartForm quickstartParamGroups={params} /> : <Spinner />}
+            {loading ? <Spinner /> : <QuickstartForm quickstartParamGroups={params} />}
         </QuickStartDeployContainer>
     );
 };
