@@ -4,7 +4,7 @@ import { I18n } from '@atlassian/wrm-react-i18n';
 
 import { overviewPath, quickstartPath } from '../utils/RoutePaths.ts';
 import { MigrationOverview } from './MigrationOverview.tsx';
-import { QuickStartDeploy } from './QuickStartDeploy.tsx';
+import { QuickStartDeploy } from './quickstart/QuickStartDeploy.tsx';
 import { Home } from './Home.tsx';
 
 export const App: FunctionComponent = () => {

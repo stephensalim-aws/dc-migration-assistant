@@ -5,53 +5,34 @@ import Button from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
 import { I18n } from '@atlassian/wrm-react-i18n';
 
-import { createQuickstartFormField } from '../utils/quickstartToAtlaskit.tsx';
-
-type QuickStartParameterYamlNode = {
-    Type: string;
-    Default: string | number | boolean;
-    Description: string;
-    AllowedValues?: Array<string | boolean>;
-    ConstraintDescription?: string;
-    AllowedPattern?: string;
-    MaxLength?: number;
-    MinLength?: number;
-    MaxValue?: number;
-    MinValue?: number;
-    NoEcho?: boolean;
-};
-
-type QuickstartParamLabelYamlNode = {
-    default: string;
-};
-
-type QuickstartParamGroupYamlNode = {
-    Label: QuickstartParamLabelYamlNode;
-    Parameters: Array<string>;
-};
-
-type QuickstartParameterGroup = {
-    groupLabel: string;
-    parameters: Array<QuickstartParameter>;
-};
-
-export type QuickstartParameterProperties = QuickStartParameterYamlNode;
-
-export type Test = {
-    hello: boolean;
-};
-
-export type QuickstartParameter = {
-    paramKey: string;
-    paramLabel: string;
-    paramProperties: QuickstartParameterProperties;
-};
+import { createQuickstartFormField } from './quickstartToAtlaskit.tsx';
+import {
+    QuickstartParameterGroup,
+    QuickStartParameterYamlNode,
+    QuickstartParamGroupYamlNode,
+    QuickstartParamLabelYamlNode,
+    // eslint-disable-next-line import/extensions
+} from './QuickStartTypes';
 
 const QuickstartForm = ({
     quickstartParamGroups,
 }: Record<string, Array<QuickstartParameterGroup>>): ReactElement => (
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    <Form onSubmit={(data: FormData): void => console.log('form data', data)}>
+    <Form
+        onSubmit={(data: Record<string, any>): void => {
+            // console.log(data);
+            const transformedCfnParams = data;
+            Object.entries(data).forEach(entry => {
+                // Hoist value from Select inputs to root of form value
+                const [key, value] = entry;
+                if (value.label) {
+                    transformedCfnParams[key] = value.value;
+                }
+                return true;
+            });
+            console.log(transformedCfnParams);
+        }}
+    >
         {({ formProps }: any): ReactElement => (
             /* eslint-enable @typescript-eslint/no-explicit-any */
             <form {...formProps}>

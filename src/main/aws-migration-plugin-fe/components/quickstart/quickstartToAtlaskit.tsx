@@ -5,7 +5,7 @@ import TextField from '@atlaskit/textfield';
 import { ErrorMessage, Field, HelperMessage } from '@atlaskit/form';
 
 // eslint-disable-next-line import/extensions
-import { QuickstartParameter } from '../components/QuickStartDeploy';
+import { QuickstartParameter } from './QuickStartTypes';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type FormElementGenerator = (
