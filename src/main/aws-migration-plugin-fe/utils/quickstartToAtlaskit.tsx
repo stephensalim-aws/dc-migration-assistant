@@ -4,24 +4,8 @@ import Toggle from '@atlaskit/toggle';
 import TextField from '@atlaskit/textfield';
 import { ErrorMessage, Field, HelperMessage } from '@atlaskit/form';
 
-export type QuickStartParameterYamlNode = {
-    Type: string;
-    Default: string | number | boolean;
-    Description: string;
-    AllowedValues?: Array<string | boolean>;
-    ConstraintDescription?: string;
-    AllowedPattern?: string;
-    MaxLength?: number;
-    MinLength?: number;
-    MaxValue?: number;
-    MinValue?: number;
-    NoEcho?: boolean;
-};
-
-export type QuickstartParameter = {
-    key: string;
-    paramProperties: QuickStartParameterYamlNode;
-};
+// eslint-disable-next-line import/extensions
+import { QuickstartParameter, QuickstartParameterProperties } from '../components/QuickStartDeploy';
 
 type FormElementGenerator = (
     defaultProps: Record<string, string>,
@@ -121,7 +105,7 @@ const createStringInputFromQuickstartParam: FormElementGenerator = (defaultField
                 if (testSuccess) {
                     return undefined;
                 }
-                return ConstraintDescription || `${param.key} must match ${AllowedPattern}`;
+                return ConstraintDescription || `${param.paramKey} must match ${AllowedPattern}`;
             },
         };
     }
@@ -141,7 +125,7 @@ const createStringInputFromQuickstartParam: FormElementGenerator = (defaultField
 
 const createInputFromQuickstartParam: FormElementGenerator = (defaultFieldProps, param) => {
     const {
-        key,
+        paramKey,
         paramProperties: { Type },
     } = param;
     if (Type === 'Number') {
@@ -151,7 +135,7 @@ const createInputFromQuickstartParam: FormElementGenerator = (defaultFieldProps,
         return createStringInputFromQuickstartParam(defaultFieldProps, param);
     }
 
-    return <div key={key}>UNRECOGNISED PARAM TYPE</div>;
+    return <div key={paramKey}>UNRECOGNISED PARAM TYPE</div>;
 };
 
 const createSelectFromQuickstartParam: FormElementGenerator = (defaultFieldProps, param) => {
@@ -205,12 +189,12 @@ const quickstartParamToAtlaskitFormElement: FormElementGenerator = (defaultField
 };
 
 export const createQuickstartFormField = (param: QuickstartParameter): ReactElement => {
-    const { key } = param;
+    const { paramKey, paramLabel } = param;
 
     const defaultFieldProps = {
-        key,
-        label: key,
-        name: key,
+        key: paramKey,
+        label: paramLabel,
+        name: paramKey,
         defaultValue: '',
     };
 
