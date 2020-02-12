@@ -9,11 +9,12 @@ import com.aws.apn.migration.awsmigrationplugin.core.fs.FilesystemMigrationStatu
 import com.aws.apn.migration.awsmigrationplugin.dto.Migration;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationService;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationService;
 import org.springframework.stereotype.Component;
 
+import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.NOT_STARTED;
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.READY_FS_MIGRATION;
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.STARTED;
-import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.NOT_STARTED;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -63,10 +64,10 @@ public class AWSMigrationService implements MigrationService {
     }
 
     @Override
-    public FilesystemMigrationProgress startFilesystemMigration(FilesystemMigrationConfig config) {
+    public FilesystemMigrationProgress startFilesystemMigration(@ComponentImport FilesystemMigrationService service, FilesystemMigrationConfig config) {
         if (this.getMigrationStage() != READY_FS_MIGRATION) {
             return new FilesystemMigrationProgress(FilesystemMigrationStatus.FAILED);
         }
-        return new FilesystemMigrationProgress(FilesystemMigrationStatus.RUNNING);
+        return service.startMigration(config);
     }
 }
