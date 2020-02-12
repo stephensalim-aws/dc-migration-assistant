@@ -18,7 +18,9 @@ public class S3UploadListener implements S3ProgressListener {
     @Override
     public void progressChanged(ProgressEvent progressEvent) {
         bytesTransferred += progressEvent.getBytesTransferred();
-        logger.info("Transferred {} bytes", bytesTransferred);
+        if (bytesTransferred != 0) {
+            logger.info("Transferred {} bytes", bytesTransferred);
+        }
     }
 
     public long getBytesTransferred() {

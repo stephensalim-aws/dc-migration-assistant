@@ -11,9 +11,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class S3FilesystemMigrationServiceTest {
+class S3FilesystemMigrationServiceTest {
     @Test
-    public void migrationShouldFailWithIncorrectDirectory() {
+    void migrationShouldFailWithIncorrectDirectory() {
         // given
         Path nonexistentDir = Paths.get(UUID.randomUUID().toString());
         FilesystemMigrationConfig config = new FilesystemMigrationConfig("s3bucket", nonexistentDir);

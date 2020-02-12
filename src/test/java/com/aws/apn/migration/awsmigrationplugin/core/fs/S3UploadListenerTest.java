@@ -5,9 +5,9 @@ import com.amazonaws.event.ProgressEventType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class S3UploadListenerTest {
+class S3UploadListenerTest {
     @Test
-    public void transferredBytesAreAccessibleFromListener() {
+    void transferredBytesAreAccessibleFromListener() {
         // given
         long transferredBytes = 1000;
         ProgressEvent progressEvent = new ProgressEvent(ProgressEventType.REQUEST_BYTE_TRANSFER_EVENT, transferredBytes);
