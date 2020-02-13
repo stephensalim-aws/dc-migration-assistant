@@ -1,0 +1,154 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Quick Start to Atlaskit Input Converter Should create a number input 1`] = `
+<input
+  aria-invalid="false"
+  aria-labelledby="TestParam-uid2-label TestParam-uid2-helper TestParam-uid2-valid TestParam-uid2-error"
+  class="css-tonkbf-Input"
+  id="TestParam-uid2"
+  name="TestParam"
+  type="number"
+  value="12"
+/>
+`;
+
+exports[`Quick Start to Atlaskit Input Converter Should create a password input for NoEcho parameters 1`] = `
+<input
+  aria-invalid="false"
+  aria-labelledby="TestParam-uid8-label TestParam-uid8-helper TestParam-uid8-valid TestParam-uid8-error"
+  class="css-tonkbf-Input"
+  id="TestParam-uid8"
+  name="TestParam"
+  type="password"
+  value="test default"
+/>
+`;
+
+exports[`Quick Start to Atlaskit Input Converter Should create a select input when there are multiple allowed values that are not boolean 1`] = `
+<input
+  aria-autocomplete="list"
+  aria-labelledby="TestParam-uid6-label TestParam-uid6-helper TestParam-uid6-valid TestParam-uid6-error"
+  autocapitalize="none"
+  autocomplete="off"
+  autocorrect="off"
+  id="react-select-2-input"
+  spellcheck="false"
+  style="box-sizing: content-box; width: 2px; border: 0px; font-size: inherit; opacity: 1; outline: 0; padding: 0px;"
+  tabindex="0"
+  type="text"
+  value=""
+/>
+`;
+
+exports[`Quick Start to Atlaskit Input Converter Should create a toggle input when there are two allowed values that are boolean 1`] = `
+<input
+  checked=""
+  class="sc-fzXfLP cOsBmS"
+  id="uid5"
+  name="TestParam"
+  type="checkbox"
+  value=""
+/>
+`;
+
+exports[`Quick Start to Atlaskit Input Converter Should create multi select input for AZ parameter 1`] = `
+<div
+  class=" css-1sptkt-container"
+  id="TestParam-uid7"
+>
+  <div
+    class=" css-5zed9i-control"
+  >
+    <div
+      class=" css-1b6odlt"
+    >
+      <div
+        class=" css-ypi1dq-placeholder"
+        style="opacity: 1; transition: opacity 260ms;"
+      >
+        Select...
+      </div>
+      <input
+        class="css-62g3xt-dummyInput"
+        id="react-select-3-input"
+        readonly=""
+        tabindex="0"
+        value=""
+      />
+    </div>
+    <div
+      class=" css-xji0fq-IndicatorsContainer"
+    >
+      <div
+        aria-hidden="true"
+        class="css-1r2gs9k-loadingIndicator"
+      >
+        <span
+          class="sc-AykKH efaQvt"
+        >
+          <span
+            class="sc-AykKF guWTxi"
+            size="16"
+          >
+            <svg
+              class="sc-AykKG bRRuJZ"
+              focusable="false"
+              height="16"
+              size="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="8"
+                cy="8"
+                r="7"
+              />
+            </svg>
+          </span>
+        </span>
+      </div>
+      <div
+        aria-hidden="true"
+        class=" css-gg6ksl-indicatorContainer"
+      >
+        <span
+          aria-label="open"
+          class="sc-AykKC irHdoa"
+        >
+          <svg
+            focusable="false"
+            height="24"
+            role="presentation"
+            viewBox="0 0 24 24"
+            width="24"
+          >
+            <path
+              d="M6.744 8.744a1.053 1.053 0 0 0 0 1.49l4.547 4.557a1 1 0 0 0 1.416 0l4.55-4.558a1.051 1.051 0 1 0-1.488-1.488l-3.77 3.776-3.768-3.776a1.051 1.051 0 0 0-1.487 0z"
+              fill="currentColor"
+            />
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div>
+    <input
+      name="TestParam"
+      type="hidden"
+    />
+  </div>
+</div>
+`;
+
+exports[`Quick Start to Atlaskit Input Converter Should render String inputs 1`] = `
+<input
+  aria-invalid="false"
+  aria-labelledby="TestParam-uid3-label TestParam-uid3-helper TestParam-uid3-valid TestParam-uid3-error"
+  class="css-tonkbf-Input"
+  id="TestParam-uid3"
+  name="TestParam"
+  type="text"
+  value="test default"
+/>
+`;
