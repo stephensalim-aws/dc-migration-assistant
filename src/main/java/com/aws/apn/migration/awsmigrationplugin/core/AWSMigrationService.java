@@ -10,6 +10,7 @@ import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationConfig
 import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationService;
 import org.springframework.stereotype.Component;
 
+import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.FS_MIGRATION;
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.NOT_STARTED;
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.READY_FS_MIGRATION;
 import static com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage.STARTED;
@@ -28,6 +29,9 @@ public class AWSMigrationService implements MigrationService {
 
     private MigrationStage currentStage;
 
+    private Migration migration;
+
+
     /**
      * Creates a new, unstarted AWS Migration
      */
@@ -45,9 +49,7 @@ public class AWSMigrationService implements MigrationService {
             return false;
         }
 
-        final Migration migration = ao.create(Migration.class);
-        migration.setStage(STARTED);
-        migration.save();
+        updateMigrationStage(STARTED);
 
         return true;
     }
@@ -57,17 +59,32 @@ public class AWSMigrationService implements MigrationService {
      */
     @Override
     public MigrationStage getMigrationStage() {
-        Migration[] migrations = ao.find(Migration.class);
-        if (migrations.length == 1) {
-            return migrations[0].getStage();
+        if (migration == null) {
+            Migration[] migrations = ao.find(Migration.class);
+            if (migrations.length == 1) {
+                // In case we have interrupted migration (e.g. the node went down), we want to pick up where we've
+                // left off.
+                migration = migrations[0];
+            } else {
+                // We didn't start the migration, so we need to create record in the db
+                migration = ao.create(Migration.class);
+                migration.setStage(NOT_STARTED);
+                migration.save();
+            }
         }
-        return NOT_STARTED;
+        return migration.getStage();
+    }
+
+    public void updateMigrationStage(MigrationStage stage) {
+        migration.setStage(stage);
+        migration.save();
     }
 
     public boolean startFilesystemMigration(FilesystemMigrationConfig config) {
-        if (this.getMigrationStage() != READY_FS_MIGRATION) {
+        if (getMigrationStage() != READY_FS_MIGRATION) {
             return false;
         }
+        updateMigrationStage(FS_MIGRATION);
         fsService.startMigration(config);
         return true;
     }

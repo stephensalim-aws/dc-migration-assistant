@@ -41,6 +41,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
             S3UploadListener listener = new S3UploadListener(progress);
             upload.addProgressListener(listener);
             FilesystemMigrationStatus status = waitToComplete(upload);
+            progress.setStatus(status);
         } else {
             progress.setStatus(FilesystemMigrationStatus.FAILED);
         }

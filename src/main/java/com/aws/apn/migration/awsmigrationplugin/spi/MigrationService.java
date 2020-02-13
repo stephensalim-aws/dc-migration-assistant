@@ -1,9 +1,6 @@
 package com.aws.apn.migration.awsmigrationplugin.spi;
 
 import com.atlassian.activeobjects.tx.Transactional;
-import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationConfig;
-import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationProgress;
-import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationService;
 
 /**
  * Abstraction of an on-premise to cloud migration modeled as a finite state machine.
