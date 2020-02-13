@@ -60,11 +60,9 @@ Parameters:
     Description: Fourth Parameter
 `;
 
-// eslint-disable-next-line no-undef
-fetchMock.mockResponse(() => {
-    // console.log('in fetch mock');
-    return Promise.resolve(mockCfnYaml);
-});
+const mockFetch = jest.fn();
+mockFetch.mockReturnValue(Promise.resolve({ text: () => mockCfnYaml }));
+window.fetch = mockFetch;
 
 describe('Quick Start Provisioning Screen', () => {
     it('Should render', async () => {
