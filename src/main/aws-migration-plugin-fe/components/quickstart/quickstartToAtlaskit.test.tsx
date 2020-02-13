@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 // eslint-disable-next-line import/extensions
 import { QuickstartParameter } from './QuickStartTypes';
@@ -8,7 +8,7 @@ const TEST_PARAM_KEY = 'TestParam';
 const TEST_PARAM_LABEL = 'Test Param';
 const TEST_PARAM_DESCRIPTION = 'a test parameter';
 const TEST_STRING_DEFAULT = 'test default';
-const TEST_CONSTRAINT_DESCRIPTION = 'test constraint description';
+const TEST_NUMBER_DEFAULT = 12;
 
 const STRING_INPUT: QuickstartParameter = {
     paramKey: TEST_PARAM_KEY,
@@ -33,7 +33,7 @@ const NUMBER_INPUT: QuickstartParameter = {
     paramLabel: TEST_PARAM_LABEL,
     paramProperties: {
         Type: 'Number',
-        Default: 12,
+        Default: TEST_NUMBER_DEFAULT,
         Description: TEST_PARAM_DESCRIPTION,
     },
 };
@@ -119,5 +119,13 @@ describe('Quick Start to Atlaskit Input Converter', () => {
         const { getByLabelText } = render(createQuickstartFormField(NO_ECHO_INPUT));
 
         expect(getByLabelText(TEST_PARAM_LABEL)).toMatchSnapshot();
+    });
+
+    it('Should populate parameters with their default values', () => {
+        const { getByLabelText } = render(createQuickstartFormField(NUMBER_INPUT));
+
+        expect(getByLabelText(TEST_PARAM_LABEL).getAttribute('value')).toEqual(
+            `${TEST_NUMBER_DEFAULT}`
+        );
     });
 });
