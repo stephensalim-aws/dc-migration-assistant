@@ -23,9 +23,4 @@ public interface MigrationService {
      * @see MigrationStage
      */
     MigrationStage getMigrationStage();
-
-    /**
-     * Start migration of local files to remote destination
-     */
-    FilesystemMigrationProgress startFilesystemMigration(FilesystemMigrationService service, FilesystemMigrationConfig config);
 }

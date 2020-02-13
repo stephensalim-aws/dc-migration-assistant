@@ -7,7 +7,9 @@ import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationServic
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Files;
@@ -16,8 +18,9 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.UUID;
 
-@Disabled
-class S3FilesystemMigrationServiceIntegrationTest {
+@Tag("integration")
+@EnabledIfEnvironmentVariable(named = "integration", matches = "true")
+class S3FilesystemMigrationServiceIntegrationTestIT {
     @TempDir
     Path dir;
 
@@ -35,7 +38,7 @@ class S3FilesystemMigrationServiceIntegrationTest {
         System.out.println(System.getenv("AWS_ACCESS_KEY_ID"));
         FilesystemMigrationConfig config = new FilesystemMigrationConfig(s3Bucket, dir);
         FilesystemMigrationService fsService = new S3FilesystemMigrationService();
-        FilesystemMigrationProgress filesystemMigrationProgress = fsService.startMigration(config);
-        Assertions.assertNotEquals(FilesystemMigrationStatus.FAILED, filesystemMigrationProgress.getStatus());
+        fsService.startMigration(config);
+        Assertions.assertNotEquals(FilesystemMigrationStatus.FAILED, fsService.getProgress().getStatus());
     }
 }

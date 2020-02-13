@@ -4,6 +4,7 @@ import static com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigratio
 
 public class FilesystemMigrationProgress {
     private FilesystemMigrationStatus status;
+    private long bytesTransferred = 0L;
 
     public FilesystemMigrationProgress() {
         this(NOT_STARTED);
@@ -19,5 +20,14 @@ public class FilesystemMigrationProgress {
 
     public FilesystemMigrationStatus getStatus() {
         return status;
+    }
+
+    public long getBytesTransferred() {
+        return bytesTransferred;
+    }
+
+    public long addBytes(long bytesTransferred) {
+        this.bytesTransferred += bytesTransferred;
+        return this.bytesTransferred;
     }
 }

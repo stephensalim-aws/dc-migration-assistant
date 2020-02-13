@@ -40,7 +40,8 @@ public class AWSMigrationServiceTest {
     public void setup() {
         assertNotNull(entityManager);
         ao = new TestActiveObjects(entityManager);
-        sut = new AWSMigrationService(ao);
+        FilesystemMigrationService fsService = mock(FilesystemMigrationService.class);
+        sut = new AWSMigrationService(ao, fsService);
     }
 
     @Test
@@ -97,9 +98,9 @@ public class AWSMigrationServiceTest {
         ao.migrate(Migration.class);
         FilesystemMigrationService fsService = mock(FilesystemMigrationService.class);
         // when
-        FilesystemMigrationProgress progress = sut.startFilesystemMigration(fsService, mockConfig);
+        boolean success = sut.startFilesystemMigration(mockConfig);
         // then
-        assertEquals(FilesystemMigrationStatus.FAILED, progress.getStatus());
+        assertFalse(success);
     }
 
     @Test
@@ -107,12 +108,10 @@ public class AWSMigrationServiceTest {
         // given
         ao.migrate(Migration.class);
         createMigration(READY_FS_MIGRATION);
-        FilesystemMigrationService fsService = mock(FilesystemMigrationService.class);
-        when(fsService.startMigration(mockConfig)).thenReturn(new FilesystemMigrationProgress(FilesystemMigrationStatus.RUNNING));
         // when
-        FilesystemMigrationProgress progress = sut.startFilesystemMigration(fsService, mockConfig);
+        boolean success = sut.startFilesystemMigration(mockConfig);
         // then
-        assertEquals(FilesystemMigrationStatus.RUNNING, progress.getStatus());
+        assertTrue(success);
     }
 
     private void assertNumberOfMigrations(int i) {

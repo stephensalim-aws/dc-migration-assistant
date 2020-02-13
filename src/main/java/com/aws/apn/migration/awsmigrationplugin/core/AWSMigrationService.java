@@ -3,12 +3,10 @@ package com.aws.apn.migration.awsmigrationplugin.core;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationConfig;
-import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationProgress;
-import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationStatus;
 import com.aws.apn.migration.awsmigrationplugin.dto.Migration;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationService;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
+import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationConfig;
 import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationService;
 import org.springframework.stereotype.Component;
 
@@ -26,13 +24,16 @@ public class AWSMigrationService implements MigrationService {
 
     private ActiveObjects ao;
 
+    private FilesystemMigrationService fsService;
+
     private MigrationStage currentStage;
 
     /**
      * Creates a new, unstarted AWS Migration
      */
-    public AWSMigrationService(@ComponentImport ActiveObjects ao) {
+    public AWSMigrationService(@ComponentImport ActiveObjects ao, @ComponentImport FilesystemMigrationService fms) {
         this.ao = requireNonNull(ao);
+        this.fsService = fms;
     }
 
     /**
@@ -63,11 +64,11 @@ public class AWSMigrationService implements MigrationService {
         return NOT_STARTED;
     }
 
-    @Override
-    public FilesystemMigrationProgress startFilesystemMigration(@ComponentImport FilesystemMigrationService service, FilesystemMigrationConfig config) {
+    public boolean startFilesystemMigration(FilesystemMigrationConfig config) {
         if (this.getMigrationStage() != READY_FS_MIGRATION) {
-            return new FilesystemMigrationProgress(FilesystemMigrationStatus.FAILED);
+            return false;
         }
-        return service.startMigration(config);
+        fsService.startMigration(config);
+        return true;
     }
 }

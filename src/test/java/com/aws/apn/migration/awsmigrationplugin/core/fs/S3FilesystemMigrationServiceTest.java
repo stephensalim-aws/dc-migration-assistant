@@ -19,8 +19,8 @@ class S3FilesystemMigrationServiceTest {
         FilesystemMigrationConfig config = new FilesystemMigrationConfig("s3bucket", nonexistentDir);
         S3FilesystemMigrationService fsService = new S3FilesystemMigrationService();
         // when
-        FilesystemMigrationProgress progress = fsService.startMigration(config);
+        fsService.startMigration(config);
         // then
-        assertEquals(FilesystemMigrationStatus.FAILED, progress.getStatus());
+        assertEquals(FilesystemMigrationStatus.FAILED, fsService.getProgress().getStatus());
     }
 }
