@@ -1,5 +1,5 @@
-import format from '../wrm/format';
-import { getPhrase } from '../i18n-mock';
+import format from '../wrm/format.ts';
+import { getPhrase } from '../i18n-mock.ts';
 
 export const I18n = {
     getText(phraseId: string, ...params: Array<string>) {
