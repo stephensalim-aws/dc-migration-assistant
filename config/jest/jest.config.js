@@ -13,7 +13,8 @@ module.exports = {
     transformIgnorePatterns: ['node_modules/(?!(@atlaskit)/)'],
     moduleNameMapper: {
         '^wrm/context-path$': path.join(paths.mocksRoot, './wrm/context-path.ts'),
-        '^@atlassian/wrm-react-i18n$': path.join(paths.mocksRoot, './@atlassian/wrm-react-i18n.js'),
+        '^wrm/format$': path.join(paths.mocksRoot, './wrm/format.ts'),
+        '^@atlassian/wrm-react-i18n$': path.join(paths.mocksRoot, './@atlassian/wrm-react-i18n.ts'),
         '\\.(css|less)$': 'identity-obj-proxy',
     },
     testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
