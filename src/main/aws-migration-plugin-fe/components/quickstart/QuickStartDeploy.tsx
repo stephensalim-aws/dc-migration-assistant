@@ -19,10 +19,12 @@ import {
 const QUICKSTART_PARAMS_URL =
     'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/quickstart-jira-dc-with-vpc.template.parameters.yaml';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isOptionType = (obj: any): obj is OptionType => {
     return obj.label && obj.value;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isArrayOfOptionType = (obj: any): obj is Array<OptionType> => {
     return obj.length > 0 && isOptionType(obj[0]);
 };

@@ -74,17 +74,15 @@ const createNumberInputFromQuickstartParam: FormElementGenerator = (defaultField
         paramProperties: { Default, ConstraintDescription, Description, MaxValue, MinValue },
     } = param;
 
-    let overrideInputProps: InputProps = {
+    const overrideInputProps: InputProps = {
         type: 'number',
     };
 
-    let overrideFieldProps: InputProps = {};
+    let overrideFieldProps: InputProps = {
+        defaultValue: (Default as number) || '',
+    };
 
     if (MaxValue) {
-        overrideInputProps = {
-            ...overrideInputProps,
-            max: MaxValue,
-        };
         overrideFieldProps = {
             ...overrideFieldProps,
             validate: (value: number): string => {
@@ -111,18 +109,13 @@ const createNumberInputFromQuickstartParam: FormElementGenerator = (defaultField
             };
         }
 
-        overrideInputProps = {
-            ...overrideInputProps,
-            min: MinValue,
-        };
-
         overrideFieldProps = {
             ...overrideFieldProps,
             validate,
         };
     }
     return (
-        <Field {...defaultFieldProps} {...overrideFieldProps} defaultValue={Default as number}>
+        <Field {...defaultFieldProps} {...overrideFieldProps}>
             {({ fieldProps, error }: any): ReactElement => {
                 return (
                     <>
