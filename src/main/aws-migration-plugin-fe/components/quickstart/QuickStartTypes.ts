@@ -1,6 +1,6 @@
 export type QuickStartParameterYamlNode = {
     Type: string;
-    Default: string | number | boolean;
+    Default?: string | number | boolean;
     Description: string;
     AllowedValues?: Array<string | boolean>;
     ConstraintDescription?: string;
