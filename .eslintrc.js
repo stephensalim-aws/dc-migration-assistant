@@ -37,7 +37,7 @@ module.exports = {
         'react/forbid-prop-types': 'warn',
         'react/prop-types': 'warn',
         'react/destructuring-assignment': 'warn',
-        'import/no-extraneous-dependencies': 'warn',
+        'import/no-extraneous-dependencies': ["error", {"devDependencies": ["**/*.test.tsx", "**/*.test.ts"]}],
         'jsx-a11y/label-has-associated-control': 'warn',
         'no-return-assign': 'warn',
         'react/static-property-placement': 'warn',

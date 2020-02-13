@@ -6,7 +6,7 @@ const { MY_I18N_FILES } = require('./webpack.constants');
 function getLoaders({ isProductionEnv = false }) {
     return [
         {
-            test: /\.jsx?$/,
+            test: /\.(tsx|ts)?$/,
             exclude: /node_modules/,
             use: [
                 {
@@ -14,12 +14,6 @@ function getLoaders({ isProductionEnv = false }) {
                     options: {
                         i18nFiles: MY_I18N_FILES,
                         disabled: isProductionEnv,
-                    },
-                },
-                {
-                    loader: 'babel-loader',
-                    options: {
-                        cacheDirectory: true,
                     },
                 },
             ],
