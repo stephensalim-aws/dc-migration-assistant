@@ -34,6 +34,7 @@ export const App: FunctionComponent = () => {
                         }}
                         onSubmitCreds={(creds): Promise<string> => {
                             // This should be replaced with API call that stores the credentials
+                            // eslint-disable-next-line no-console
                             console.log(creds);
                             return Promise.resolve('');
                         }}
