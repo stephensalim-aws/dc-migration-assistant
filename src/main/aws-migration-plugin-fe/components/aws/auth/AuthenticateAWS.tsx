@@ -1,5 +1,5 @@
 import React, { FunctionComponent, ReactElement } from 'react';
-import Form, { Field } from '@atlaskit/form';
+import Form, { ErrorMessage, Field, HelperMessage } from '@atlaskit/form';
 import Button from '@atlaskit/button';
 import styled from 'styled-components';
 import TextField from '@atlaskit/textfield';
@@ -29,6 +29,10 @@ type AuthenticateAWSProps = {
     getRegions: QueryRegionFun;
 };
 
+const CredsSubmitButton = styled(Button)`
+    margin-top: 10px;
+`;
+
 const RegionSelect: FunctionComponent<{ getRegions: QueryRegionFun }> = (props): ReactElement => {
     const { getRegions } = props;
 
@@ -48,27 +52,40 @@ const RegionSelect: FunctionComponent<{ getRegions: QueryRegionFun }> = (props):
             {...props}
             cacheOptions
             defaultOptions
-            isMulti
-            isSearchable={false}
+            isSearchable
             loadOptions={promiseOptions}
         />
     );
 };
 
-export const AuthenticateAWS: FunctionComponent<{
-    onSubmitCreds: CredSubmitFun;
-    getRegions: QueryRegionFun;
-}> = ({ onSubmitCreds, getRegions }): ReactElement => {
+export const AuthenticateAWS: FunctionComponent<AuthenticateAWSProps> = ({
+    onSubmitCreds,
+    getRegions,
+}): ReactElement => {
+    const submitCreds = (formCreds: {
+        accessKeyID: string;
+        secretAccessKey: string;
+        region: OptionType;
+    }): void => {
+        const { accessKeyID, secretAccessKey, region } = formCreds;
+        const creds: AWSCreds = {
+            accessKeyID,
+            secretAccessKey,
+            region: region.value as string,
+        };
+        onSubmitCreds(creds);
+    };
+
     return (
         <>
             <h1>{I18n.getText('aws.migration.authenticate.aws.title')}</h1>
-            <Form>
+            <Form onSubmit={submitCreds}>
                 {({ formProps }: any): ReactElement => (
                     <form {...formProps}>
                         <Field
                             isRequired
                             label={I18n.getText('aws.migration.authenticate.aws.accessKeyId.label')}
-                            name="acccessKeyId"
+                            name="accessKeyID"
                             defaultValue=""
                         >
                             {({ fieldProps }: any): ReactElement => (
@@ -88,15 +105,33 @@ export const AuthenticateAWS: FunctionComponent<{
                             )}
                         </Field>
                         <Field
-                            isRequired
                             label={I18n.getText('aws.migration.authenticate.aws.region.label')}
                             name="region"
-                            defaultValue=""
+                            validate={(value: OptionType): string => {
+                                return value ? undefined : 'NO_REGION';
+                            }}
                         >
-                            {({ fieldProps }: any): ReactElement => (
-                                <RegionSelect getRegions={getRegions} {...fieldProps} />
+                            {({ fieldProps, error }: any): ReactElement => (
+                                <>
+                                    <HelperMessage>
+                                        {I18n.getText(
+                                            'aws.migration.authenticate.aws.region.helper'
+                                        )}
+                                    </HelperMessage>
+                                    <RegionSelect getRegions={getRegions} {...fieldProps} />
+                                    {error && (
+                                        <ErrorMessage>
+                                            {I18n.getText(
+                                                'aws.migration.authenticate.aws.region.error'
+                                            )}
+                                        </ErrorMessage>
+                                    )}
+                                </>
                             )}
                         </Field>
+                        <CredsSubmitButton type="submit" appearance="primary">
+                            {I18n.getText('aws.migration.generic.submit')}
+                        </CredsSubmitButton>
                     </form>
                 )}
             </Form>

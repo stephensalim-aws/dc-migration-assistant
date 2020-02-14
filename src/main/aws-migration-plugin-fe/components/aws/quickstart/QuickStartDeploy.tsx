@@ -70,7 +70,7 @@ const QuickstartForm = ({
                     );
                 })}
                 <QuickstartSubmitButton type="submit" appearance="primary">
-                    Submit
+                    {I18n.getText('aws.migration.generic.submit')}
                 </QuickstartSubmitButton>
             </QuickstartFormContainer>
         )}
