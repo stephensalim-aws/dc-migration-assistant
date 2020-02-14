@@ -21,6 +21,7 @@ module.exports = {
         sourceType: 'module',
     },
     rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
         'import/no-webpack-loader-syntax': 'off',
         'import/prefer-default-export': 'off',
         'prettier/prettier': 'error',
