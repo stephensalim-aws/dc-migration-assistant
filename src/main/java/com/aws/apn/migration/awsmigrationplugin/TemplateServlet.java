@@ -1,19 +1,19 @@
 package com.aws.apn.migration.awsmigrationplugin;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collections;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
-
-import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.permission.PermissionEnforcer;
 import com.atlassian.soy.renderer.SoyTemplateRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Collections;
 
 /**
  * Creates the servlet which renders the soy template containing the frontend SPA bundle.
@@ -52,11 +52,12 @@ public class TemplateServlet extends HttpServlet {
 
     private void render(HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.TEXT_HTML);
+
         templateRenderer.render(
-            response.getWriter(),
-            "com.aws.apn.migration.aws-migration-plugin:aws-migration-plugin-templates",
-            "awsmigrationplugin.init", 
-            Collections.emptyMap()
+                response.getWriter(),
+                "com.aws.apn.migration.aws-migration-plugin:aws-migration-plugin-templates",
+                "awsmigrationplugin.init",
+                Collections.emptyMap()
         );
     }
 }

@@ -115,9 +115,23 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>cloudformation</artifactId>
+            <version>${aws.sdk.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>software.amazon.awssdk</groupId>
+                    <artifactId>apache-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
         </dependency>
+
+        <!-- Test Dependencies follow -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -208,6 +222,21 @@
                             com.atlassian.analytics.api.annotations;resolution:="optional",
                             com.atlassian.confluence.*;resolution:="optional",
                             org.slf4j,
+                            !com.google.protobuf.*,
+                            !com.jcraft.jzlib,
+                            !com.ning.compress.*,
+                            !com.oracle.svm.core.*,
+                            !io.netty.internal.tcnative,
+                            !lzma.sdk.*,
+                            !net.jpountz.*,
+                            !org.apache.logging.log4j.*,
+                            !org.bouncycastle.cert.*,
+                            !org.bouncycastle.operator.*,
+                            !org.conscrypt.*,
+                            !org.eclipse.jetty.*,
+                            !org.jboss.*,
+                            !sun.misc.*,
+                            !sun.security.*,
                             !org.apache.avalon.framework.logger.*,
                             !org.apache.log.*;
                             !com.conversantmedia.util.concurrent.*,
@@ -359,6 +388,7 @@
         <webfragments.version>5.1.0</webfragments.version>
         <mockito.version>3.2.4</mockito.version>
         <junit.version>5.4.2</junit.version>
+        <aws.sdk.version>2.10.61</aws.sdk.version>
     </properties>
 
 </project>

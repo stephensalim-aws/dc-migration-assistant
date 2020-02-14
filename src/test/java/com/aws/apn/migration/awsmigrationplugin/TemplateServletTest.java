@@ -12,14 +12,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.net.URI;
 
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
-
 import static org.junit.jupiter.api.Assertions.fail;
-
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
