@@ -179,7 +179,7 @@
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-bom</artifactId>
-                <version>1.11.715</version>
+                <version>${aws.sdk.v1.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -208,6 +208,11 @@
                             com.atlassian.analytics.api.annotations;resolution:="optional",
                             com.atlassian.confluence.*;resolution:="optional",
                             org.slf4j,
+                            !org.apache.avalon.framework.logger.*,
+                            !org.apache.log.*;
+                            !com.conversantmedia.util.concurrent.*,
+                            !org.apache.logging.log4j.core.async.*,
+                            !org.joda.convert.*,
                             *
                         </Import-Package>
                     </instructions>
@@ -348,7 +353,8 @@
         <spring.version>5.0.10.RELEASE</spring.version>
         <atlassian.spring.scanner.version>2.1.9</atlassian.spring.scanner.version>
         <atlassian.plugins.version>5.2.1</atlassian.plugins.version>
-        <amps.version>8.0.0</amps.version>
+        <amps.version>8.0.2</amps.version>
+        <aws.sdk.v1.version>1.11.715</aws.sdk.v1.version>
         <soy.version>5.0.0</soy.version>
         <webfragments.version>5.1.0</webfragments.version>
         <mockito.version>3.2.4</mockito.version>
