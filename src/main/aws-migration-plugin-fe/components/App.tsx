@@ -28,8 +28,12 @@ export const App: FunctionComponent = () => {
                 </Route>
                 <Route path={awsAuthPath}>
                     <AuthenticateAWS
-                        getRegions={(): Promise<Array<string>> => Promise.resolve(regions)}
+                        getRegions={(): Promise<Array<string>> => {
+                            // This should be replaced with API call which gets regions
+                            return Promise.resolve(regions);
+                        }}
                         onSubmitCreds={(creds): Promise<string> => {
+                            // This should be replaced with API call that stores the credentials
                             console.log(creds);
                             return Promise.resolve('');
                         }}
