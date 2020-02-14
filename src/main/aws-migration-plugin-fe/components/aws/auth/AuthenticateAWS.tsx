@@ -6,7 +6,7 @@ import TextField from '@atlaskit/textfield';
 import { I18n } from '@atlassian/wrm-react-i18n';
 import { AsyncSelect, OptionType } from '@atlaskit/select';
 
-type AWSCreds = {
+export type AWSCreds = {
     accessKeyID: string;
     secretAccessKey: string;
     region: string;
@@ -24,7 +24,7 @@ with the AWS regions
 */
 type QueryRegionFun = () => Promise<Array<string>>;
 
-type AuthenticateAWSProps = {
+export type AuthenticateAWSProps = {
     onSubmitCreds: CredSubmitFun;
     getRegions: QueryRegionFun;
 };
