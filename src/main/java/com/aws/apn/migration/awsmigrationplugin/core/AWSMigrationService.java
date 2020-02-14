@@ -35,7 +35,7 @@ public class AWSMigrationService implements MigrationService {
     /**
      * Creates a new, unstarted AWS Migration
      */
-    public AWSMigrationService(@ComponentImport ActiveObjects ao, @ComponentImport FilesystemMigrationService fms) {
+    public AWSMigrationService(@ComponentImport ActiveObjects ao, FilesystemMigrationService fms) {
         this.ao = requireNonNull(ao);
         this.fsService = fms;
     }
