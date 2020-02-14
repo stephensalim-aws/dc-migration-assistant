@@ -7,7 +7,7 @@ import { OptionType } from '@atlaskit/select';
 import { I18n } from '@atlassian/wrm-react-i18n';
 import styled from 'styled-components';
 
-import { createQuickstartFormField } from './quickstartToAtlaskit.tsx';
+import { createQuickstartFormField } from './quickstartToAtlaskit';
 import {
     QuickstartParameterGroup,
     QuickStartParameterYamlNode,

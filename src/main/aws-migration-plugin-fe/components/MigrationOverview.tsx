@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Button } from '@atlaskit/button/dist/cjs/components/Button';
 import { Link } from 'react-router-dom';
 
-import { homePath } from '../utils/RoutePaths.ts';
+import { homePath } from '../utils/RoutePaths';
 
 const OverviewContainer = styled.div`
     display: flex;
