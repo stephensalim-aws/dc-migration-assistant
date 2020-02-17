@@ -22,5 +22,10 @@ public interface MigrationService {
      */
     MigrationStage getMigrationStage();
 
+    /**
+     * Provisions a CloudFormation stack.
+     * @param provisioningConfig contains information required to provision a stack
+     * @return a stack identifier of the created stack
+     */
     String provisionInfrastructure(ProvisioningConfig provisioningConfig);
 }

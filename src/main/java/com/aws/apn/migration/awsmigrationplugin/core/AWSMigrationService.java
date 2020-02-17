@@ -1,7 +1,6 @@
 package com.aws.apn.migration.awsmigrationplugin.core;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.aws.apn.migration.awsmigrationplugin.core.aws.CfnApi;
 import com.aws.apn.migration.awsmigrationplugin.core.exceptions.InfrastructureProvisioningError;
@@ -27,16 +26,12 @@ import static java.util.Objects.requireNonNull;
  * Manages a migration from on-premise to self-hosted AWS.
  */
 @Component
-//TODO: Delete export as sservice as we don't need to expose this as an OSGI service
-@ExportAsService({MigrationService.class})
 public class AWSMigrationService implements MigrationService {
 
     private ActiveObjects ao;
 
     private FilesystemMigrationService fsService;
     private final CfnApi cfnApi;
-
-    private MigrationStage currentStage;
 
     private Migration migration;
 
@@ -85,9 +80,12 @@ public class AWSMigrationService implements MigrationService {
         return migration.getStage();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String provisionInfrastructure(ProvisioningConfig config) {
-        //TODO: Who sets this value here? The previous step?
+        //TODO: Refactor this to a state machine as part of https://aws-partner.atlassian.net/browse/CHET-101
         MigrationStage currentMigrationStage = getMigrationStage();
         if (currentMigrationStage != READY_TO_PROVISION) {
             throw new InvalidMigrationStageError(String.format("Expected migration stage was %s, but found %s", READY_TO_PROVISION, currentMigrationStage));
