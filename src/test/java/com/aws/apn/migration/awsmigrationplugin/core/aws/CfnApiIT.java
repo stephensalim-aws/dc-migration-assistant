@@ -41,7 +41,7 @@ class CfnApiIT {
 
     @Test
     @Disabled("Disabled until LocalStack is Created")
-    public void shouldRaiseExceptionWhenStackDoesNoyExist() {
+    public void shouldRaiseExceptionWhenStackDoesNotExist() {
         String stackArn = "arn:aws:cloudformation:ap-southeast-2:1231231231:stack/i-do-not-exist";
         Assertions.assertThrows(StackInstanceNotFoundException.class, () -> {
             cfnApi.getStatus(stackArn);
