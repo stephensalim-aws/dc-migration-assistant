@@ -27,7 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // We have to use the JUnit 4 API because there is no JUnit 5 active objects extension :(
@@ -35,26 +38,23 @@ import static org.mockito.Mockito.when;
 public class AWSMigrationServiceTest {
 
     private ActiveObjects ao;
-
     private FilesystemMigrationConfig mockConfig;
-
     private EntityManager entityManager;
-
     private AWSMigrationService sut;
-
     private CfnApi cfnApi;
+    private FilesystemMigrationService filesystemMigrationService;
 
     @Before
     public void setup() {
         assertNotNull(entityManager);
         ao = new TestActiveObjects(entityManager);
-        FilesystemMigrationService fsService = mock(FilesystemMigrationService.class);
+        filesystemMigrationService = mock(FilesystemMigrationService.class);
         cfnApi = mock(CfnApi.class);
-        sut = new AWSMigrationService(ao, fsService, cfnApi);
+        sut = new AWSMigrationService(ao, filesystemMigrationService, cfnApi);
     }
 
     @Test
-    public void testStageWhenNoMigrationCreatedIsUnstarted() {
+    public void shouldBeInUnStartedStageWhenNoMigrationExists() {
         ao.migrate(Migration.class);
 
         MigrationStage initialStage = sut.getMigrationStage();
@@ -63,10 +63,8 @@ public class AWSMigrationServiceTest {
     }
 
     @Test
-    public void testStageOfCurrentMigrationIsReturned() {
-        ao.migrate(Migration.class);
-
-        createMigration(STARTED);
+    public void shouldGetCorrectMigrationStage() {
+        initializeAndCreateSingleMigrationWithStage(STARTED);
 
         assertNumberOfMigrations(1);
 
@@ -79,7 +77,7 @@ public class AWSMigrationServiceTest {
 
 
     @Test
-    public void testStageIsStartedAfterStartingMigration() {
+    public void shouldTransitionStageToStartedWhenMigrationIsStarted() {
         ao.migrate();
         assertNumberOfMigrations(0);
 
@@ -91,9 +89,8 @@ public class AWSMigrationServiceTest {
     }
 
     @Test
-    public void testStageIsUnstartedWhenNoMigrationExists() {
-        ao.migrate(Migration.class);
-        createMigration(STARTED);
+    public void shouldNotStartMigrationWhenExistingStateIsNotUnStarted() {
+        initializeAndCreateSingleMigrationWithStage(STARTED);
 
         ao.flushAll();
         assertNumberOfMigrations(1);
@@ -102,21 +99,20 @@ public class AWSMigrationServiceTest {
     }
 
     @Test
-    public void testFsMigrationFailsWhenNotReady() {
+    public void shouldNotStartFileSystemMigrationWhenNoMigrationExists() {
         // given
         ao.migrate(Migration.class);
-        FilesystemMigrationService fsService = mock(FilesystemMigrationService.class);
         // when
         boolean success = sut.startFilesystemMigration(mockConfig);
         // then
         assertFalse(success);
+        verify(this.filesystemMigrationService, never()).startMigration(any());
     }
 
     @Test
-    public void testFsMigrationRunningWhenReadyForFsSync() {
+    public void shouldStartFsMigrationWhenMigrationStageIsReadyForFsSync() {
         // given
-        ao.migrate(Migration.class);
-        createMigration(READY_FS_MIGRATION);
+        initializeAndCreateSingleMigrationWithStage(READY_FS_MIGRATION);
         // when
         boolean success = sut.startFilesystemMigration(mockConfig);
         // then
@@ -129,7 +125,7 @@ public class AWSMigrationServiceTest {
         HashMap<String, String> params = new HashMap<>();
         String expectedStackId = "arn:stack:test_provision";
 
-        createMigration(MigrationStage.READY_TO_PROVISION);
+        initializeAndCreateSingleMigrationWithStage(MigrationStage.READY_TO_PROVISION);
 
         when(this.cfnApi.provisionStack(templateUrl, stackName, params)).thenReturn(Optional.of(expectedStackId));
 
@@ -143,7 +139,7 @@ public class AWSMigrationServiceTest {
         String templateUrl = "https://template.url", stackName = "test_provision";
         HashMap<String, String> params = new HashMap<>();
 
-        createMigration(MigrationStage.READY_TO_PROVISION);
+        initializeAndCreateSingleMigrationWithStage(MigrationStage.READY_TO_PROVISION);
         when(this.cfnApi.provisionStack(templateUrl, stackName, params)).thenReturn(Optional.empty());
 
         assertThrows(InfrastructureProvisioningError.class, () -> {
@@ -155,19 +151,22 @@ public class AWSMigrationServiceTest {
 
 
     @Test
-    public void shouldNotProvisionWhenInitialStateIsNotReadyToProvision() {
-        createMigration(STARTED);
+    public void shouldNotProvisionWhenInitialMigrationStateIsNotReadyToProvision() {
+        initializeAndCreateSingleMigrationWithStage(STARTED);
 
         assertThrows(InvalidMigrationStageError.class, () -> {
             sut.provisionInfrastructure(new ProvisioningConfig("", "", new HashMap<>()));
         });
+
+        verify(this.cfnApi, never()).provisionStack(any(), any(), any());
     }
 
     private void assertNumberOfMigrations(int i) {
         assertEquals(i, ao.find(Migration.class).length);
     }
 
-    private Migration createMigration(MigrationStage stage) {
+    private Migration initializeAndCreateSingleMigrationWithStage(MigrationStage stage) {
+        ao.migrate(Migration.class);
         Migration migration = ao.create(Migration.class);
         migration.setStage(stage);
         migration.save();
