@@ -7,7 +7,7 @@ import { OptionType } from '@atlaskit/select';
 import { I18n } from '@atlassian/wrm-react-i18n';
 import styled from 'styled-components';
 
-import { createQuickstartFormField } from './quickstartToAtlaskit.tsx';
+import { createQuickstartFormField } from './quickstartToAtlaskit';
 import {
     QuickstartParameterGroup,
     QuickStartParameterYamlNode,
@@ -19,12 +19,10 @@ import {
 const QUICKSTART_PARAMS_URL =
     'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/quickstart-jira-dc-with-vpc.template.parameters.yaml';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isOptionType = (obj: any): obj is OptionType => {
     return obj.label && obj.value;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isArrayOfOptionType = (obj: any): obj is Array<OptionType> => {
     return obj.length > 0 && isOptionType(obj[0]);
 };
@@ -40,7 +38,6 @@ const QuickstartSubmitButton = styled(Button)`
 const QuickstartForm = ({
     quickstartParamGroups,
 }: Record<string, Array<QuickstartParameterGroup>>): ReactElement => (
-    /* eslint-disable @typescript-eslint/no-explicit-any */
     <Form
         onSubmit={(data: Record<string, any>): void => {
             const transformedCfnParams = data;
@@ -60,7 +57,6 @@ const QuickstartForm = ({
         }}
     >
         {({ formProps }: any): ReactElement => (
-            /* eslint-enable @typescript-eslint/no-explicit-any */
             <QuickstartFormContainer {...formProps}>
                 <FormHeader title={I18n.getText('aws.migration.provision.aws.form.title')} />
 
@@ -74,14 +70,13 @@ const QuickstartForm = ({
                     );
                 })}
                 <QuickstartSubmitButton type="submit" appearance="primary">
-                    Submit
+                    {I18n.getText('aws.migration.generic.submit')}
                 </QuickstartSubmitButton>
             </QuickstartFormContainer>
         )}
     </Form>
 );
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const buildQuickstartParams = (quickstartParamDoc: any): Array<QuickstartParameterGroup> => {
     const params: Record<string, QuickStartParameterYamlNode> = quickstartParamDoc.Parameters;
     const paramLabels: Record<string, QuickstartParamLabelYamlNode> =

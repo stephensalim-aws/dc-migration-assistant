@@ -3,7 +3,7 @@ import { render, waitForElement } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { act } from 'react-dom/test-utils';
 
-import { QuickStartDeploy } from './QuickStartDeploy.tsx';
+import { QuickStartDeploy } from './QuickStartDeploy';
 
 const FORM_HEADER_KEY = 'aws.migration.provision.aws.form.title';
 const FIRST_PARAM_GROUP_NAME = 'Group One';
