@@ -8,7 +8,6 @@ import { I18n } from '@atlassian/wrm-react-i18n';
 // eslint-disable-next-line import/extensions
 import { QuickstartParameter } from './QuickStartTypes';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 type FormElementGenerator = (
     defaultProps: Record<string, string>,
     param: QuickstartParameter

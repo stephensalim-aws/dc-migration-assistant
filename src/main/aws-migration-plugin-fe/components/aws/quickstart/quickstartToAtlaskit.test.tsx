@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 
 // eslint-disable-next-line import/extensions
 import { QuickstartParameter } from './QuickStartTypes';
-import { createQuickstartFormField } from './quickstartToAtlaskit.tsx';
+import { createQuickstartFormField } from './quickstartToAtlaskit';
 
 const TEST_PARAM_KEY = 'TestParam';
 const TEST_PARAM_LABEL = 'Test Param';

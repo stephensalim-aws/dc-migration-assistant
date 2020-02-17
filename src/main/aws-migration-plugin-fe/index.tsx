@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import whenDomReady from 'when-dom-ready';
 import { hot } from 'react-hot-loader';
 
-import { App } from './components/App.tsx';
+import { App } from './components/App';
 
 whenDomReady().then(function example() {
     const container = document.getElementById('dc-on-aws-migration-plugin');

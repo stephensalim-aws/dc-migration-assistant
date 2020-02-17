@@ -15,3 +15,4 @@ const routePrefix = ((): string => {
 export const homePath = routePrefix;
 export const overviewPath = `${routePrefix}/overview`;
 export const quickstartPath = `${routePrefix}/provision-aws`;
+export const awsAuthPath = `${routePrefix}/auth-aws`;
