@@ -1,10 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.aws.apn.migration</groupId>
-    <artifactId>serverPlugin</artifactId>
+    <parent>
+      <groupId>com.atlassian.pom</groupId>
+      <artifactId>public-pom</artifactId>
+      <version>6.0.2</version>
+    </parent>
+
+    <repositories>
+        <repository>
+            <id>atlassian-public</id>
+            <url>https://packages.atlassian.com/mvn/maven-external/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>atlassian-public</id>
+            <url>https://packages.atlassian.com/mvn/maven-external/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <groupId>com.atlassian.migration.datacenter</groupId>
+    <artifactId>dc-migration-assistant</artifactId>
     <version>1.0.0</version>
     <licenses>
         <license>
@@ -14,86 +52,25 @@
         </license>
     </licenses>
     <organization>
-        <name>Amazon Web Services</name>
-        <url>https://aws.amazon.com/</url>
+        <name>Atlassian</name>
+        <url>https://www.atlassian.com</url>
     </organization>
-    <name>AWS Data Migration Plugin</name>
-    <description>This is the officially supported AWS Data Migration plugin for Atlassian JIRA.</description>
+    <name>Atlassian Data Center Migration Assistant</name>
+    <description>This is the officially supported DC Migration plugin for Atlassian JIRA.</description>
     <packaging>atlassian-plugin</packaging>
+
     <dependencies>
         <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-api</artifactId>
-            <version>${jira.version}</version>
+            <groupId>com.atlassian.activeobjects</groupId>
+            <artifactId>activeobjects-plugin</artifactId>
+            <version>${ao.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>jta</groupId>
-            <artifactId>jta</artifactId>
-            <version>1.0.1b</version>
-        </dependency>
-        <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
-        <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
-        <!--
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-core</artifactId>
-            <version>${jira.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.plugin</groupId>
-            <artifactId>atlassian-spring-scanner-annotation</artifactId>
-            <version>${atlassian.spring.scanner.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.plugin</groupId>
-            <artifactId>atlassian-spring-scanner-runtime</artifactId>
-            <version>${atlassian.spring.scanner.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.sal</groupId>
             <artifactId>sal-api</artifactId>
-            <version>4.0.0</version>
+            <version>${sal.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.templaterenderer</groupId>
-            <artifactId>atlassian-template-renderer-api</artifactId>
-            <version>4.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-cloudformation</artifactId>
-            <version>${aws.api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-ec2</artifactId>
-            <version>${aws.api.version}</version>
-        </dependency>
-        <!-- WIRED TEST RUNNER DEPENDENCIES -->
-        <dependency>
-            <groupId>com.atlassian.plugins</groupId>
-            <artifactId>atlassian-plugins-osgi-testrunner</artifactId>
-            <version>${plugin.testrunner.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -102,103 +79,175 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>wstx-asl</artifactId>
-            <version>4.0.6</version>
+            <groupId>com.atlassian.plugin</groupId>
+            <artifactId>atlassian-spring-scanner-annotation</artifactId>
+            <version>${atlassian.spring.scanner.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.2-atlassian-1</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>2.1.1</version>
+            <groupId>com.atlassian.plugins</groupId>
+            <artifactId>atlassian-plugins-api</artifactId>
+            <version>${atlassian.plugins.version}</version>
+            <scope>provided</scope>
         </dependency>
-        <!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
-        <!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
-        <!--
         <dependency>
-            <groupId>com.atlassian.jira.tests</groupId>
-            <artifactId>jira-testkit-client</artifactId>
-            <version>${testkit.version}</version>
-            <scope>test</scope>
+            <groupId>com.atlassian.soy</groupId>
+            <artifactId>soy-template-renderer-api</artifactId>
+            <version>${soy.version}</version>
+            <scope>provided</scope>
         </dependency>
-        -->
+        <dependency>
+            <groupId>com.atlassian.plugins</groupId>
+            <artifactId>atlassian-plugins-webfragment-api</artifactId>
+            <version>${webfragments.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>cloudformation</artifactId>
+            <version>${aws.sdk.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>software.amazon.awssdk</groupId>
+                    <artifactId>apache-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+        </dependency>
+
+        <!-- Test Dependencies follow -->
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.8.5</version>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.wink</groupId>
+            <artifactId>wink-client</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.activeobjects</groupId>
+            <artifactId>activeobjects-test</artifactId>
+            <version>${ao.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.5.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.30</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>${aws.sdk.v1.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>jira-maven-plugin</artifactId>
+                <artifactId>amps-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <productVersion>${jira.version}</productVersion>
-                    <productDataVersion>${jira.version}</productDataVersion>
-                    <!-- Uncomment to install TestKit backdoor in JIRA. -->
-                    <!--
-                    <pluginArtifacts>
-                        <pluginArtifact>
-                            <groupId>com.atlassian.jira.tests</groupId>
-                            <artifactId>jira-testkit-plugin</artifactId>
-                            <version>${testkit.version}</version>
-                        </pluginArtifact>
-                    </pluginArtifacts>
-                    -->
                     <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
-                    <!-- See here for an explanation of default instructions: -->
-                    <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
-                        <!-- Add package to export here -->
-                        <Export-Package>com.aws.apn.migration.serverPlugin</Export-Package>
-                        <!-- Add package import here -->
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional",
-                            org.eclipse.gemini.blueprint.*;resolution:="optional",
-                            *;version="0";resolution:=optional
-                        </Import-Package>
-                        <!-- Ensure plugin is spring powered -->
+                        <Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
                         <Spring-Context>*</Spring-Context>
+                        <Import-Package>
+                            org.springframework.osgi.*;resolution:="optional",
+                            org.eclipse.gemini.blueprint.*;resolution:="optional",
+                            com.atlassian.crowd*;resolution:="optional",
+                            com.atlassian.user*;resolution:="optional",
+                            com.atlassian.jira.*;resolution:="optional",
+                            com.atlassian.analytics.api.annotations;resolution:="optional",
+                            com.atlassian.confluence.*;resolution:="optional",
+                            org.slf4j,
+                            !com.google.protobuf.*,
+                            !com.jcraft.jzlib,
+                            !com.ning.compress.*,
+                            !com.oracle.svm.core.*,
+                            !io.netty.internal.tcnative,
+                            !lzma.sdk.*,
+                            !net.jpountz.*,
+                            !org.apache.logging.log4j.*,
+                            !org.bouncycastle.cert.*,
+                            !org.bouncycastle.operator.*,
+                            !org.conscrypt.*,
+                            !org.eclipse.jetty.*,
+                            !org.jboss.*,
+                            !sun.misc.*,
+                            !sun.security.*,
+                            !org.apache.avalon.framework.logger.*,
+                            !org.apache.log.*;
+                            !com.conversantmedia.util.concurrent.*,
+                            !org.apache.logging.log4j.core.async.*,
+                            !org.joda.convert.*,
+                            *
+                        </Import-Package>
                     </instructions>
-                    <systemProperties>
-                        <property>
-                            <name>atlassian.org.osgi.framework.bootdelegation</name>
-                            <value>sun.*,com.sun.*</value>
-                        </property>
-                    </systemProperties>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>maven</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>1.8.1</version>
-                <configuration>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                        <manifestEntries>
-                            <Built-By>Amazon Web Service</Built-By>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
+
             <plugin>
                 <groupId>com.atlassian.plugin</groupId>
                 <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
@@ -212,6 +261,9 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <includeExclude>
+                        -com.atlassian.migration.datacenter.internal.properties.*,-com.atlassian.migration.datacenter.internal.requesthandler.logging.*
+                    </includeExclude>
                     <scannedDependencies>
                         <dependency>
                             <groupId>com.atlassian.plugin</groupId>
@@ -221,77 +273,122 @@
                     <verbose>false</verbose>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <!-- Install front-end modules and run ESLint -->
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${frontend.maven.plugin.version}</version>
+                <configuration>
+                    <nodeVersion>${nodeVersion}</nodeVersion>
+                    <yarnVersion>${yarnVersion}</yarnVersion>
+                    <installDirectory>${frontend.maven.plugin.install.directory}</installDirectory>
+                    <workingDirectory>${frontend.working.directory}</workingDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-node-and-yarn</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>install-prod-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>${yarn.cmd.install}</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-the-ui</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>${yarn.cmd.build}</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lint</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>lint</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>run-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>test</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-        </pluginRepository>
-        <pluginRepository>
-            <id>atlassian-public</id>
-            <url>https://maven.atlassian.com/repository/public/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-        </repository>
-        <repository>
-            <id>atlassian-public</id>
-            <url>https://maven.atlassian.com/repository/public/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-        </repository>
-    </repositories>
+
+    <profiles>
+        <profile>
+            <id>watch-mode</id>
+            <properties>
+                <yarn.cmd.install>${yarn.cmd.install.dev}</yarn.cmd.install>
+                <yarn.cmd.build>${yarn.cmd.build.dev}</yarn.cmd.build>
+            </properties>
+        </profile>
+        <profile>
+            <id>integration-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>3.0.0-M4</version>
+                        <configuration>
+                            <groups>integration</groups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <properties>
-        <jira.version>8.5.3</jira.version>
-        <amps.version>8.0.2</amps.version>
-        <allowGoogleTracking>false</allowGoogleTracking>
-        <aws.api.version>1.11.710</aws.api.version>
-        <plugin.testrunner.version>2.0.1</plugin.testrunner.version>
-        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
-        <!-- This property ensures consistency between the key in atlassian-plugin.xml and the OSGi bundle's key. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
-        <!-- TestKit version 6.x for JIRA 6.x -->
-        <testkit.version>6.3.11</testkit.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <frontend.maven.plugin.version>1.6</frontend.maven.plugin.version>
+        <frontend.maven.plugin.install.directory>${project.build.directory}</frontend.maven.plugin.install.directory>
+        <nodeVersion>v12.13.0</nodeVersion>
+        <yarnVersion>v1.19.1</yarnVersion>
+        <yarn.cmd.install>install --frozen-lockfile --prefer-offline --mutex network --no-progress</yarn.cmd.install>
+        <yarn.cmd.install.dev>install --pure-lockfile --prefer-offline --mutex network</yarn.cmd.install.dev>
+        <yarn.cmd.build>build</yarn.cmd.build>
+        <yarn.cmd.build.dev>build:dev</yarn.cmd.build.dev>
+        <node.modules>${project.basedir}/src/main/dc-migration-assistant-fe/node_modules</node.modules>
+        <frontend.working.directory>src/main/dc-migration-assistant-fe</frontend.working.directory>
+
+        <ao.version>3.2.2</ao.version>
+        <sal.version>4.0.0</sal.version>
+        <atlassian.spring.scanner.version>2.1.9</atlassian.spring.scanner.version>
+        <spring.version>5.0.10.RELEASE</spring.version>
+        <atlassian.spring.scanner.version>2.1.9</atlassian.spring.scanner.version>
+        <atlassian.plugins.version>5.2.1</atlassian.plugins.version>
+        <amps.version>8.0.2</amps.version>
+        <aws.sdk.v1.version>1.11.715</aws.sdk.v1.version>
+        <soy.version>5.0.0</soy.version>
+        <webfragments.version>5.1.0</webfragments.version>
+        <mockito.version>3.2.4</mockito.version>
+        <junit.version>5.4.2</junit.version>
+        <aws.sdk.version>2.10.61</aws.sdk.version>
     </properties>
+
 </project>
