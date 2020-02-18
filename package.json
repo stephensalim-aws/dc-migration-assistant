@@ -1,8 +1,8 @@
 {
-    "name": "aws-migration-plugin-fe",
+    "name": "dc-migration-assistant-fe",
     "version": "0.1.0",
     "private": true,
-    "author": "AWS and Atlassian Pty Ltd",
+    "author": "Atlassian Pty Ltd",
     "license": "Apache 2",
     "dependencies": {
         "@atlaskit/button": "^13.3.5",

@@ -78,13 +78,15 @@ export const AuthenticateAWS: FunctionComponent<AuthenticateAWSProps> = ({
 
     return (
         <>
-            <h1>{I18n.getText('aws.migration.authenticate.aws.title')}</h1>
+            <h1>{I18n.getText('atlassian.migration.datacenter.authenticate.aws.title')}</h1>
             <Form onSubmit={submitCreds}>
                 {({ formProps }: any): ReactElement => (
                     <form {...formProps}>
                         <Field
                             isRequired
-                            label={I18n.getText('aws.migration.authenticate.aws.accessKeyId.label')}
+                            label={I18n.getText(
+                                'atlassian.migration.datacenter.authenticate.aws.accessKeyId.label'
+                            )}
                             name="accessKeyID"
                             defaultValue=""
                         >
@@ -95,7 +97,7 @@ export const AuthenticateAWS: FunctionComponent<AuthenticateAWSProps> = ({
                         <Field
                             isRequired
                             label={I18n.getText(
-                                'aws.migration.authenticate.aws.secretAccessKey.label'
+                                'atlassian.migration.datacenter.authenticate.aws.secretAccessKey.label'
                             )}
                             name="secretAccessKey"
                             defaultValue=""
@@ -105,7 +107,9 @@ export const AuthenticateAWS: FunctionComponent<AuthenticateAWSProps> = ({
                             )}
                         </Field>
                         <Field
-                            label={I18n.getText('aws.migration.authenticate.aws.region.label')}
+                            label={I18n.getText(
+                                'atlassian.migration.datacenter.authenticate.aws.region.label'
+                            )}
                             name="region"
                             validate={(value: OptionType): string => {
                                 return value ? undefined : 'NO_REGION';
@@ -115,14 +119,14 @@ export const AuthenticateAWS: FunctionComponent<AuthenticateAWSProps> = ({
                                 <>
                                     <HelperMessage>
                                         {I18n.getText(
-                                            'aws.migration.authenticate.aws.region.helper'
+                                            'atlassian.migration.datacenter.authenticate.aws.region.helper'
                                         )}
                                     </HelperMessage>
                                     <RegionSelect getRegions={getRegions} {...fieldProps} />
                                     {error && (
                                         <ErrorMessage>
                                             {I18n.getText(
-                                                'aws.migration.authenticate.aws.region.error'
+                                                'atlassian.migration.datacenter.authenticate.aws.region.error'
                                             )}
                                         </ErrorMessage>
                                     )}
@@ -130,7 +134,7 @@ export const AuthenticateAWS: FunctionComponent<AuthenticateAWSProps> = ({
                             )}
                         </Field>
                         <CredsSubmitButton type="submit" appearance="primary">
-                            {I18n.getText('aws.migration.generic.submit')}
+                            {I18n.getText('atlassian.migration.datacenter.generic.submit')}
                         </CredsSubmitButton>
                     </form>
                 )}

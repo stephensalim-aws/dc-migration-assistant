@@ -58,7 +58,9 @@ const QuickstartForm = ({
     >
         {({ formProps }: any): ReactElement => (
             <QuickstartFormContainer {...formProps}>
-                <FormHeader title={I18n.getText('aws.migration.provision.aws.form.title')} />
+                <FormHeader
+                    title={I18n.getText('atlassian.migration.datacenter.provision.aws.form.title')}
+                />
 
                 {quickstartParamGroups.map(group => {
                     return (
@@ -70,7 +72,7 @@ const QuickstartForm = ({
                     );
                 })}
                 <QuickstartSubmitButton type="submit" appearance="primary">
-                    {I18n.getText('aws.migration.generic.submit')}
+                    {I18n.getText('atlassian.migration.datacenter.generic.submit')}
                 </QuickstartSubmitButton>
             </QuickstartFormContainer>
         )}

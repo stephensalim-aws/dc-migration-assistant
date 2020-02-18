@@ -42,10 +42,10 @@ export const App: FunctionComponent = () => {
                 </Route>
                 <Route>
                     <Home
-                        title={I18n.getText('aws.migration.home.title')}
-                        synopsis={I18n.getText('aws.migration.home.synopsis')}
+                        title={I18n.getText('atlassian.migration.datacenter.home.title')}
+                        synopsis={I18n.getText('atlassian.migration.datacenter.home.synopsis')}
                         exploreMigrationButtonText={I18n.getText(
-                            'aws.migration.home.explore.migration'
+                            'atlassian.migration.datacenter.home.explore.migration'
                         )}
                     />
                 </Route>

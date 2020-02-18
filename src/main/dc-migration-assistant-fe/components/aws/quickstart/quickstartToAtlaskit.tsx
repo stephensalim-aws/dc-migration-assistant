@@ -59,7 +59,9 @@ const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
                     />
                     {error && (
                         <ErrorMessage>
-                            {I18n.getText('aws.migration.provision.aws.form.wrongNumberAZError')}
+                            {I18n.getText(
+                                'atlassian.migration.datacenter.provision.aws.form.wrongNumberAZError'
+                            )}
                         </ErrorMessage>
                     )}
                 </>
@@ -170,7 +172,7 @@ const createStringInputFromQuickstartParam: FormElementGenerator = (defaultField
                 return (
                     ConstraintDescription ||
                     `${param.paramLabel} ${I18n.getText(
-                        'aws.migration.provision.aws.form.defaultError'
+                        'atlassian.migration.datacenter.provision.aws.form.defaultError'
                     )} ${AllowedPattern}`
                 );
             },

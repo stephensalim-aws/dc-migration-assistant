@@ -5,7 +5,7 @@ import { act } from 'react-dom/test-utils';
 
 import { QuickStartDeploy } from './QuickStartDeploy';
 
-const FORM_HEADER_KEY = 'aws.migration.provision.aws.form.title';
+const FORM_HEADER_KEY = 'atlassian.migration.datacenter.provision.aws.form.title';
 const FIRST_PARAM_GROUP_NAME = 'Group One';
 const SECOND_PARAM_GROUP_NAME = 'Group Two';
 

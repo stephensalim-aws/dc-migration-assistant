@@ -41,8 +41,8 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <groupId>com.aws.apn.migration</groupId>
-    <artifactId>aws-migration-plugin</artifactId>
+    <groupId>com.atlassian.migration.datacenter</groupId>
+    <artifactId>dc-migration-assistant</artifactId>
     <version>1.0.0</version>
     <licenses>
         <license>
@@ -52,11 +52,11 @@
         </license>
     </licenses>
     <organization>
-        <name>Amazon Web Services</name>
-        <url>https://aws.amazon.com/</url>
+        <name>Atlassian</name>
+        <url>https://www.atlassian.com</url>
     </organization>
-    <name>AWS Data Migration Plugin</name>
-    <description>This is the officially supported AWS Data Migration plugin for Atlassian JIRA.</description>
+    <name>Atlassian Data Center Migration Assistant</name>
+    <description>This is the officially supported DC Migration plugin for Atlassian JIRA.</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
@@ -262,7 +262,7 @@
                 </executions>
                 <configuration>
                     <includeExclude>
-                        -com.atlassian.awsmigrationplugin.internal.properties.*,-com.atlassian.awsmigrationplugin.internal.requesthandler.logging.*
+                        -com.atlassian.migration.datacenter.internal.properties.*,-com.atlassian.migration.datacenter.internal.requesthandler.logging.*
                     </includeExclude>
                     <scannedDependencies>
                         <dependency>
