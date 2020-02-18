@@ -91,6 +91,7 @@ public class AWSMigrationService implements MigrationService {
             throw new InvalidMigrationStageError(String.format("Expected migration stage was %s, but found %s", READY_TO_PROVISION, currentMigrationStage));
         }
 
+        //TODO: Make this async. i.e. do not wait for provisioning to complete.
         Optional<String> stackIdentifier = this.cfnApi.provisionStack(config.getTemplateUrl(), config.getStackName(), config.getParams());
         if (stackIdentifier.isPresent()) {
             updateMigrationStage(MigrationStage.PROVISIONING_IN_PROGRESS);

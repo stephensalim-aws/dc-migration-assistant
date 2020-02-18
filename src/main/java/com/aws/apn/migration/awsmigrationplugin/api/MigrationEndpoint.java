@@ -2,6 +2,7 @@ package com.aws.apn.migration.awsmigrationplugin.api;
 
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationService;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
+import com.aws.apn.migration.awsmigrationplugin.spi.infrastructure.ProvisioningConfig;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -59,6 +60,20 @@ public class MigrationEndpoint {
                     .status(Response.Status.CONFLICT)
                     .entity("migration already exists")
                     .build();
+        }
+    }
+
+    @POST
+    @Path("/provision")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response provisionInfrastructure(ProvisioningConfig provisioningConfig) {
+        try {
+            String stackId = migrationService.provisionInfrastructure(provisioningConfig);
+            //Should be updated to URI location after get stack details Endpoint is built
+            return Response.status(Response.Status.ACCEPTED).entity(stackId).build();
+        } catch (RuntimeException e) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
 }
