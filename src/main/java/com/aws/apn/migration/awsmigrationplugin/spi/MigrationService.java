@@ -3,6 +3,8 @@ package com.aws.apn.migration.awsmigrationplugin.spi;
 import com.atlassian.activeobjects.tx.Transactional;
 import com.aws.apn.migration.awsmigrationplugin.spi.infrastructure.ProvisioningConfig;
 
+import java.util.Optional;
+
 /**
  * Abstraction of an on-premise to cloud migration modeled as a finite state machine.
  */
@@ -28,4 +30,6 @@ public interface MigrationService {
      * @return a stack identifier of the created stack
      */
     String provisionInfrastructure(ProvisioningConfig provisioningConfig);
+
+    Optional<String> getInfrastructureProvisioningStatus(String stackId);
 }

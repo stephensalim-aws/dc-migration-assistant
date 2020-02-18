@@ -12,6 +12,8 @@ import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationConfig
 import com.aws.apn.migration.awsmigrationplugin.spi.fs.FilesystemMigrationService;
 import com.aws.apn.migration.awsmigrationplugin.spi.infrastructure.ProvisioningConfig;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.services.cloudformation.model.StackInstanceNotFoundException;
+import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 
 import java.util.Optional;
 
@@ -99,6 +101,16 @@ public class AWSMigrationService implements MigrationService {
         } else {
             updateMigrationStage(MigrationStage.PROVISIONING_ERROR);
             throw new InfrastructureProvisioningError(String.format("Unable to provision stack (URL - %s) with name - %s", config.getTemplateUrl(), config.getStackName()));
+        }
+    }
+
+    @Override
+    public Optional<String> getInfrastructureProvisioningStatus(String stackId) {
+        try {
+            StackStatus status = this.cfnApi.getStatus(stackId);
+            return Optional.of(status.toString());
+        } catch (StackInstanceNotFoundException e) {
+            return Optional.empty();
         }
     }
 
