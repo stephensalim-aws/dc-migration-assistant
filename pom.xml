@@ -117,7 +117,6 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>cloudformation</artifactId>
-            <version>${aws.sdk.version}</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
@@ -125,6 +124,11 @@
                     <artifactId>apache-client</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>regions</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -194,6 +198,13 @@
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-bom</artifactId>
                 <version>${aws.sdk.v1.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws.sdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
