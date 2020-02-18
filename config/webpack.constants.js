@@ -4,12 +4,12 @@ const rootDir = path.join(__dirname, '..');
 const srcDir = path.join(rootDir, 'src', 'main');
 
 const I18N_SRC_DIR = path.join(srcDir, 'resources');
-const FRONTEND_SRC_DIR = path.join(srcDir, 'aws-migration-plugin-fe');
+const FRONTEND_SRC_DIR = path.join(srcDir, 'dc-migration-assistant-fe');
 const FRONTEND_OUTPUT_DIR = path.join(rootDir, 'target', 'classes');
-const PLUGIN_KEY = 'com.aws.apn.migration.aws-migration-plugin';
-const ENTRY_POINT = { 'aws-migration-plugin': path.join(FRONTEND_SRC_DIR, 'index.tsx') };
+const PLUGIN_KEY = 'com.atlassian.migration.datacenter.dc-migration-assistant';
+const ENTRY_POINT = { 'dc-migration-assistant': path.join(FRONTEND_SRC_DIR, 'index.tsx') };
 
-const MY_I18N_FILES = ['aws-migration-plugin.properties'].map(file => path.join(I18N_SRC_DIR, 'i18n', file));
+const MY_I18N_FILES = ['dc-migration-assistant.properties'].map(file => path.join(I18N_SRC_DIR, 'i18n', file));
 const WRM_OUTPUT = path.resolve(
     './',
     'target',
