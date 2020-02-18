@@ -2,7 +2,7 @@
 
 Atlassian server app for migrating to Data Center on AWS
 
-[![Atlassian license](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](LICENSE) ![Build](https://github.com/atlassian-labs/dc-migration-assistant/workflows/Run%20test%20suite/badge.svg) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
+[![Atlassian license](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](LICENSE) ![Build](https://github.com/atlassian-labs/dc-migration-assistant/workflows/Tests/badge.svg) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
 
 ## Usage
 
