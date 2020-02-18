@@ -6,4 +6,3 @@ public class InfrastructureProvisioningError extends RuntimeException {
     }
 
 }
-

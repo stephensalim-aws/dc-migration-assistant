@@ -1,5 +1,7 @@
 package com.aws.apn.migration.awsmigrationplugin.api;
 
+import com.aws.apn.migration.awsmigrationplugin.core.exceptions.InfrastructureProvisioningError;
+import com.aws.apn.migration.awsmigrationplugin.core.exceptions.InvalidMigrationStageError;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationService;
 import com.aws.apn.migration.awsmigrationplugin.spi.MigrationStage;
 import com.aws.apn.migration.awsmigrationplugin.spi.infrastructure.ProvisioningConfig;
@@ -72,7 +74,7 @@ public class MigrationEndpoint {
             String stackId = migrationService.provisionInfrastructure(provisioningConfig);
             //Should be updated to URI location after get stack details Endpoint is built
             return Response.status(Response.Status.ACCEPTED).entity(stackId).build();
-        } catch (RuntimeException e) {
+        } catch (InvalidMigrationStageError | InfrastructureProvisioningError e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }

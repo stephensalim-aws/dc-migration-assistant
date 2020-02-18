@@ -9,11 +9,16 @@ import software.amazon.awssdk.services.cloudformation.model.StackInstanceNotFoun
 import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
@@ -66,9 +71,29 @@ class CfnApiIT {
         Optional<String> provisionedStackId = cfnApi.provisionStack(S3_CFN_STACK_URL, stackName, new HashMap<String, String>() {{
             put("S3BucketName", stackName + "-bucket");
         }});
-        assertFalse(stackName.isEmpty());
+
         assertNotNull(provisionedStackId.get());
 
-        assertEquals(StackStatus.CREATE_COMPLETE, cfnApi.getStatus(stackName));
+        try {
+            awaitStackCreation(provisionedStackId.get(), cfnApi::getStatus).get(60, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            Assertions.fail("Timeout while waiting for stack creation to complete", e);
+        }
+    }
+
+    private CompletableFuture<String> awaitStackCreation(String stackId, Function<String, StackStatus> statusFunc) {
+        CompletableFuture<String> completableFuture = new CompletableFuture<>();
+        ScheduledFuture<?> scheduledFuture = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            StackStatus status = statusFunc.apply(stackId);
+            if (Objects.equals(status, StackStatus.CREATE_COMPLETE)) {
+                completableFuture.complete(stackId);
+            }
+        }, 0, 10, TimeUnit.SECONDS);
+
+        completableFuture.whenComplete((result, thrown) -> {
+            scheduledFuture.cancel(true);
+        });
+
+        return completableFuture;
     }
 }
