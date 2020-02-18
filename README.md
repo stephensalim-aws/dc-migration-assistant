@@ -90,4 +90,6 @@ Contributions to DC Migration Assistant are welcome! Please see [CONTRIBUTING.md
 
 This library is licensed under the Apache 2.0 License. 
 
+<br/>
+
 [![With ❤️ from Atlassian](https://raw.githubusercontent.com/atlassian-internal/oss-assets/master/banner-with-thanks.png)](https://www.atlassian.com)
