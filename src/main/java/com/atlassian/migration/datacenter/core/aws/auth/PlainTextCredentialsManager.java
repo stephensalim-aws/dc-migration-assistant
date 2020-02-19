@@ -14,7 +14,7 @@ public class PlainTextCredentialsManager implements CredentialsFetcher, Credenti
     private static final String SECRET_ACCESS_KEY_PLUGIN_STORAGE_SUFFIX = ".secretAccessKey";
 
 
-    public PluginSettingsFactory pluginSettingsFactory;
+    private final PluginSettingsFactory pluginSettingsFactory;
 
     @Autowired
     public PlainTextCredentialsManager(@ComponentImport PluginSettingsFactory pluginSettingsFactory) {
