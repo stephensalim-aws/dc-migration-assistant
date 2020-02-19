@@ -16,13 +16,13 @@ export type AWSCreds = {
 Function to submit the AWS credentials. Should return a promise which resolves when the
 credentials have been submitted. Should reject with an error message if there was an error submitting the credentials.
 */
-type CredSubmitFun = (creds: AWSCreds) => Promise<string>;
+export type CredSubmitFun = (creds: AWSCreds) => Promise<string>;
 
 /*
 Function to get all AWS regions. Should return a promise which resolves
 with the AWS regions
 */
-type QueryRegionFun = () => Promise<Array<string>>;
+export type QueryRegionFun = () => Promise<Array<string>>;
 
 export type AuthenticateAWSProps = {
     onSubmitCreds: CredSubmitFun;

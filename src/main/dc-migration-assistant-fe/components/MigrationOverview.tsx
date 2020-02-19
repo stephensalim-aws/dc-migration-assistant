@@ -19,7 +19,7 @@ const ButtonContainer = styled.div`
 export const MigrationOverview: FunctionComponent = () => {
     return (
         <OverviewContainer>
-            <h1>My title now please</h1>
+            <h1>{I18n.getText('atlassian.migration.datacenter.overview.title')}</h1>
             <ButtonContainer>
                 <Link to={homePath}>
                     <Button appearance="danger">Abort</Button>
