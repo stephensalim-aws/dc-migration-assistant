@@ -43,8 +43,6 @@ public class AWSGlobalInfrastructureEndpointTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
 
-        System.out.println(res.getEntity());
-
-        assertEquals(new String[] { regionOne, regionTwo }, res.getEntity());
+        assertEquals(Arrays.asList(regionOne, regionTwo), res.getEntity());
     }
 }
