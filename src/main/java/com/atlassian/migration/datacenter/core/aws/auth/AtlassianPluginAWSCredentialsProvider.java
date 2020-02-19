@@ -1,4 +1,4 @@
-package com.atlassian.migration.datacenter.core.aws;
+package com.atlassian.migration.datacenter.core.aws.auth;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -8,6 +8,12 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 
 public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProvider, AWSCredentialsProvider {
+
+    CredentialsFetcher credentialsFetcher;
+
+    public AtlassianPluginAWSCredentialsProvider(CredentialsFetcher credentialsFetcher) {
+        this.credentialsFetcher = credentialsFetcher;
+    }
 
     /**
      * AWS SDK V1 credentials API
