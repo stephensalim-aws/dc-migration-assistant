@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import { quickstartPath, awsAuthPath } from '../../utils/RoutePaths';
 import { QuickStartDeploy } from './quickstart/QuickStartDeploy';
@@ -13,20 +13,20 @@ const getRegions: QueryRegionFun = () => {
 };
 
 export const AWSRoutes: FunctionComponent = () => (
-    <>
-        <Route path={quickstartPath}>
+    <Switch>
+        <Route exact path={quickstartPath}>
             <QuickStartDeploy />
         </Route>
-        <Route path={awsAuthPath}>
+        <Route exact path={awsAuthPath}>
             <AuthenticateAWS
                 getRegions={getRegions}
                 onSubmitCreds={(creds): Promise<string> => {
                     // This should be replaced with API call that stores the credentials
                     // eslint-disable-next-line no-console
-                    console.log(creds);
+                    console.log('received AWS credentials!');
                     return Promise.resolve('');
                 }}
             />
         </Route>
-    </>
+    </Switch>
 );
