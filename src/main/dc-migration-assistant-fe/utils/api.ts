@@ -35,5 +35,8 @@ export const callAppRest = (
     options = addToOptionsIfexists(body, options);
     options = addToOptionsIfexists(headers, options);
 
-    return fetch(`${contextPath()}/rest/dc-migration/1.0/${path}?${queryParams}`, options);
+    const basePath = `${contextPath()}/rest/dc-migration/1.0/${path}`;
+    const callPath = queryParams ? `${basePath}?${queryParams}` : basePath;
+
+    return fetch(callPath, options);
 };
