@@ -12,13 +12,11 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 @Component
 public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProvider, AWSCredentialsProvider {
 
-    private final CredentialsStorer credentialsStorer;
     private final CredentialsFetcher credentialsFetcher;
 
     @Autowired
-    public AtlassianPluginAWSCredentialsProvider(CredentialsFetcher credentialsFetcher, CredentialsStorer credentialsStorer) {
+    public AtlassianPluginAWSCredentialsProvider(CredentialsFetcher credentialsFetcher) {
         this.credentialsFetcher = credentialsFetcher;
-        this.credentialsStorer = credentialsStorer;
     }
 
     /**
