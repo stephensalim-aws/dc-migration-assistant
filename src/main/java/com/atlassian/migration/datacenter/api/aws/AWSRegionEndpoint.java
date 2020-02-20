@@ -1,8 +1,7 @@
 package com.atlassian.migration.datacenter.api.aws;
 
 import com.atlassian.migration.datacenter.core.aws.region.InvalidAWSRegionException;
-import com.atlassian.migration.datacenter.core.aws.region.RegionFetcher;
-import com.atlassian.migration.datacenter.core.aws.region.RegionStorer;
+import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,26 +17,24 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Path("aws/region")
 public class AWSRegionEndpoint {
 
-    private final RegionFetcher regionFetcher;
-    private final RegionStorer regionStorer;
+    private final RegionService regionService;
 
     @Autowired
-    public AWSRegionEndpoint(RegionFetcher regionFetcher, RegionStorer regionStorer) {
-        this.regionFetcher = regionFetcher;
-        this.regionStorer = regionStorer;
+    public AWSRegionEndpoint(RegionService regionService) {
+        this.regionService = regionService;
     }
 
     @GET
     @Produces(APPLICATION_JSON)
     public Response getRegion() {
-        return Response.ok(regionFetcher.getRegion()).build();
+        return Response.ok(regionService.getRegion()).build();
     }
 
     @POST
     @Consumes(APPLICATION_JSON)
     public Response setRegion(AWSRegionWebObject region) {
         try {
-            regionStorer.storeRegion(region.getRegion());
+            regionService.storeRegion(region.getRegion());
         } catch(InvalidAWSRegionException e) {
             return Response
                     .status(Response.Status.BAD_REQUEST)

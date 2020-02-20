@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * The region is stored in the plugin settings of this app.
  */
 @Component
-public class PluginSettingsRegionManager implements RegionStorer, RegionFetcher {
+public class PluginSettingsRegionManager implements RegionService {
 
     private static final String AWS_REGION_PLUGIN_STORAGE_KEY = "com.atlassian.migration.datacenter.core.aws.region";
     private static final String REGION_PLUGIN_STORAGE_SUFFIX = ".region";

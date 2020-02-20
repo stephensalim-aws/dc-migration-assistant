@@ -3,7 +3,7 @@ package com.atlassian.migration.datacenter.core.aws.auth;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.Bucket;
-import com.atlassian.migration.datacenter.core.aws.region.RegionFetcher;
+import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +24,12 @@ public class ProbeAWSAuth {
     private static final Logger logger = LoggerFactory.getLogger(ProbeAWSAuth.class);
 
     private AtlassianPluginAWSCredentialsProvider credentialsProvider;
-    private RegionFetcher regionFetcher;
+    private RegionService regionService;
 
     @Autowired
-    public ProbeAWSAuth(AtlassianPluginAWSCredentialsProvider credentialsProvider, RegionFetcher regionFetcher) {
+    public ProbeAWSAuth(AtlassianPluginAWSCredentialsProvider credentialsProvider, RegionService regionService) {
         this.credentialsProvider = credentialsProvider;
-        this.regionFetcher = regionFetcher;
+        this.regionService = regionService;
     }
 
     /**
@@ -39,7 +39,7 @@ public class ProbeAWSAuth {
     public List<String> probeSDKV1() {
         AmazonS3 s3 = AmazonS3ClientBuilder
                 .standard()
-                .withRegion(regionFetcher.getRegion())
+                .withRegion(regionService.getRegion())
                 .withCredentials(credentialsProvider).build();
         List<Bucket> buckets = s3.listBuckets();
         return buckets
@@ -56,7 +56,7 @@ public class ProbeAWSAuth {
     public List<String> probeSDKV2() {
         CloudFormationAsyncClient client = CloudFormationAsyncClient
                 .builder()
-                .region(Region.of(regionFetcher.getRegion()))
+                .region(Region.of(regionService.getRegion()))
                 .credentialsProvider(credentialsProvider)
                 .build();
 
