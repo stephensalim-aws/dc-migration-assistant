@@ -7,6 +7,7 @@ public class AWSCredentialsWebObject {
 
     private String accessKeyId;
     private String secretAccessKey;
+    private String region;
 
     public String getAccessKeyId() {
         return accessKeyId;
@@ -16,11 +17,19 @@ public class AWSCredentialsWebObject {
         return secretAccessKey;
     }
 
+    public String getRegion() {
+        return region;
+    }
+
     public void setAccessKeyId(String accessKeyId) {
         this.accessKeyId = accessKeyId;
     }
 
     public void setSecretAccessKey(String secretAccessKey) {
         this.secretAccessKey = secretAccessKey;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 }
