@@ -1,8 +1,8 @@
 package com.atlassian.migration.datacenter.api.aws;
 
-import com.atlassian.migration.datacenter.core.aws.auth.InvalidAWSRegionException;
-import com.atlassian.migration.datacenter.core.aws.auth.RegionFetcher;
-import com.atlassian.migration.datacenter.core.aws.auth.RegionStorer;
+import com.atlassian.migration.datacenter.core.aws.region.InvalidAWSRegionException;
+import com.atlassian.migration.datacenter.core.aws.region.RegionFetcher;
+import com.atlassian.migration.datacenter.core.aws.region.RegionStorer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.springframework.beans.factory.annotation.Autowired;
 

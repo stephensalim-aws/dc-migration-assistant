@@ -3,6 +3,7 @@ package com.atlassian.migration.datacenter.core.aws.auth;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.Bucket;
+import com.atlassian.migration.datacenter.core.aws.region.RegionFetcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

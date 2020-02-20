@@ -1,4 +1,4 @@
-package com.atlassian.migration.datacenter.core.aws.auth;
+package com.atlassian.migration.datacenter.core.aws.region;
 
 public interface RegionStorer {
 
