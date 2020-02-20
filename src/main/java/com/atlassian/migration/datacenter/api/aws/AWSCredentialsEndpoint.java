@@ -3,7 +3,6 @@ package com.atlassian.migration.datacenter.api.aws;
 import com.atlassian.migration.datacenter.core.aws.auth.CredentialStorage;
 import com.atlassian.migration.datacenter.core.aws.auth.ProbeAWSAuth;
 import lombok.Data;
-import org.apache.log4j.Logger;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,8 +13,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("aws/credentials")
 public class AWSCredentialsEndpoint {
-
-    private final static Logger LOGGER = Logger.getLogger(AWSCredentialsEndpoint.class);
 
     private final CredentialStorage credentialsManagement;
     private final ProbeAWSAuth probe;
@@ -28,16 +25,11 @@ public class AWSCredentialsEndpoint {
 
     @GET
     @Produces(APPLICATION_JSON)
-    public Response getAWSCredentials() {
+    public AWSCredentialsWebObject getAWSCredentials() {
         AWSCredentialsWebObject dto = new AWSCredentialsWebObject();
         dto.setAccessKeyId(credentialsManagement.getAccessKeyId());
         dto.setSecretAccessKey(credentialsManagement.getSecretAccessKey());
-        if (dto.getAccessKeyId() == null || dto.getSecretAccessKey() == null) {
-            LOGGER.error("Failed to retrieve AWS Credentials from plugin storage.");
-            return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } else {
-            return Response.ok(dto).build();
-        }
+        return dto;
     }
 
     @POST
