@@ -56,9 +56,9 @@ public class PlainTextCredentialsManager implements CredentialsFetcher, Credenti
     }
 
     @Override
-    public void storeRegion(String region) {
+    public void storeRegion(String region) throws InvalidAWSRegionException {
         if(!isValidRegion(region)) {
-            throw new IllegalArgumentException("region must be a supported AWS Region");
+            throw new InvalidAWSRegionException();
         }
 
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
