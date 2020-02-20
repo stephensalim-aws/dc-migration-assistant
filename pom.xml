@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-      <groupId>com.atlassian.pom</groupId>
-      <artifactId>public-pom</artifactId>
-      <version>6.0.2</version>
+        <groupId>com.atlassian.pom</groupId>
+        <artifactId>public-pom</artifactId>
+        <version>6.0.2</version>
     </parent>
 
     <repositories>
@@ -133,6 +133,12 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+        </dependency>
+
 
         <!-- Test Dependencies follow -->
         <dependency>

@@ -15,7 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.Executors;
 
 @Component
 public class S3FilesystemMigrationService implements FilesystemMigrationService {
@@ -27,21 +31,36 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
 
     public void startMigration(FilesystemMigrationConfig config) {
         progress = new FilesystemMigrationProgress();
-        TransferManager transferManager = getTransferManager();
 
         boolean canMigrate = verifyDirectory(config.getDirectoryToMigrate());
 
         if (canMigrate) {
-            MultipleFileUpload upload = transferManager.uploadDirectory(
-                    config.getS3Bucket(),
-                    DEFAULT_PREFIX,
-                    config.getDirectoryToMigrate().toFile(),
-                    DEFAULT_INCLUDE_SUBDIRECTORIES);
-            progress.setStatus(FilesystemMigrationStatus.RUNNING);
-            S3UploadListener listener = new S3UploadListener(progress);
-            upload.addProgressListener(listener);
-            FilesystemMigrationStatus status = waitToComplete(upload);
-            progress.setStatus(status);
+
+            int cores = Runtime.getRuntime().availableProcessors();
+
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(config.getDirectoryToMigrate().toFile().toPath())) {
+                for (Path entry : directoryStream) {
+                    if (Files.isDirectory(entry)) {
+                        Executors.newScheduledThreadPool(cores).execute(() -> {
+                            TransferManager transferManager = getTransferManager();
+
+                            MultipleFileUpload upload = transferManager.uploadDirectory(
+                                    config.getS3Bucket(),
+                                    DEFAULT_PREFIX,
+                                    entry.toFile(),
+                                    DEFAULT_INCLUDE_SUBDIRECTORIES);
+                            progress.setStatus(FilesystemMigrationStatus.RUNNING);
+                            S3UploadListener listener = new S3UploadListener(progress);
+                            upload.addProgressListener(listener);
+                            FilesystemMigrationStatus status = waitToComplete(upload);
+                            progress.setStatus(status);
+                        });
+                    }
+                }
+            } catch (IOException ioe) {
+                logger.error(ioe.getLocalizedMessage());
+            }
+
         } else {
             progress.setStatus(FilesystemMigrationStatus.FAILED);
         }
@@ -79,4 +98,6 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
         return TransferManagerBuilder.standard().withS3Client(s3).build();
     }
+
+
 }
