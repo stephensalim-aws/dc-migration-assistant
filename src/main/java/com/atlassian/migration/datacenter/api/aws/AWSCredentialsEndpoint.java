@@ -3,6 +3,7 @@ package com.atlassian.migration.datacenter.api.aws;
 import com.atlassian.migration.datacenter.core.aws.auth.CredentialsFetcher;
 import com.atlassian.migration.datacenter.core.aws.auth.CredentialsStorer;
 import com.atlassian.migration.datacenter.core.aws.auth.ProbeAWSAuth;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.Consumes;
@@ -51,6 +52,38 @@ public class AWSCredentialsEndpoint {
     @Produces(APPLICATION_JSON)
     public Response testCredentialsSDKV2() {
         return Response.ok(probe.probeSDKV2()).build();
+    }
+
+    @JsonAutoDetect
+    static class AWSCredentialsWebObject {
+
+        private String accessKeyId;
+        private String secretAccessKey;
+        private String region;
+
+        public String getAccessKeyId() {
+            return accessKeyId;
+        }
+
+        public String getSecretAccessKey() {
+            return secretAccessKey;
+        }
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setAccessKeyId(String accessKeyId) {
+            this.accessKeyId = accessKeyId;
+        }
+
+        public void setSecretAccessKey(String secretAccessKey) {
+            this.secretAccessKey = secretAccessKey;
+        }
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
     }
 
 }
