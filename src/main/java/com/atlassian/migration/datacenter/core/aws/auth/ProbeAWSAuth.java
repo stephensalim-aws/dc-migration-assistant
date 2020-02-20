@@ -3,17 +3,24 @@ package com.atlassian.migration.datacenter.core.aws.auth;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.Bucket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.services.cloudformation.CloudFormationClient;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cloudformation.CloudFormationAsyncClient;
 import software.amazon.awssdk.services.cloudformation.model.DescribeStacksResponse;
 import software.amazon.awssdk.services.cloudformation.model.Stack;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Component
 public class ProbeAWSAuth {
+    private static final Logger logger = LoggerFactory.getLogger(ProbeAWSAuth.class);
 
     private AtlassianPluginAWSCredentialsProvider credentialsProvider;
 
@@ -41,16 +48,25 @@ public class ProbeAWSAuth {
      * @return a list containing the names of the stacks in the account in the current region
      */
     public List<String> probeSDKV2() {
-        CloudFormationClient client = CloudFormationClient
+        CloudFormationAsyncClient client = CloudFormationAsyncClient
                 .builder()
+                .region(Region.US_EAST_1)
                 .credentialsProvider(credentialsProvider)
                 .build();
 
-        DescribeStacksResponse response = client.describeStacks();
-        return response
-                .stacks()
-                .stream()
-                .map(Stack::stackName)
-                .collect(Collectors.toList());
+        CompletableFuture<DescribeStacksResponse> futureResponse = client.describeStacks();
+
+        try {
+            DescribeStacksResponse response = futureResponse.get();
+            List<String> stackNames = response
+                    .stacks()
+                    .stream()
+                    .map(Stack::stackName)
+                    .collect(Collectors.toList());
+            return stackNames;
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("unable to get DescribeStacksResponse", e);
+            return Collections.emptyList();
+        }
     }
 }
