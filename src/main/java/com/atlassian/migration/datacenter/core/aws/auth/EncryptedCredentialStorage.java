@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.core.aws.auth;
 
 import com.atlassian.jira.bc.license.JiraLicenseService;
+import com.atlassian.jira.license.LicenseDetails;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
@@ -22,6 +23,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
+import java.util.Iterator;
 
 /**
  * Class for managing the storage and retrieval of AWS Credentials. Should not be used for direct access to credentials
@@ -52,7 +54,7 @@ public class EncryptedCredentialStorage implements CredentialStorage {
      * Creates the Cipher needed to perform the encyption / decryption offerings
      *
      * @param secretKey the string to use as the secret
-     * @param opMode    the Ciper operation mode.
+     * @param opMode    the Cipher operation mode.
      * @return the Cipher object to act on the given string
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeySpecException
@@ -68,6 +70,15 @@ public class EncryptedCredentialStorage implements CredentialStorage {
         Cipher cipher = Cipher.getInstance(key.getAlgorithm());
         cipher.init(opMode, key, paramSpec);
         return cipher;
+    }
+
+    private String getEncryptionKey() throws InvalidKeyException {
+        Iterator<LicenseDetails> licenseIterator = this.jiraLicenseService.getLicenses().iterator();
+        if (licenseIterator.hasNext()) {
+            return licenseIterator.next().getLicenseString();
+        } else {
+            throw new InvalidKeyException("Jira License does not exist to use as encryption key.");
+        }
     }
 
     @Override
@@ -99,8 +110,8 @@ public class EncryptedCredentialStorage implements CredentialStorage {
      * @return the encrypted string
      */
     private String encryptString(final String raw) {
-        final String key = this.jiraLicenseService.getServerId();
         try {
+            final String key = this.getEncryptionKey();
             Cipher cipher = getCipher(key, Cipher.ENCRYPT_MODE);
             byte[] encrypted = cipher.doFinal(raw.getBytes(CHAR_SET));
             return new String(Base64.getEncoder().encode(encrypted));
@@ -117,8 +128,8 @@ public class EncryptedCredentialStorage implements CredentialStorage {
      * @return the decrypted plaintext string
      */
     private String decryptString(final String encrypted) {
-        String key = this.jiraLicenseService.getServerId();
         try {
+            final String key = this.getEncryptionKey();
             Cipher cipher = getCipher(key, Cipher.DECRYPT_MODE);
             byte[] enc = Base64.getDecoder().decode(encrypted);
             byte[] utf8 = cipher.doFinal(enc);
