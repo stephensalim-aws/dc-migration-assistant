@@ -3,26 +3,25 @@ package com.atlassian.migration.datacenter.core.aws.auth;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.regions.RegionMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
 
 @Component
 public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProvider, AWSCredentialsProvider {
 
-    private final CredentialsFetcher credentialsFetcher;
+    private final CredentialStorage credentialStorage;
 
     @Autowired
-    public AtlassianPluginAWSCredentialsProvider(CredentialsFetcher credentialsFetcher) {
-        this.credentialsFetcher = credentialsFetcher;
+    public AtlassianPluginAWSCredentialsProvider(CredentialStorage credentialStorage) {
+        this.credentialStorage = credentialStorage;
     }
 
     /**
      * AWS SDK V1 credentials API
+     *
      * @return AWS Credentials to be used with SDK V1 clients
      */
     @Override
@@ -31,12 +30,12 @@ public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProv
             return new AWSCredentials() {
                 @Override
                 public String getAWSAccessKeyId() {
-                    return credentialsFetcher.getAccessKeyId();
+                    return credentialStorage.getAccessKeyId();
                 }
 
                 @Override
                 public String getAWSSecretKey() {
-                    return credentialsFetcher.getSecretAccessKey();
+                    return credentialStorage.getSecretAccessKey();
                 }
             };
         }
@@ -44,11 +43,11 @@ public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProv
     }
 
     private boolean secretKeyIsDefined() {
-        return credentialsFetcher.getSecretAccessKey() != null && !credentialsFetcher.getSecretAccessKey().equals("");
+        return this.credentialStorage.getSecretAccessKey() != null && !this.credentialStorage.getSecretAccessKey().equals("");
     }
 
     private boolean accessKeyIsDefined() {
-        return credentialsFetcher.getAccessKeyId() != null && !credentialsFetcher.getAccessKeyId().equals("");
+        return this.credentialStorage.getAccessKeyId() != null && !this.credentialStorage.getAccessKeyId().equals("");
     }
 
     /**
@@ -62,20 +61,21 @@ public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProv
 
     /**
      * AWS SDK V2 credentials API
+     *
      * @return AWS Credentials to be used with SDK V2 clients
      */
     @Override
     public AwsCredentials resolveCredentials() {
-        if(accessKeyIsDefined() && secretKeyIsDefined()) {
+        if (accessKeyIsDefined() && secretKeyIsDefined()) {
             return new AwsCredentials() {
                 @Override
                 public String accessKeyId() {
-                    return credentialsFetcher.getAccessKeyId();
+                    return credentialStorage.getAccessKeyId();
                 }
 
                 @Override
                 public String secretAccessKey() {
-                    return credentialsFetcher.getSecretAccessKey();
+                    return credentialStorage.getSecretAccessKey();
                 }
             };
         }

@@ -13,18 +13,15 @@ import org.springframework.stereotype.Component;
  * The region is stored in the plugin settings of this app.
  */
 @Component
-public class PluginSettingsRegionManager implements RegionStorer, RegionFetcher {
+public class PluginSettingsRegionManagement implements RegionManagement {
 
-    private static final String AWS_REGION_PLUGIN_STORAGE_KEY = "com.atlassian.migration.datacenter.core.aws.region";
-    private static final String REGION_PLUGIN_STORAGE_SUFFIX = ".region";
-
-    private final PluginSettingsFactory pluginSettingsFactory;
     private final GlobalInfrastructure globalInfrastructure;
+    private final PluginSettings pluginSettings;
 
     @Autowired
-    public PluginSettingsRegionManager(@ComponentImport PluginSettingsFactory pluginSettingsFactory, GlobalInfrastructure globalInfrastructure) {
-        this.pluginSettingsFactory = pluginSettingsFactory;
+    public PluginSettingsRegionManagement(@ComponentImport PluginSettingsFactory pluginSettingsFactory, GlobalInfrastructure globalInfrastructure) {
         this.globalInfrastructure = globalInfrastructure;
+        this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
     }
 
     /**
@@ -33,9 +30,8 @@ public class PluginSettingsRegionManager implements RegionStorer, RegionFetcher 
      */
     @Override
     public String getRegion() {
-        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String pluginSettingsRegion = (String) pluginSettings.get(AWS_REGION_PLUGIN_STORAGE_KEY + REGION_PLUGIN_STORAGE_SUFFIX);
-        if (pluginSettingsRegion == null || pluginSettingsRegion == "") {
+        String pluginSettingsRegion = (String) this.pluginSettings.get(AWS_REGION_PLUGIN_STORAGE_KEY + REGION_PLUGIN_STORAGE_SUFFIX);
+        if (pluginSettingsRegion == null || pluginSettingsRegion.equals("")) {
             return Regions.DEFAULT_REGION.getName();
         }
         return pluginSettingsRegion;
@@ -52,15 +48,13 @@ public class PluginSettingsRegionManager implements RegionStorer, RegionFetcher 
         if(!isValidRegion(region)) {
             throw new InvalidAWSRegionException();
         }
-
-        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        pluginSettings.put(AWS_REGION_PLUGIN_STORAGE_KEY + REGION_PLUGIN_STORAGE_SUFFIX, region);
+        this.pluginSettings.put(AWS_REGION_PLUGIN_STORAGE_KEY + REGION_PLUGIN_STORAGE_SUFFIX, region);
     }
 
     private boolean isValidRegion(String testRegion) {
         return globalInfrastructure.
                 getRegions()
-                .stream()
+                .parallelStream()
                 .anyMatch(region -> region.equals(testRegion));
     }
 }
