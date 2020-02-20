@@ -1,6 +1,6 @@
 package com.atlassian.migration.datacenter.core.aws.auth;
 
-public interface CredentialsStorer {
+public interface WriteCredentialsService {
 
     void storeAccessKeyId(String accessKeyId);
 

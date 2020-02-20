@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * and should not be used in production.
  */
 @Component
-public class PlainTextCredentialsManager implements CredentialsFetcher, CredentialsStorer {
+public class PlainTextCredentialsManager implements ReadCredentialsService, WriteCredentialsService {
 
     private static final String AWS_CREDS_PLUGIN_STORAGE_KEY = "com.atlassian.migration.datacenter.core.aws.auth";
     private static final String ACCESS_KEY_ID_PLUGIN_STORAGE_SUFFIX = ".accessKeyId";

@@ -1,7 +1,7 @@
 package com.atlassian.migration.datacenter.api.aws;
 
-import com.atlassian.migration.datacenter.core.aws.auth.CredentialsFetcher;
-import com.atlassian.migration.datacenter.core.aws.auth.CredentialsStorer;
+import com.atlassian.migration.datacenter.core.aws.auth.ReadCredentialsService;
+import com.atlassian.migration.datacenter.core.aws.auth.WriteCredentialsService;
 import com.atlassian.migration.datacenter.core.aws.auth.ProbeAWSAuth;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +17,14 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Path("aws/credentials")
 public class AWSCredentialsEndpoint {
 
-    private final CredentialsStorer credentialsStorer;
-    private final CredentialsFetcher credentialsFetcher;
+    private final WriteCredentialsService writeCredentialsService;
+    private final ReadCredentialsService readCredentialsService;
     private final ProbeAWSAuth probe;
 
     @Autowired
-    public AWSCredentialsEndpoint(CredentialsStorer credentialsStorer, CredentialsFetcher credentialsFetcher, ProbeAWSAuth probe) {
-        this.credentialsStorer = credentialsStorer;
-        this.credentialsFetcher = credentialsFetcher;
+    public AWSCredentialsEndpoint(WriteCredentialsService writeCredentialsService, ReadCredentialsService readCredentialsService, ProbeAWSAuth probe) {
+        this.writeCredentialsService = writeCredentialsService;
+        this.readCredentialsService = readCredentialsService;
         this.probe = probe;
     }
 
@@ -32,8 +32,8 @@ public class AWSCredentialsEndpoint {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response storeAWSCredentials(AWSCredentialsWebObject credentials) {
-        credentialsStorer.storeAccessKeyId(credentials.getAccessKeyId());
-        credentialsStorer.storeSecretAccessKey(credentials.getSecretAccessKey());
+        writeCredentialsService.storeAccessKeyId(credentials.getAccessKeyId());
+        writeCredentialsService.storeSecretAccessKey(credentials.getSecretAccessKey());
 
         return Response
                 .noContent()

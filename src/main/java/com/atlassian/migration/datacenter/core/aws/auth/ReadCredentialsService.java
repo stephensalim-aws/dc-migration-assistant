@@ -1,6 +1,6 @@
 package com.atlassian.migration.datacenter.core.aws.auth;
 
-public interface CredentialsFetcher {
+public interface ReadCredentialsService {
 
     String getAccessKeyId();
 
