@@ -6,10 +6,14 @@ import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.regions.Region;
 
+/**
+ * Class for managing the storage and retrieval of AWS Credentials. Should not be used for direct access to credentials
+ * except for in a CredentialsProvider implementation. This class stores credentials insecurely through pluginsettings
+ * and should not be used in production.
+ */
 @Component
-public class PlainTextCredentialsManager implements CredentialsFetcher, CredentialsStorer {
+public class PlainTextCredentialsManager implements CredentialsFetcher, CredentialsStorer, RegionFetcher, RegionStorer {
 
     private static final String AWS_CREDS_PLUGIN_STORAGE_KEY = "com.atlassian.migration.datacenter.core.aws.auth";
     private static final String ACCESS_KEY_ID_PLUGIN_STORAGE_SUFFIX = ".accessKeyId";

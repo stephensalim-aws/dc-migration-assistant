@@ -6,5 +6,4 @@ public interface CredentialsStorer {
 
     void storeSecretAccessKey(String secretAccessKey);
 
-    void storeRegion(String region) throws InvalidAWSRegionException;
 }

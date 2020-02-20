@@ -6,6 +6,4 @@ public interface CredentialsFetcher {
 
     String getSecretAccessKey();
 
-    String getRegion();
-
 }
