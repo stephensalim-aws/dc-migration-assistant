@@ -23,10 +23,12 @@ public class ProbeAWSAuth {
     private static final Logger logger = LoggerFactory.getLogger(ProbeAWSAuth.class);
 
     private AtlassianPluginAWSCredentialsProvider credentialsProvider;
+    private RegionFetcher regionFetcher;
 
     @Autowired
-    public ProbeAWSAuth(AtlassianPluginAWSCredentialsProvider credentialsProvider) {
+    public ProbeAWSAuth(AtlassianPluginAWSCredentialsProvider credentialsProvider, RegionFetcher regionFetcher) {
         this.credentialsProvider = credentialsProvider;
+        this.regionFetcher = regionFetcher;
     }
 
     /**
@@ -34,7 +36,10 @@ public class ProbeAWSAuth {
      * @return A list containing the names of the buckets in the account in the current region
      */
     public List<String> probeSDKV1() {
-        AmazonS3 s3 = AmazonS3ClientBuilder.standard().withCredentials(credentialsProvider).build();
+        AmazonS3 s3 = AmazonS3ClientBuilder
+                .standard()
+                .withRegion(regionFetcher.getRegion())
+                .withCredentials(credentialsProvider).build();
         List<Bucket> buckets = s3.listBuckets();
         return buckets
                 .stream()
@@ -50,7 +55,7 @@ public class ProbeAWSAuth {
     public List<String> probeSDKV2() {
         CloudFormationAsyncClient client = CloudFormationAsyncClient
                 .builder()
-                .region(Region.US_EAST_1)
+                .region(Region.of(regionFetcher.getRegion()))
                 .credentialsProvider(credentialsProvider)
                 .build();
 
