@@ -1,8 +1,8 @@
 package com.atlassian.migration.datacenter.core.fs;
 
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
+import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -34,7 +34,7 @@ class S3FilesystemMigrationServiceIntegrationTestIT {
     @Test
     void testSuccessfulDirectoryMigration(@TempDir Path dir) {
         System.out.println(System.getenv("AWS_ACCESS_KEY_ID"));
-        FilesystemMigrationConfig config = new FilesystemMigrationConfig(s3Bucket, dir);
+        FilesystemMigrationConfig config = new FilesystemMigrationConfig(s3Bucket, dir.toString());
         FilesystemMigrationService fsService = new S3FilesystemMigrationService();
         fsService.startMigration(config);
         Assertions.assertNotEquals(FilesystemMigrationStatus.FAILED, fsService.getProgress().getStatus());

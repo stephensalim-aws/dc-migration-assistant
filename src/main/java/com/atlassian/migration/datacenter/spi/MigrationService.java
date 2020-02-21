@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.spi;
 
 import com.atlassian.activeobjects.tx.Transactional;
+import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
 import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 
 /**
@@ -28,4 +29,6 @@ public interface MigrationService {
      * @return a stack identifier of the created stack
      */
     String provisionInfrastructure(ProvisioningConfig provisioningConfig);
+
+    boolean startFilesystemMigration(FilesystemMigrationConfig config);
 }

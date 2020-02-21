@@ -2,10 +2,12 @@ package com.atlassian.migration.datacenter.api;
 
 import com.atlassian.migration.datacenter.spi.MigrationService;
 import com.atlassian.migration.datacenter.spi.MigrationStage;
+import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -44,6 +46,7 @@ public class MigrationEndpoint {
 
     /**
      * Creates a new migration if none exists. Otherwise will respond with a 400 and an error message.
+     *
      * @return no content if successful or 400 and error  message if a migration already exists.
      */
     @POST
@@ -60,5 +63,14 @@ public class MigrationEndpoint {
                     .entity("migration already exists")
                     .build();
         }
+    }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/filesystem")
+    public Response runFileMigration(FilesystemMigrationConfig config) {
+        boolean started = migrationService.startFilesystemMigration(config);
+        return Response.status(Response.Status.ACCEPTED).entity("S3 Migration started = " + started).build();
     }
 }

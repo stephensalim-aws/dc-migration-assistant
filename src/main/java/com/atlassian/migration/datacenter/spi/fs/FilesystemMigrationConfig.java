@@ -1,21 +1,38 @@
 package com.atlassian.migration.datacenter.spi.fs;
 
-import java.nio.file.Path;
-
 public class FilesystemMigrationConfig {
-    private final String s3Bucket;
-    private final Path directoryToMigrate;
+    private String s3Bucket;
+    private String directory;
 
-    public FilesystemMigrationConfig(String s3Bucket, Path directoryToMigrate) {
+    public FilesystemMigrationConfig() {
+    }
+
+    public FilesystemMigrationConfig(String s3Bucket, String directory) {
         this.s3Bucket = s3Bucket;
-        this.directoryToMigrate = directoryToMigrate;
+        this.directory = directory;
     }
 
     public String getS3Bucket() {
         return s3Bucket;
     }
 
-    public Path getDirectoryToMigrate() {
-        return directoryToMigrate;
+    public void setS3Bucket(String s3Bucket) {
+        this.s3Bucket = s3Bucket;
+    }
+
+    public String getDirectory() {
+        return directory;
+    }
+
+    public void setDirectory(String directory) {
+        this.directory = directory;
+    }
+
+    @Override
+    public String toString() {
+        return "FilesystemMigrationConfig{" +
+                "s3Bucket='" + s3Bucket + '\'' +
+                ", directory='" + directory + '\'' +
+                '}';
     }
 }
