@@ -47,8 +47,6 @@ public class AWSRegionEndpointTest {
         } catch (InvalidAWSRegionException invalidRegionException) {
             fail(invalidRegionException.getMessage());
         }
-
-
     }
 
     @Test
