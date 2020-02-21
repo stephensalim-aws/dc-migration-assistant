@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudformation.CloudFormationAsyncClient;
+import software.amazon.awssdk.services.cloudformation.model.CloudFormationException;
 import software.amazon.awssdk.services.cloudformation.model.DescribeStacksResponse;
 import software.amazon.awssdk.services.cloudformation.model.Stack;
 
@@ -71,6 +72,9 @@ public class ProbeAWSAuth {
                     .collect(Collectors.toList());
             return stackNames;
         } catch (InterruptedException | ExecutionException e) {
+            if(e.getCause() instanceof CloudFormationException) {
+                throw (CloudFormationException) e.getCause();
+            }
             logger.error("unable to get DescribeStacksResponse", e);
             return Collections.emptyList();
         }
