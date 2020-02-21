@@ -16,23 +16,16 @@ import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import software.amazon.awssdk.services.cloudformation.model.Parameter;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 
-import static com.atlassian.migration.datacenter.spi.MigrationStage.NOT_STARTED;
-import static com.atlassian.migration.datacenter.spi.MigrationStage.READY_FS_MIGRATION;
-import static com.atlassian.migration.datacenter.spi.MigrationStage.STARTED;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 // We have to use the JUnit 4 API because there is no JUnit 5 active objects extension :(
 @RunWith(ActiveObjectsJUnitRunner.class)
@@ -165,7 +158,8 @@ public class AWSMigrationServiceTest {
             sut.provisionInfrastructure(new ProvisioningConfig("", "", new HashMap<>()));
         });
 
-        verify(this.cfnApi, never()).provisionStack(any(), any(), any());
+        Collection<Parameter> parameterList = any();
+        verify(this.cfnApi, never()).provisionStack(any(), any(), parameterList);
     }
 
     private void assertNumberOfMigrations(int i) {

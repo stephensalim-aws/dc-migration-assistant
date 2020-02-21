@@ -36,8 +36,6 @@ public class AWSCloudFormationEndpoint {
     private final RegionService regionManagement;
     private final CfnApi cfnApi;
 
-    private List<String> cfnParams = new ArrayList<>();
-
     @Inject
     public AWSCloudFormationEndpoint(AtlassianPluginAWSCredentialsProvider credentialsProvider, RegionService regionManagement, CfnApi cfnApi) {
         this.credentialsProvider = credentialsProvider;
@@ -58,8 +56,8 @@ public class AWSCloudFormationEndpoint {
     }
 
     /**
-     * @param rawJSON
-     * @return
+     * @param rawJSON the json of the cloudformation parameters
+     * @return returns the response of the cloudformation api service
      */
     @POST
     @Path("/create")
