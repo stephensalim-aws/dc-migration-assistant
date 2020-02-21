@@ -1,6 +1,12 @@
-# aws-datacenter-jira-plugin2
+# Atlassian DC Migration Assistant
 
-Atlassian Jira Data Center Plugin2 for AWS EventBridge Integration
+Atlassian server app for migrating to Data Center on AWS
+
+[![Atlassian license](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](LICENSE) ![Build](https://github.com/atlassian-labs/dc-migration-assistant/workflows/Tests/badge.svg) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
+
+## Usage
+
+Build the plugin via `mvn package` then install the plugin into your Jira instance through the "Manage Apps" menu and uploading the app .jar or .obr found in the `target` directory.
 
 ## Developing the plugin
 
@@ -22,8 +28,6 @@ The frontend is built on a stack of:
 * [styled components](https://styled-components.com/)
 * Built with [Webpack](https://webpack.js.org/) and [Babel](https://babeljs.io/)
 
-#### Executing and Testing
-
 In the project directory, you can run:
 
 ##### `yarn start`
@@ -36,27 +40,13 @@ Go to localhost:3333 to run the frontend without Jira
 
 If you want to test in-app, run atlas-run --product \[jira|refapp|confluence\] while the dev server is running
 
-##### `yarn test`
-
-For running UI tests.
-
-##### `yarn lint`
-
-Checks the frontend plugin for styling errors. 
-
-The ruleset is set to be compatible with other Server plugins, 
-so please mind that when considering making changes to it.
-
-##### `yarn lint --fix`
-
-Will additionally fix any automatically-fixable issues.
-
 ### Backend
 
 Here are the SDK commands you'll use immediately:
 
 * Run the plugin in a product: `mvn amps:run -Dproduct=[jira|confluence|refapp] -Dproduct.version=<version e.g. 8.5.0>`
-* Build the plugin: `mvn package`
+    * If you want to remotely debug your code running in the product, run `mvn amps:debug -Dproduct=[jira|confluence|refapp]` and create IDEA _Remote_ run configuration (defaults are ok)
+* Build the plugin: `mvn package` and quick reload will reinstall the plugin in the product (https://developer.atlassian.com/server/framework/atlassian-sdk/automatic-plugin-reinstallation-with-quickreload/)
 * When in doubt, `mvn clean` it out
 * [Full atlassian maven reference](https://developer.atlassian.com/server/framework/atlassian-sdk/working-with-maven/#using-the-amps-maven-plugin-directly)
 
@@ -71,10 +61,36 @@ Full documentation is always available at:
 
 https://developer.atlassian.com/display/DOCS/Introduction+to+the+Atlassian+Plugin+SDK
 
-## Deploying to remote product
+## Executing and Testing
 
-To deploy the plugin to a full product stack, run a build `atlas-mvn package` and upload the generated OBR to the product through the plugin manager
+##### `mvn verify`
 
-# License
+Will run all tests
+
+##### `yarn test`
+
+For running just UI tests.
+
+##### `yarn lint`
+
+Checks the frontend plugin for styling errors. 
+
+The ruleset is set to be compatible with other Server plugins, 
+so please mind that when considering making changes to it.
+
+##### `yarn lint --fix`
+
+Will additionally fix any automatically-fixable issues.
+
+## Contributions
+
+Contributions to DC Migration Assistant are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details
+
+
+## License
 
 This library is licensed under the Apache 2.0 License. 
+
+<br/>
+
+[![With ❤️ from Atlassian](https://raw.githubusercontent.com/atlassian-internal/oss-assets/master/banner-with-thanks.png)](https://www.atlassian.com)

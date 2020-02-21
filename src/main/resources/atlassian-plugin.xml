@@ -7,55 +7,55 @@
 
     <ao key="ao-module">
         <description>The module configuring the Active Objects service used by this plugin</description>
-        <entity>com.aws.apn.migration.awsmigrationplugin.dto.Migration</entity>
+        <entity>com.atlassian.migration.datacenter.dto.Migration</entity>
     </ao>
 
     <!-- add our i18n resource -->
-    <resource type="i18n" name="aws-migration-plugin" location="i18n/aws-migration-plugin"/>
+    <resource type="i18n" name="dc-migration-assistant" location="i18n/dc-migration-assistant"/>
     
-    <servlet key="aws-migration-plugin-servlet" name="AWS Migration Servlet"
-             class="com.aws.apn.migration.awsmigrationplugin.TemplateServlet">
-        <url-pattern>/aws-migration-plugin*</url-pattern>
+    <servlet key="dc-migration-assistant-servlet" name="DC Migration Assistant Servlet"
+             class="com.atlassian.migration.datacenter.TemplateServlet">
+        <url-pattern>/dc-migration-assistant*</url-pattern>
     </servlet>
 
-    <web-resource key="aws-migration-plugin-templates" name="AWS Migration Plugin Soy Templates">
-        <resource type="soy" name="aws-migration-plugin.soy" location="/templates/aws-migration-plugin.soy"/>
+    <web-resource key="dc-migration-assistant-templates" name="DC Migration Assistant Soy Templates">
+        <resource type="soy" name="dc-migration-assistant.soy" location="/templates/dc-migration-assistant.soy"/>
         <dependency>com.atlassian.auiplugin:soy</dependency>
         <dependency>com.atlassian.soy.soy-template-plugin:soy-deps</dependency>
     </web-resource>
 
-    <web-item key="refapp-menu-item" name="Refapp AWS Migration Plugin" section="system.admin/general" weight="10"
+    <web-item key="refapp-menu-item" name="Refapp DC Migration Plugin" section="system.admin/general" weight="10"
               application="refapp">
-        <label>AWS Migration Plugin</label>
-        <label key="awsmigrationplugin.title"/>
-        <link linkId="awsmigrationplugin">/plugins/servlet/aws-migration-plugin</link>
+        <label key="atlassian.migration.datacenter.title"/>
+        <description>Refapp admin menu item for this app</description>
+        <link linkId="dc-migration-assistant">/plugins/servlet/dc-migration-assistant</link>
     </web-item>
 
-    <web-item key="jira-menu-item" name="Jira AWS Migration Plugin" section="advanced_menu_section/advanced_section"
+    <web-item key="jira-menu-item" name="Jira DC Migration Plugin" section="advanced_menu_section/advanced_section"
               weight="200"
               application="jira">
-        <label key="awsmigrationplugin.title"/>
-        <description>AWS Migration Plugin</description>
-        <link linkId="awsmigrationplugin">/plugins/servlet/aws-migration-plugin</link>
+        <label key="atlassian.migration.datacenter.title"/>
+        <description>Jira admin menu item for this app</description>
+        <link linkId="dc-migration-assistant">/plugins/servlet/dc-migration-assistant</link>
     </web-item>
 
-    <web-item key="bitbucket-menu-item" name="Bitbucket AWS Migration Plugin" section="atl.admin/admin-support-section"
+    <web-item key="bitbucket-menu-item" name="Bitbucket DC Migration Plugin" section="atl.admin/admin-support-section"
               weight="10"
               application="bitbucket">
-        <label key="awsmigrationplugin.title"/>
-        <description>AWS Migration Plugin</description>
-        <link linkId="awsmigrationplugin">/plugins/servlet/aws-migration-plugin</link>
+        <label key="atlassian.migration.datacenter.title"/>
+        <description>Bitbucket admin menu item for this plugin</description>
+        <link linkId="dc-migration-assistant">/plugins/servlet/dc-migration-assistant</link>
     </web-item>
 
-    <web-item key="confluence-menu-item" name="Confluence AWS Migration Plugin" section="system.admin/administration"
+    <web-item key="confluence-menu-item" name="Confluence DC Migration Plugin" section="system.admin/administration"
               weight="10"
               application="confluence">
-        <label key="awsmigrationplugin.title"/>
-        <description>AWS Migration Plugin</description>
-        <link linkId="awsmigrationplugin">/plugins/servlet/aws-migration-plugin</link>
+        <label key="atlassian.migration.datacenter.title"/>
+        <description>Confluence admin menu item for this plugin</description>
+        <link linkId="dc-migration-assistant">/plugins/servlet/dc-migration-assistant</link>
     </web-item>
 
-    <rest name="AWS Migration Resource" i18n-name-key="aws.migration.rest.name" key="aws-migration-rest" path="/aws-migration" version="1.0">
-        <description key="aws.migration.rest.description">The AWS migration plugin rest API</description>
+    <rest name="DC Migration Resource" i18n-name-key="atlassian.migration.datacenter.rest.name" key="dc-migration-rest" path="/dc-migration" version="1.0">
+        <description>The AWS migration plugin rest API</description>
     </rest>
 </atlassian-plugin>

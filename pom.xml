@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-      <groupId>com.atlassian.pom</groupId>
-      <artifactId>public-pom</artifactId>
-      <version>6.0.2</version>
+        <groupId>com.atlassian.pom</groupId>
+        <artifactId>public-pom</artifactId>
+        <version>6.0.2</version>
     </parent>
 
     <repositories>
@@ -41,8 +41,8 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <groupId>com.aws.apn.migration</groupId>
-    <artifactId>aws-migration-plugin</artifactId>
+    <groupId>com.atlassian.migration.datacenter</groupId>
+    <artifactId>dc-migration-assistant</artifactId>
     <version>1.0.0</version>
     <licenses>
         <license>
@@ -52,11 +52,11 @@
         </license>
     </licenses>
     <organization>
-        <name>Amazon Web Services</name>
-        <url>https://aws.amazon.com/</url>
+        <name>Atlassian</name>
+        <url>https://www.atlassian.com</url>
     </organization>
-    <name>AWS Data Migration Plugin</name>
-    <description>This is the officially supported AWS Data Migration plugin for Atlassian JIRA.</description>
+    <name>Atlassian Data Center Migration Assistant</name>
+    <description>This is the officially supported DC Migration plugin for Atlassian JIRA.</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
@@ -115,16 +115,41 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.atlassian.scheduler</groupId>
+            <artifactId>atlassian-scheduler-api</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-api</artifactId>
+            <version>8.6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.woodstox</groupId>
+            <artifactId>woodstox-core</artifactId>
+            <version>6.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>jta</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.0.1b</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>cloudformation</artifactId>
-            <version>${aws.sdk.version}</version>
-            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>software.amazon.awssdk</groupId>
                     <artifactId>apache-client</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>regions</artifactId>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -197,6 +222,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws.sdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -242,6 +274,7 @@
                             !com.conversantmedia.util.concurrent.*,
                             !org.apache.logging.log4j.core.async.*,
                             !org.joda.convert.*,
+                            !com.sun.org.apache.xml.internal.resolver.*,
                             *
                         </Import-Package>
                     </instructions>
@@ -262,7 +295,7 @@
                 </executions>
                 <configuration>
                     <includeExclude>
-                        -com.atlassian.awsmigrationplugin.internal.properties.*,-com.atlassian.awsmigrationplugin.internal.requesthandler.logging.*
+                        -com.atlassian.migration.datacenter.internal.properties.*,-com.atlassian.migration.datacenter.internal.requesthandler.logging.*
                     </includeExclude>
                     <scannedDependencies>
                         <dependency>
@@ -361,6 +394,39 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>no-frontend</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>install-node-and-yarn</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>install-prod-dependencies</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>compile-the-ui</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>lint</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>run-tests</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <properties>
@@ -373,8 +439,8 @@
         <yarn.cmd.install.dev>install --pure-lockfile --prefer-offline --mutex network</yarn.cmd.install.dev>
         <yarn.cmd.build>build</yarn.cmd.build>
         <yarn.cmd.build.dev>build:dev</yarn.cmd.build.dev>
-        <node.modules>${project.basedir}/src/main/aws-migration-plugin-fe/node_modules</node.modules>
-        <frontend.working.directory>src/main/aws-migration-plugin-fe</frontend.working.directory>
+        <node.modules>${project.basedir}/src/main/dc-migration-assistant-fe/node_modules</node.modules>
+        <frontend.working.directory>src/main/dc-migration-assistant-fe</frontend.working.directory>
 
         <ao.version>3.2.2</ao.version>
         <sal.version>4.0.0</sal.version>

@@ -1,0 +1,23 @@
+# Contributing to Atlassian DC Migration Assistant
+
+Thank you for considering a contribution to DC Migration Assistant! Pull requests, issues and comments are welcome. For pull requests, please:
+
+* Use the [feature branching](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow) pattern
+    * If you have changes that are dependent on another developer's branch, create your feature branch off their branch. Your PR should also target their branch.
+* Pull requests should target the branch you branched off (master is the default branch)
+* Try to keep one PR scoped to one issue
+* Pull requests require at least one approval from a maintainer and all builds must pass
+* Add tests for new features and bug fixes
+* Follow the existing style
+* Separate unrelated changes into multiple pull requests
+
+See the existing issues for things to start contributing.
+
+For bigger changes, please make sure you start a discussion first by creating an issue and explaining the intended change.
+
+Atlassian requires contributors to sign a Contributor License Agreement, known as a CLA. This serves as a record stating that the contributor is entitled to contribute the code/documentation/translation to the project and is willing to have it used in distributions and derivative works (or is willing to transfer ownership).
+
+Prior to accepting your contributions we ask that you please follow the appropriate link below to digitally sign the CLA. The Corporate CLA is for those who are contributing as a member of an organization and the individual CLA is for those contributing as an individual.
+
+* [CLA for corporate contributors](https://na2.docusign.net/Member/PowerFormSigning.aspx?PowerFormId=e1c17c66-ca4d-4aab-a953-2c231af4a20b)
+* [CLA for individuals](https://na2.docusign.net/Member/PowerFormSigning.aspx?PowerFormId=3f94fbdc-2fbe-46ac-b14c-5d152700ae5d)
