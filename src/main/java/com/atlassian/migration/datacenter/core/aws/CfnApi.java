@@ -1,33 +1,20 @@
 package com.atlassian.migration.datacenter.core.aws;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.services.cloudformation.CloudFormationAsyncClient;
-import software.amazon.awssdk.services.cloudformation.model.CreateStackRequest;
-import software.amazon.awssdk.services.cloudformation.model.CreateStackResponse;
-import software.amazon.awssdk.services.cloudformation.model.DescribeStacksRequest;
-import software.amazon.awssdk.services.cloudformation.model.DescribeStacksResponse;
-import software.amazon.awssdk.services.cloudformation.model.Parameter;
 import software.amazon.awssdk.services.cloudformation.model.Stack;
-import software.amazon.awssdk.services.cloudformation.model.StackInstanceNotFoundException;
-import software.amazon.awssdk.services.cloudformation.model.StackStatus;
-import software.amazon.awssdk.services.cloudformation.model.Tag;
+import software.amazon.awssdk.services.cloudformation.model.*;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Component
 public class CfnApi {
+
+    private static Logger LOGGER = Logger.getLogger(CfnApi.class);
 
     private final CloudFormationAsyncClient client;
 
@@ -57,10 +44,14 @@ public class CfnApi {
 
     public Optional<String> provisionStack(String templateUrl, String stackName, Map<String, String> params) {
         Set<Parameter> parameters = params.entrySet()
-                .stream()
+                .parallelStream()
                 .map(e -> Parameter.builder().parameterKey(e.getKey()).parameterValue(e.getValue()).build())
                 .collect(Collectors.toSet());
 
+        return this.provisionStack(templateUrl, stackName, parameters);
+    }
+
+    public final Optional<String> provisionStack(final String templateUrl, final String stackName, final Collection<Parameter> parameters) {
         Tag tag = Tag.builder()
                 .key("created_by")
                 .value("atlassian-awsmigration-plugin")
@@ -94,6 +85,7 @@ public class CfnApi {
             Stack stack = response.stacks().get(0);
             return Optional.ofNullable(stack);
         } catch (CompletionException | CancellationException e) {
+            LOGGER.error(e.getLocalizedMessage());
             return Optional.empty();
         }
     }
