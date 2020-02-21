@@ -2,6 +2,11 @@
 
 Thank you for considering a contribution to DC Migration Assistant! Pull requests, issues and comments are welcome. For pull requests, please:
 
+* Use the [feature branching](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow) pattern
+    * If you have changes that are dependent on another developer's branch, create your feature branch off their branch. Your PR should also target their branch.
+* Pull requests should target the branch you branched off (master is the default branch)
+* Try to keep one PR scoped to one issue
+* Pull requests require at least one approval from a maintainer and all builds must pass
 * Add tests for new features and bug fixes
 * Follow the existing style
 * Separate unrelated changes into multiple pull requests
