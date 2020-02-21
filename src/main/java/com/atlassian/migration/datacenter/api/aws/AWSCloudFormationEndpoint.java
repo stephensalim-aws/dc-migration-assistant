@@ -10,7 +10,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.atlassian.jira.util.json.JSONObject;
 import com.atlassian.migration.datacenter.core.aws.CfnApi;
 import com.atlassian.migration.datacenter.core.aws.auth.AtlassianPluginAWSCredentialsProvider;
-import com.atlassian.migration.datacenter.core.aws.region.RegionManagement;
+import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.cloudformation.model.Parameter;
@@ -33,13 +33,13 @@ public class AWSCloudFormationEndpoint {
     private final static String QS_URL = "https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-jira/templates/quickstart-jira-dc-with-vpc.template.yaml";
     private final static Logger LOGGER = Logger.getLogger(AWSCloudFormationEndpoint.class);
     private final AtlassianPluginAWSCredentialsProvider credentialsProvider;
-    private final RegionManagement regionManagement;
+    private final RegionService regionManagement;
     private final CfnApi cfnApi;
 
     private List<String> cfnParams = new ArrayList<>();
 
     @Inject
-    public AWSCloudFormationEndpoint(AtlassianPluginAWSCredentialsProvider credentialsProvider, RegionManagement regionManagement, CfnApi cfnApi) {
+    public AWSCloudFormationEndpoint(AtlassianPluginAWSCredentialsProvider credentialsProvider, RegionService regionManagement, CfnApi cfnApi) {
         this.credentialsProvider = credentialsProvider;
         this.regionManagement = regionManagement;
         this.cfnApi = cfnApi;

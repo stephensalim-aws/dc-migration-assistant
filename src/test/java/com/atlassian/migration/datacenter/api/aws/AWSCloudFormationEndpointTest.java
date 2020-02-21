@@ -2,9 +2,9 @@ package com.atlassian.migration.datacenter.api.aws;
 
 import com.atlassian.migration.datacenter.core.aws.CfnApi;
 import com.atlassian.migration.datacenter.core.aws.auth.AtlassianPluginAWSCredentialsProvider;
-import com.atlassian.migration.datacenter.core.aws.auth.CredentialStorage;
+import com.atlassian.migration.datacenter.core.aws.auth.ReadCredentialsService;
 import com.atlassian.migration.datacenter.core.aws.region.InvalidAWSRegionException;
-import com.atlassian.migration.datacenter.core.aws.region.RegionManagement;
+import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class AWSCloudFormationEndpointTest {
 
     private AWSCloudFormationEndpoint cloudFormationEndpoint;
-    private RegionManagement regionManagement;
-    private CredentialStorage credentialStorage;
+    private RegionService regionManagement;
+    private ReadCredentialsService credentialStorage;
 
     @Mock
     private PluginSettingsFactory pluginSettings;
@@ -39,7 +39,7 @@ public class AWSCloudFormationEndpointTest {
     @BeforeEach
     public void initializeCloudFormationEndpoint() {
         CfnApi cfnApi = new CfnApi();
-        regionManagement = new RegionManagement() {
+        regionManagement = new RegionService() {
             @Override
             public void storeRegion(String string) throws InvalidAWSRegionException {
             }
@@ -50,23 +50,15 @@ public class AWSCloudFormationEndpointTest {
             }
         };
 
-        credentialStorage = new CredentialStorage() {
+        credentialStorage = new ReadCredentialsService() {
             @Override
             public String getAccessKeyId() {
                 return "";
             }
 
             @Override
-            public void setAccessKeyId(String accessKeyId) {
-            }
-
-            @Override
             public String getSecretAccessKey() {
                 return "";
-            }
-
-            @Override
-            public void setSecretAccessKey(String secretAccessKey) {
             }
         };
 
