@@ -1,16 +1,19 @@
 package com.atlassian.migration.datacenter.api.aws;
 
+import com.amazonaws.services.ec2.model.AvailabilityZone;
+import com.atlassian.migration.datacenter.core.aws.region.AvailabilityZoneService;
 import com.atlassian.migration.datacenter.core.aws.region.InvalidAWSRegionException;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.inject.Inject;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -18,10 +21,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class AWSRegionEndpoint {
 
     private final RegionService regionService;
+    private final AvailabilityZoneService availabilityZoneService;
 
-    @Autowired
-    public AWSRegionEndpoint(RegionService regionService) {
+    @Inject
+    public AWSRegionEndpoint(RegionService regionService, AvailabilityZoneService availabilityZoneService) {
         this.regionService = regionService;
+        this.availabilityZoneService = availabilityZoneService;
     }
 
     @GET
@@ -35,7 +40,7 @@ public class AWSRegionEndpoint {
     public Response setRegion(AWSRegionWebObject region) {
         try {
             regionService.storeRegion(region.getRegion());
-        } catch(InvalidAWSRegionException e) {
+        } catch (InvalidAWSRegionException e) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage())
@@ -46,6 +51,22 @@ public class AWSRegionEndpoint {
                 .noContent()
                 .build();
     }
+
+    @GET
+    @Produces(APPLICATION_JSON)
+    @Path("/availabilityZones")
+    public Response getCurrentRegionAZList() {
+        List<AvailabilityZone> zones = this.availabilityZoneService.getZonesForRegion(this.regionService.getRegion());
+        try (Stream<AvailabilityZone> zoneStream = zones.parallelStream()) {
+            List<AWSAZWebObject> dtoList = zoneStream.map(zone -> new AWSAZWebObject(zone.getZoneName(), zone.getZoneId()))
+                    .sorted()
+                    .collect(Collectors.toList());
+            return Response.ok(dtoList).build();
+        } catch (Exception e) {
+            return Response.serverError().build();
+        }
+    }
+
 
     @JsonAutoDetect
     static class AWSRegionWebObject {
@@ -58,6 +79,19 @@ public class AWSRegionEndpoint {
 
         public void setRegion() {
             this.region = region;
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @JsonAutoDetect
+    static class AWSAZWebObject implements Comparable<AWSAZWebObject> {
+        private String name;
+        private String id;
+
+        @Override
+        public int compareTo(AWSAZWebObject o) {
+            return this.name.compareTo(o.getName());
         }
     }
 }
