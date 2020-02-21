@@ -12,16 +12,15 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 @Component
 public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProvider, AWSCredentialsProvider {
 
-    private final CredentialStorage credentialStorage;
+    private final ReadCredentialsService readCredentialsService;
 
     @Autowired
-    public AtlassianPluginAWSCredentialsProvider(CredentialStorage credentialStorage) {
-        this.credentialStorage = credentialStorage;
+    public AtlassianPluginAWSCredentialsProvider(ReadCredentialsService readCredentialsService) {
+        this.readCredentialsService = readCredentialsService;
     }
 
     /**
      * AWS SDK V1 credentials API
-     *
      * @return AWS Credentials to be used with SDK V1 clients
      */
     @Override
@@ -30,12 +29,12 @@ public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProv
             return new AWSCredentials() {
                 @Override
                 public String getAWSAccessKeyId() {
-                    return credentialStorage.getAccessKeyId();
+                    return readCredentialsService.getAccessKeyId();
                 }
 
                 @Override
                 public String getAWSSecretKey() {
-                    return credentialStorage.getSecretAccessKey();
+                    return readCredentialsService.getSecretAccessKey();
                 }
             };
         }
@@ -43,11 +42,11 @@ public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProv
     }
 
     private boolean secretKeyIsDefined() {
-        return this.credentialStorage.getSecretAccessKey() != null && !this.credentialStorage.getSecretAccessKey().equals("");
+        return readCredentialsService.getSecretAccessKey() != null && !readCredentialsService.getSecretAccessKey().equals("");
     }
 
     private boolean accessKeyIsDefined() {
-        return this.credentialStorage.getAccessKeyId() != null && !this.credentialStorage.getAccessKeyId().equals("");
+        return readCredentialsService.getAccessKeyId() != null && !readCredentialsService.getAccessKeyId().equals("");
     }
 
     /**
@@ -61,21 +60,20 @@ public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProv
 
     /**
      * AWS SDK V2 credentials API
-     *
      * @return AWS Credentials to be used with SDK V2 clients
      */
     @Override
     public AwsCredentials resolveCredentials() {
-        if (accessKeyIsDefined() && secretKeyIsDefined()) {
+        if(accessKeyIsDefined() && secretKeyIsDefined()) {
             return new AwsCredentials() {
                 @Override
                 public String accessKeyId() {
-                    return credentialStorage.getAccessKeyId();
+                    return readCredentialsService.getAccessKeyId();
                 }
 
                 @Override
                 public String secretAccessKey() {
-                    return credentialStorage.getSecretAccessKey();
+                    return readCredentialsService.getSecretAccessKey();
                 }
             };
         }

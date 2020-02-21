@@ -12,12 +12,16 @@ import org.springframework.stereotype.Component;
  * and should not be used in production.
  */
 @Component
-public class PlainTextCredentialStorage implements CredentialStorage {
+public class PlainTextCredentialsManager implements ReadCredentialsService, WriteCredentialsService {
+
+    private static final String AWS_CREDS_PLUGIN_STORAGE_KEY = "com.atlassian.migration.datacenter.core.aws.auth";
+    private static final String ACCESS_KEY_ID_PLUGIN_STORAGE_SUFFIX = ".accessKeyId";
+    private static final String SECRET_ACCESS_KEY_PLUGIN_STORAGE_SUFFIX = ".secretAccessKey";
 
     private final PluginSettingsFactory pluginSettingsFactory;
 
     @Autowired
-    public PlainTextCredentialStorage(@ComponentImport PluginSettingsFactory pluginSettingsFactory) {
+    public PlainTextCredentialsManager(@ComponentImport PluginSettingsFactory pluginSettingsFactory) {
         this.pluginSettingsFactory = pluginSettingsFactory;
     }
 
@@ -34,13 +38,13 @@ public class PlainTextCredentialStorage implements CredentialStorage {
     }
 
     @Override
-    public void setAccessKeyId(String accessKeyId) {
+    public void storeAccessKeyId(String accessKeyId) {
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         pluginSettings.put(AWS_CREDS_PLUGIN_STORAGE_KEY + ACCESS_KEY_ID_PLUGIN_STORAGE_SUFFIX, accessKeyId);
     }
 
     @Override
-    public void setSecretAccessKey(String secretAccessKey) {
+    public void storeSecretAccessKey(String secretAccessKey) {
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         pluginSettings.put(AWS_CREDS_PLUGIN_STORAGE_KEY + SECRET_ACCESS_KEY_PLUGIN_STORAGE_SUFFIX, secretAccessKey);
     }

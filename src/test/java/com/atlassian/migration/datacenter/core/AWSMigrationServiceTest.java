@@ -10,40 +10,54 @@ import com.atlassian.migration.datacenter.spi.MigrationStage;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
+import com.atlassian.scheduler.SchedulerService;
 import net.java.ao.EntityManager;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import software.amazon.awssdk.services.cloudformation.model.Parameter;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
-import static com.atlassian.migration.datacenter.spi.MigrationStage.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.NOT_STARTED;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.READY_FS_MIGRATION;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.STARTED;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 // We have to use the JUnit 4 API because there is no JUnit 5 active objects extension :(
 @RunWith(ActiveObjectsJUnitRunner.class)
 public class AWSMigrationServiceTest {
 
     private ActiveObjects ao;
-    private FilesystemMigrationConfig mockConfig;
+    private FilesystemMigrationConfig fsConfig;
     private EntityManager entityManager;
     private AWSMigrationService sut;
     private CfnApi cfnApi;
     private FilesystemMigrationService filesystemMigrationService;
+    private SchedulerService schedulerService;
 
     @Before
     public void setup() {
         assertNotNull(entityManager);
+
         ao = new TestActiveObjects(entityManager);
         filesystemMigrationService = mock(FilesystemMigrationService.class);
         cfnApi = mock(CfnApi.class);
-        sut = new AWSMigrationService(ao, filesystemMigrationService, cfnApi);
+        schedulerService = mock(SchedulerService.class);
+
+        fsConfig = new FilesystemMigrationConfig("s3bucket", "directory");
+
+        sut = new AWSMigrationService(ao, filesystemMigrationService, cfnApi, schedulerService);
     }
 
     @Test
@@ -96,7 +110,7 @@ public class AWSMigrationServiceTest {
         // given
         ao.migrate(Migration.class);
         // when
-        boolean success = sut.startFilesystemMigration(mockConfig);
+        boolean success = sut.startFilesystemMigration(fsConfig);
         // then
         assertFalse(success);
         verify(this.filesystemMigrationService, never()).startMigration(any());
@@ -107,7 +121,7 @@ public class AWSMigrationServiceTest {
         // given
         initializeAndCreateSingleMigrationWithStage(READY_FS_MIGRATION);
         // when
-        boolean success = sut.startFilesystemMigration(mockConfig);
+        boolean success = sut.startFilesystemMigration(fsConfig);
         // then
         assertTrue(success);
     }
@@ -151,9 +165,7 @@ public class AWSMigrationServiceTest {
             sut.provisionInfrastructure(new ProvisioningConfig("", "", new HashMap<>()));
         });
 
-        List<Parameter> params = any();
-
-        verify(this.cfnApi, never()).provisionStack(any(), any(), params);
+        verify(this.cfnApi, never()).provisionStack(any(), any(), any());
     }
 
     private void assertNumberOfMigrations(int i) {

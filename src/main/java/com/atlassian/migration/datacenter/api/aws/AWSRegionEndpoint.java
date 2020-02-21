@@ -1,12 +1,15 @@
 package com.atlassian.migration.datacenter.api.aws;
 
 import com.atlassian.migration.datacenter.core.aws.region.InvalidAWSRegionException;
-import com.atlassian.migration.datacenter.core.aws.region.RegionManagement;
+import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -14,25 +17,25 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Path("aws/region")
 public class AWSRegionEndpoint {
 
-    private final RegionManagement regionManagement;
+    private final RegionService regionService;
 
     @Autowired
-    public AWSRegionEndpoint(RegionManagement regionManagement) {
-        this.regionManagement = regionManagement;
+    public AWSRegionEndpoint(RegionService regionService) {
+        this.regionService = regionService;
     }
 
     @GET
     @Produces(APPLICATION_JSON)
     public Response getRegion() {
-        return Response.ok(regionManagement.getRegion()).build();
+        return Response.ok(regionService.getRegion()).build();
     }
 
     @POST
     @Consumes(APPLICATION_JSON)
     public Response setRegion(AWSRegionWebObject region) {
         try {
-            regionManagement.storeRegion(region.getRegion());
-        } catch (InvalidAWSRegionException e) {
+            regionService.storeRegion(region.getRegion());
+        } catch(InvalidAWSRegionException e) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage())
@@ -45,8 +48,16 @@ public class AWSRegionEndpoint {
     }
 
     @JsonAutoDetect
-    @Data
     static class AWSRegionWebObject {
+
         private String region;
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setRegion() {
+            this.region = region;
+        }
     }
 }

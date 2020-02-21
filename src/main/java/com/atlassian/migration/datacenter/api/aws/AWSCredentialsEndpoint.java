@@ -1,13 +1,17 @@
 package com.atlassian.migration.datacenter.api.aws;
 
-import com.atlassian.migration.datacenter.core.aws.auth.CredentialStorage;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.atlassian.migration.datacenter.core.aws.auth.ReadCredentialsService;
+import com.atlassian.migration.datacenter.core.aws.auth.WriteCredentialsService;
 import com.atlassian.migration.datacenter.core.aws.auth.ProbeAWSAuth;
-import lombok.Data;
-import org.apache.log4j.Logger;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.springframework.beans.factory.annotation.Autowired;
+import software.amazon.awssdk.services.cloudformation.model.CloudFormationException;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -15,40 +19,24 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Path("aws/credentials")
 public class AWSCredentialsEndpoint {
 
-    private final static Logger LOGGER = Logger.getLogger(AWSCredentialsEndpoint.class);
-
-    private final CredentialStorage credentialsManagement;
+    private final WriteCredentialsService writeCredentialsService;
     private final ProbeAWSAuth probe;
 
     @Autowired
-    public AWSCredentialsEndpoint(CredentialStorage credentialsManagement, ProbeAWSAuth probe) {
-        this.credentialsManagement = credentialsManagement;
+    public AWSCredentialsEndpoint(WriteCredentialsService writeCredentialsService, ProbeAWSAuth probe) {
+        this.writeCredentialsService = writeCredentialsService;
         this.probe = probe;
-    }
-
-    @GET
-    @Produces(APPLICATION_JSON)
-    public Response getAWSCredentials() {
-        AWSCredentialsWebObject dto = new AWSCredentialsWebObject();
-        dto.setAccessKeyId(credentialsManagement.getAccessKeyId());
-        dto.setSecretAccessKey(credentialsManagement.getSecretAccessKey());
-        if (dto.getAccessKeyId() == null || dto.getSecretAccessKey() == null) {
-            LOGGER.error("Failed to retrieve AWS Credentials from plugin storage.");
-            return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } else {
-            return Response.ok(dto).build();
-        }
     }
 
     @POST
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response storeAWSCredentials(AWSCredentialsWebObject credentials) {
-        credentialsManagement.setAccessKeyId(credentials.getAccessKeyId());
-        credentialsManagement.setSecretAccessKey(credentials.getSecretAccessKey());
+        writeCredentialsService.storeAccessKeyId(credentials.getAccessKeyId());
+        writeCredentialsService.storeSecretAccessKey(credentials.getSecretAccessKey());
 
         return Response
-                .ok()
+                .noContent()
                 .build();
     }
 
@@ -56,15 +44,66 @@ public class AWSCredentialsEndpoint {
     @Path("v1/test")
     @Produces(APPLICATION_JSON)
     public Response testCredentialsSDKV1() {
-        return Response.ok(probe.probeSDKV1()).build();
+        try {
+            return Response.ok(probe.probeSDKV1()).build();
+        } catch(AmazonS3Exception s3e) {
+            if (s3e.getStatusCode() == 401 || s3e.getStatusCode() == 403) {
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .entity(s3e.getMessage())
+                        .build();
+            }
+            throw s3e;
+        }
     }
 
-    @Data
+    @POST
+    @Path("v2/test")
+    @Produces(APPLICATION_JSON)
+    public Response testCredentialsSDKV2() {
+        try {
+            return Response.ok(probe.probeSDKV2()).build();
+        } catch(CloudFormationException cfne) {
+            if (cfne.statusCode() == 401 || cfne.statusCode() == 403) {
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .entity(cfne.getMessage())
+                        .build();
+            }
+            throw cfne;
+        }
+    }
+
     @JsonAutoDetect
     static class AWSCredentialsWebObject {
+
         private String accessKeyId;
         private String secretAccessKey;
         private String region;
+
+        public String getAccessKeyId() {
+            return accessKeyId;
+        }
+
+        public String getSecretAccessKey() {
+            return secretAccessKey;
+        }
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setAccessKeyId(String accessKeyId) {
+            this.accessKeyId = accessKeyId;
+        }
+
+        public void setSecretAccessKey(String secretAccessKey) {
+            this.secretAccessKey = secretAccessKey;
+        }
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
     }
 
 }
