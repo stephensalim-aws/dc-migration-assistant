@@ -100,7 +100,7 @@ public class AWSCloudFormationEndpoint {
     }
 
 
-    public List<String> getQuickStartParams() {
+    private List<String> getQuickStartParams() {
         AmazonCloudFormation cfn = getCloudformationClient(this.regionManagement.getRegion(), this.credentialsProvider);
         ValidateTemplateRequest validateTemplateRequest = new ValidateTemplateRequest();
         validateTemplateRequest.setTemplateURL(QS_URL);

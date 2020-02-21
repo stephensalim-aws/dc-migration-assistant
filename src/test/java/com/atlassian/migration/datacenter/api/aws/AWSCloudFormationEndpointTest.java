@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -64,12 +63,6 @@ public class AWSCloudFormationEndpointTest {
 
         AtlassianPluginAWSCredentialsProvider credentialsProvider = new AtlassianPluginAWSCredentialsProvider(this.credentialStorage);
         cloudFormationEndpoint = new AWSCloudFormationEndpoint(credentialsProvider, this.regionManagement, cfnApi);
-    }
-
-    @Test
-    public void itShouldReturnAllQSParams() {
-        List<String> params = cloudFormationEndpoint.getQuickStartParams();
-        assertEquals(59, params.size());
     }
 
     @Test
