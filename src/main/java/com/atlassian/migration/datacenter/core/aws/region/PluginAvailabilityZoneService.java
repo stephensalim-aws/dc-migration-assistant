@@ -22,7 +22,7 @@ public class PluginAvailabilityZoneService implements AvailabilityZoneService {
     }
 
     @Override
-    public List<AvailabilityZone> getZonesForRegion(String region) {
+    public List<AvailabilityZone> getZonesForCurrentRegion() throws InvalidAWSRegionException {
         AmazonEC2 ec2Client = this.getEC2Client();
         List<AvailabilityZone> zones = ec2Client.describeAvailabilityZones().getAvailabilityZones();
         return zones;

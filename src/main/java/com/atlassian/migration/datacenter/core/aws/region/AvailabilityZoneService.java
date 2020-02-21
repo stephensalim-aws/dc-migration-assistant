@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface AvailabilityZoneService {
 
-    List<AvailabilityZone> getZonesForRegion(String region);
+    List<AvailabilityZone> getZonesForCurrentRegion() throws InvalidAWSRegionException;
 
 }

@@ -4,9 +4,9 @@ import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.atlassian.migration.datacenter.core.aws.region.AvailabilityZoneService;
 import com.atlassian.migration.datacenter.core.aws.region.InvalidAWSRegionException;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -55,8 +55,8 @@ public class AWSRegionEndpoint {
     @GET
     @Produces(APPLICATION_JSON)
     @Path("/availabilityZones")
-    public Response getCurrentRegionAZList() {
-        List<AvailabilityZone> zones = this.availabilityZoneService.getZonesForRegion(this.regionService.getRegion());
+    public Response getCurrentRegionAZList() throws InvalidAWSRegionException {
+        List<AvailabilityZone> zones = this.availabilityZoneService.getZonesForCurrentRegion();
         try (Stream<AvailabilityZone> zoneStream = zones.parallelStream()) {
             List<AWSAZWebObject> dtoList = zoneStream.map(zone -> new AWSAZWebObject(zone.getZoneName(), zone.getZoneId()))
                     .sorted()

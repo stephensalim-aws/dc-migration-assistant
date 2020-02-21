@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.ws.rs.core.Response;
-
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,7 +32,22 @@ public class AWSGlobalInfrastructureEndpointTest {
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
     }
 
-    @Test void itShouldReturnAllRegions() {
+    @Test
+    void itShouldReturnAllRegions() {
+        final String regionOne = "atlassian-east-1";
+        final String regionTwo = "atlassian-west-1";
+
+        when(mockGlobalInfrastructure.getRegions()).thenReturn(Arrays.asList(regionOne, regionTwo));
+
+        Response res = sut.getRegions();
+
+        assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+
+        assertEquals(Arrays.asList(regionOne, regionTwo), res.getEntity());
+    }
+
+    @Test
+    void itShouldReturnAllAZsForARegion() {
         final String regionOne = "atlassian-east-1";
         final String regionTwo = "atlassian-west-1";
 
