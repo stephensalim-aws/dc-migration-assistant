@@ -73,6 +73,13 @@ public class AWSCloudFormationEndpointTest {
     }
 
     @Test
+    public void itShouldReturnAValidStackStatus() {
+        String dummyStackName = "SOME_STACK";
+        Response response = this.cloudFormationEndpoint.retrieveStackStatus(dummyStackName);
+        assertEquals(200, response.getStatus());
+    }
+
+    @Test
     public void itShouldFailToStartQuickStartStack() {
         StringBuilder contentBuilder = new StringBuilder();
         ClassLoader classLoader = AWSCloudFormationEndpointTest.class.getClassLoader();

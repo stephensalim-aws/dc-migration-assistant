@@ -14,6 +14,7 @@ import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.cloudformation.model.Parameter;
+import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -81,6 +82,19 @@ public class AWSCloudFormationEndpoint {
             return Response.ok(stack).build();
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage());
+            return Response.serverError().build();
+        }
+    }
+
+    @POST
+    @Path("/status")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response retrieveStackStatus(String stackName) {
+        try {
+            StackStatus stackStatus = this.cfnApi.getStatus(stackName);
+            return Response.ok(stackStatus.toString()).build();
+        } catch (Exception e) {
             return Response.serverError().build();
         }
     }
