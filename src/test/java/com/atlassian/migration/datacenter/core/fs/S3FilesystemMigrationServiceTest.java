@@ -15,7 +15,7 @@ class S3FilesystemMigrationServiceTest {
     void migrationShouldFailWithIncorrectDirectory() {
         // given
         Path nonexistentDir = Paths.get(UUID.randomUUID().toString());
-        FilesystemMigrationConfig config = new FilesystemMigrationConfig("s3bucket", nonexistentDir);
+        FilesystemMigrationConfig config = new FilesystemMigrationConfig("s3bucket", nonexistentDir.toString());
         S3FilesystemMigrationService fsService = new S3FilesystemMigrationService();
         // when
         fsService.startMigration(config);

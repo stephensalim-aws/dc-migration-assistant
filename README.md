@@ -45,7 +45,8 @@ If you want to test in-app, run atlas-run --product \[jira|refapp|confluence\] w
 Here are the SDK commands you'll use immediately:
 
 * Run the plugin in a product: `mvn amps:run -Dproduct=[jira|confluence|refapp] -Dproduct.version=<version e.g. 8.5.0>`
-* Build the plugin: `mvn package`
+    * If you want to remotely debug your code running in the product, run `mvn amps:debug -Dproduct=[jira|confluence|refapp]` and create IDEA _Remote_ run configuration (defaults are ok)
+* Build the plugin: `mvn package` and quick reload will reinstall the plugin in the product (https://developer.atlassian.com/server/framework/atlassian-sdk/automatic-plugin-reinstallation-with-quickreload/)
 * When in doubt, `mvn clean` it out
 * [Full atlassian maven reference](https://developer.atlassian.com/server/framework/atlassian-sdk/working-with-maven/#using-the-amps-maven-plugin-directly)
 

@@ -1,7 +1,9 @@
 package com.atlassian.migration.datacenter.spi.fs;
 
 public interface FilesystemMigrationService {
-    public void startMigration(FilesystemMigrationConfig config);
+    void startMigration(FilesystemMigrationConfig config);
 
-    public FilesystemMigrationProgress getProgress();
+    FilesystemMigrationProgress getProgress();
+
+    boolean isRunning();
 }

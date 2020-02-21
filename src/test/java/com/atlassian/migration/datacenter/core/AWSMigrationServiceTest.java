@@ -2,14 +2,15 @@ package com.atlassian.migration.datacenter.core;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.test.TestActiveObjects;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
-import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 import com.atlassian.migration.datacenter.core.aws.CfnApi;
 import com.atlassian.migration.datacenter.core.exceptions.InfrastructureProvisioningError;
 import com.atlassian.migration.datacenter.core.exceptions.InvalidMigrationStageError;
 import com.atlassian.migration.datacenter.dto.Migration;
 import com.atlassian.migration.datacenter.spi.MigrationStage;
+import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
+import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
+import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
+import com.atlassian.scheduler.SchedulerService;
 import net.java.ao.EntityManager;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.junit.Before;
@@ -38,19 +39,25 @@ import static org.mockito.Mockito.when;
 public class AWSMigrationServiceTest {
 
     private ActiveObjects ao;
-    private FilesystemMigrationConfig mockConfig;
+    private FilesystemMigrationConfig fsConfig;
     private EntityManager entityManager;
     private AWSMigrationService sut;
     private CfnApi cfnApi;
     private FilesystemMigrationService filesystemMigrationService;
+    private SchedulerService schedulerService;
 
     @Before
     public void setup() {
         assertNotNull(entityManager);
+
         ao = new TestActiveObjects(entityManager);
         filesystemMigrationService = mock(FilesystemMigrationService.class);
         cfnApi = mock(CfnApi.class);
-        sut = new AWSMigrationService(ao, filesystemMigrationService, cfnApi);
+        schedulerService = mock(SchedulerService.class);
+
+        fsConfig = new FilesystemMigrationConfig("s3bucket", "directory");
+
+        sut = new AWSMigrationService(ao, filesystemMigrationService, cfnApi, schedulerService);
     }
 
     @Test
@@ -103,7 +110,7 @@ public class AWSMigrationServiceTest {
         // given
         ao.migrate(Migration.class);
         // when
-        boolean success = sut.startFilesystemMigration(mockConfig);
+        boolean success = sut.startFilesystemMigration(fsConfig);
         // then
         assertFalse(success);
         verify(this.filesystemMigrationService, never()).startMigration(any());
@@ -114,7 +121,7 @@ public class AWSMigrationServiceTest {
         // given
         initializeAndCreateSingleMigrationWithStage(READY_FS_MIGRATION);
         // when
-        boolean success = sut.startFilesystemMigration(mockConfig);
+        boolean success = sut.startFilesystemMigration(fsConfig);
         // then
         assertTrue(success);
     }

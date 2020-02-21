@@ -12,7 +12,7 @@ public class S3UploadListener implements S3ProgressListener {
 
     private FilesystemMigrationProgress progress;
 
-    public S3UploadListener(FilesystemMigrationProgress progress) {
+    S3UploadListener(FilesystemMigrationProgress progress) {
         this.progress = progress;
     }
 
@@ -23,12 +23,10 @@ public class S3UploadListener implements S3ProgressListener {
     @Override
     public void progressChanged(ProgressEvent progressEvent) {
         long total = progress.addBytes(progressEvent.getBytesTransferred());
-        if (total != 0) {
-            logger.info("Transferred {} bytes", total);
-        }
+        logger.trace("Transferred {} B to S3", total);
     }
 
-    public long getBytesTransferred() {
+    long getBytesTransferred() {
         return progress.getBytesTransferred();
     }
 }
