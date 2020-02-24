@@ -14,16 +14,12 @@ import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 import software.amazon.awssdk.services.cloudformation.model.Tag;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
@@ -63,7 +59,7 @@ public class CfnApi {
 
         Tag tag = Tag.builder()
                 .key("created_by")
-                .value("atlassian-awsmigration-plugin")
+                .value("atlassian-dcmigration")
                 .build();
 
         CreateStackRequest createStackRequest = CreateStackRequest.builder()
@@ -74,8 +70,9 @@ public class CfnApi {
                 .build();
 
         try {
-            return Optional.ofNullable(this.client.createStack(createStackRequest)
-                    .thenComposeAsync(this::awaitStackCreation)
+            return Optional.ofNullable(this.client
+                    .createStack(createStackRequest)
+                    .thenApply(CreateStackResponse::stackId)
                     .get());
         } catch (InterruptedException | ExecutionException e) {
             return Optional.empty();
@@ -96,21 +93,5 @@ public class CfnApi {
         } catch (CompletionException | CancellationException e) {
             return Optional.empty();
         }
-    }
-
-    private CompletableFuture<String> awaitStackCreation(CreateStackResponse createStackResponse) {
-        CompletableFuture<String> completableFuture = new CompletableFuture<>();
-        ScheduledFuture<?> scheduledFuture = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            String stackId = createStackResponse.stackId();
-            StackStatus status = this.getStatus(stackId);
-            if (Objects.equals(status, StackStatus.CREATE_COMPLETE)) {
-                completableFuture.complete(stackId);
-            }
-        }, 0, 10, TimeUnit.SECONDS);
-
-        completableFuture.whenComplete((result, thrown) -> {
-            scheduledFuture.cancel(true);
-        });
-        return completableFuture;
     }
 }
