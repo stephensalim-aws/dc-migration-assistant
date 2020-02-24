@@ -59,7 +59,7 @@ public class CfnApi {
 
         Tag tag = Tag.builder()
                 .key("created_by")
-                .value("atlassian-awsmigration-plugin")
+                .value("atlassian-dcmigration")
                 .build();
 
         CreateStackRequest createStackRequest = CreateStackRequest.builder()
