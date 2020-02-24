@@ -69,33 +69,7 @@ public class MigrationEndpoint {
                     .build();
         }
     }
-
-    @POST
-    @Path("/provision")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response provisionInfrastructure(ProvisioningConfig provisioningConfig) {
-        try {
-            String stackId = migrationService.provisionInfrastructure(provisioningConfig);
-            //Should be updated to URI location after get stack details Endpoint is built
-            return Response.status(Response.Status.ACCEPTED).entity(stackId).build();
-        } catch (InvalidMigrationStageError | InfrastructureProvisioningError e) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-    }
-
-    @GET
-    @Path("/provision/{stackId}/status")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getInfrastructureStatus(@PathParam("stackId") String stackId) {
-        Optional<String> status = migrationService.getInfrastructureProvisioningStatus(stackId);
-        if (status.isPresent()) {
-            return Response.status(Response.Status.OK).entity(status.get()).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
-    }
-
+    
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
