@@ -99,9 +99,9 @@ public class AWSMigrationService implements MigrationService {
      */
     @Override
     public String provisionInfrastructure(ProvisioningConfig config) {
-        //TODO: Refactor this to a state machine as part of https://aws-partner.atlassian.net/browse/CHET-101
+        //TODO: Refactor this to a state machine as part of https://aws-partner.atlassian.net/browse/CHET-101. This will be extracted to a different class then
         MigrationStage currentMigrationStage = getMigrationStage();
-        if (currentMigrationStage != MigrationStage.READY_TO_PROVISION) {
+        if (currentMigrationStage != MigrationStage.STARTED) {
             throw new InvalidMigrationStageError(String.format("Expected migration stage was %s, but found %s", MigrationStage.READY_TO_PROVISION, currentMigrationStage));
         }
 

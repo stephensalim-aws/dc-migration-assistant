@@ -132,7 +132,7 @@ public class AWSMigrationServiceTest {
         HashMap<String, String> params = new HashMap<>();
         String expectedStackId = "arn:stack:test_provision";
 
-        initializeAndCreateSingleMigrationWithStage(MigrationStage.READY_TO_PROVISION);
+        initializeAndCreateSingleMigrationWithStage(STARTED);
 
         when(this.cfnApi.provisionStack(templateUrl, stackName, params)).thenReturn(Optional.of(expectedStackId));
 
@@ -146,7 +146,7 @@ public class AWSMigrationServiceTest {
         String templateUrl = "https://template.url", stackName = "test_provision";
         HashMap<String, String> params = new HashMap<>();
 
-        initializeAndCreateSingleMigrationWithStage(MigrationStage.READY_TO_PROVISION);
+        initializeAndCreateSingleMigrationWithStage(STARTED);
         when(this.cfnApi.provisionStack(templateUrl, stackName, params)).thenReturn(Optional.empty());
 
         assertThrows(InfrastructureProvisioningError.class, () -> {
@@ -159,7 +159,7 @@ public class AWSMigrationServiceTest {
 
     @Test
     public void shouldNotProvisionWhenInitialMigrationStateIsNotReadyToProvision() {
-        initializeAndCreateSingleMigrationWithStage(STARTED);
+        initializeAndCreateSingleMigrationWithStage(NOT_STARTED);
 
         assertThrows(InvalidMigrationStageError.class, () -> {
             sut.provisionInfrastructure(new ProvisioningConfig("", "", new HashMap<>()));
