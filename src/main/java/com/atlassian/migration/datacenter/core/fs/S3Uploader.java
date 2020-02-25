@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class S3Uploader implements Uploader {
     private static final Logger logger = LoggerFactory.getLogger(S3Uploader.class);
-    private static final int SLEEP_TO_WAIT_FOR_CRAWLER = 500; // ms
+    private static final int MS_TO_WAIT_FOR_CRAWLER = 500; // ms
 
     private final Map<String, Exception> failedFiles = new HashMap<>();
     private final Queue<S3UploadOperation> responsesQueue = new LinkedList<>();
@@ -37,16 +37,12 @@ public class S3Uploader implements Uploader {
         while (!((path = queue.poll()) == null) || !isCrawlDone.get()) {
             if (path == null) {
                 try {
-                    Thread.sleep(SLEEP_TO_WAIT_FOR_CRAWLER);
+                    Thread.sleep(MS_TO_WAIT_FOR_CRAWLER);
                 } catch (InterruptedException e) {
                     logger.error("Interrupted S3 upload, adding all remaining files to failed collection");
                     queue.forEach(p -> addFailedFile(p, e));
                 }
             } else {
-                if (path == null) {
-
-                }
-
                 if (Files.exists(path)) {
                     String key = config.getSharedHome().relativize(path).toString();
                     final PutObjectRequest putRequest = PutObjectRequest.builder()
