@@ -1,23 +1,24 @@
-import React, { FunctionComponent, ReactElement, useState, useEffect } from 'react';
+import React, {FunctionComponent, ReactElement, useEffect, useState} from 'react';
 import yaml from 'yaml';
-import Form, { FormHeader, FormSection } from '@atlaskit/form';
+import Form, {FormHeader, FormSection} from '@atlaskit/form';
 import Button from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
-import { OptionType } from '@atlaskit/select';
-import { I18n } from '@atlassian/wrm-react-i18n';
+import {OptionType} from '@atlaskit/select';
+import {I18n} from '@atlassian/wrm-react-i18n';
 import styled from 'styled-components';
 
-import { createQuickstartFormField } from './quickstartToAtlaskit';
+import {createQuickstartFormField} from './quickstartToAtlaskit';
 import {
+    QuickstartParameter,
     QuickstartParameterGroup,
     QuickStartParameterYamlNode,
     QuickstartParamGroupYamlNode,
     QuickstartParamLabelYamlNode,
-    // eslint-disable-next-line import/extensions
 } from './QuickStartTypes';
+import contextPath from "wrm/context-path";
 
 const QUICKSTART_PARAMS_URL =
-    'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/quickstart-jira-dc-with-vpc.template.parameters.yaml';
+    'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/test-create-s3-bucket.parameters.yaml';
 
 const isOptionType = (obj: any): obj is OptionType => {
     return obj.label && obj.value;
@@ -35,25 +36,41 @@ const QuickstartSubmitButton = styled(Button)`
     margin-top: 10px;
 `;
 
+const STACK_NAME_FIELD_NAME = "QSStackName";
 const QuickstartForm = ({
     quickstartParamGroups,
 }: Record<string, Array<QuickstartParameterGroup>>): ReactElement => (
     <Form
         onSubmit={(data: Record<string, any>): void => {
             const transformedCfnParams = data;
+            let stackName = "";
             Object.entries(data).forEach(entry => {
                 // Hoist value from Select/Multiselect inputs to root of form value
                 const [key, value] = entry;
-                if (isOptionType(value)) {
+                if (key == STACK_NAME_FIELD_NAME){
+                    stackName = value;
+                    delete transformedCfnParams[key];
+                }
+                else if (isOptionType(value)) {
                     transformedCfnParams[key] = value.value;
                 } else if (isArrayOfOptionType(value)) {
                     transformedCfnParams[key] = value.map(option => option.value);
                 }
             });
 
-            // TODO: Send this to the API
             // eslint-disable-next-line no-console
             console.log(transformedCfnParams);
+            //TODO: Use callAppRest after fixing the body parameter issue.
+            const url = `${contextPath()}/rest/dc-migration/1.0/aws/cloudformation/create`;
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({templateUrl: "https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml",
+                    stackName: stackName,
+                    params: transformedCfnParams
+                    }),
+                headers: {'content-type': 'application/json'}
+            }).then(x => x.text())
+                .then(console.log);
         }}
     >
         {({ formProps }: any): ReactElement => (
@@ -63,8 +80,14 @@ const QuickstartForm = ({
                 />
 
                 {quickstartParamGroups.map(group => {
+                    let stackNameField : React.ReactElement = createQuickstartFormField({
+                        paramKey: STACK_NAME_FIELD_NAME,
+                        paramLabel: "Name of the Quickstart Stack",
+                        paramProperties: {Type: "String",Default: "", Description: "Name of the stack", ConstraintDescription: "^[a-zA-Z.-]+$"}
+                    });
                     return (
                         <FormSection key={group.groupLabel} title={group.groupLabel}>
+                            {stackNameField}
                             {group.parameters.map(parameter => {
                                 return createQuickstartFormField(parameter);
                             })}
