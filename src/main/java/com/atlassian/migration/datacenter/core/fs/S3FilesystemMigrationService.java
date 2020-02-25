@@ -1,82 +1,114 @@
 package com.atlassian.migration.datacenter.core.fs;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
+import com.atlassian.jira.config.util.JiraHome;
+import com.atlassian.migration.datacenter.core.aws.auth.AtlassianPluginAWSCredentialsProvider;
+import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationProgress;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
+
+import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.FAILED;
 
 @Component
 public class S3FilesystemMigrationService implements FilesystemMigrationService {
-    private static final Logger log = LoggerFactory.getLogger(S3FilesystemMigrationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(S3FilesystemMigrationService.class);
 
-    private static final String S3_PREFIX = "";
-    private static final boolean INCLUDE_SUBDIRECTORIES = true;
+    private static final int NUM_UPLOAD_THREADS = Integer.getInteger("NUM_UPLOAD_THREADS", 2);
+
+    private final AtlassianPluginAWSCredentialsProvider credentialsProvider;
+    private final RegionService regionService;
+    private final JiraHome jiraHome;
 
     private MultipleFileUpload upload;
     private FilesystemMigrationProgress progress = new FilesystemMigrationProgress(FilesystemMigrationStatus.NOT_STARTED);
-    private TransferManager transferManager;
+
+    public S3FilesystemMigrationService(RegionService regionService,
+                                        AtlassianPluginAWSCredentialsProvider credentialsProvider,
+                                        @ComponentImport JiraHome jiraHome) {
+        this.regionService = regionService;
+        this.credentialsProvider = credentialsProvider;
+        this.jiraHome = jiraHome;
+    }
 
     /**
      * Start filesystem migration to S3 bucket. This is a blocking operation and should be started from ExecutorService
      * or preferably from ScheduledJob
-     *
-     * @param config configuration for filesystem migration
      */
-    public void startMigration(FilesystemMigrationConfig config) {
-        if (transferManager == null) {
-            transferManager = createTransferManager();
+    public void startMigration() {
+        S3AsyncClient s3AsyncClient = S3AsyncClient.builder()
+                .credentialsProvider(credentialsProvider)
+                .region(Region.of(regionService.getRegion()))
+                .build();
+        S3UploadConfig config = new S3UploadConfig(getS3Bucket(), s3AsyncClient, getSharedHomeDir());
+
+
+        AtomicBoolean isDoneCrawling = new AtomicBoolean(false);
+        ConcurrentLinkedQueue<Path> uploadQueue = new ConcurrentLinkedQueue<>();
+
+        Queue<Future<?>> uploadResults = new LinkedList<>();
+        ExecutorService uploadService = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
+        IntStream.range(0, NUM_UPLOAD_THREADS).forEach(i -> {
+            Uploader uploader = new S3Uploader(config);
+            Future<?> uploadResult = uploadService.submit(() -> {
+                uploader.upload(uploadQueue, isDoneCrawling);
+                // TODO surface failed uploads
+            });
+            uploadResults.add(uploadResult);
+        });
+
+        Crawler homeCrawler = new DirectoryStreamCrawler();
+        try {
+            homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
+        } catch (IOException e) {
+            logger.error("Failed to traverse home directory for S3 transfer", e);
+            progress.setStatus(FAILED);
+        } finally {
+            isDoneCrawling.set(true);
         }
 
-        final Path path = Paths.get(config.getDirectory());
-        if (isValid(path)) {
-            log.debug("Start uploading directory {}", config.getDirectory());
-
-            // FIXME - this execution currently consumes large amount of memory as `TransferManager` loads all files into memory
-            upload = transferManager.uploadDirectory(
-                    config.getS3Bucket(),
-                    S3_PREFIX,
-                    path.toFile(),
-                    INCLUDE_SUBDIRECTORIES);
-
-            progress.setStatus(FilesystemMigrationStatus.RUNNING);
-            log.debug("Adding S3 progress listener");
-            upload.addProgressListener(new S3UploadListener(progress));
-            // this is a blocking operation
-            waitForUpload();
-        } else {
-            log.error("Path to upload is incorrect: {}", path);
-            progress.setStatus(FilesystemMigrationStatus.FAILED);
+        while(!uploadResults.isEmpty()) {
+            Future<?> uploadResult = uploadResults.poll();
+            try {
+                uploadResult.get();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("Failed to upload home directory to S3", e);
+                progress.setStatus(FAILED);
+            }
         }
+
+
     }
 
-    private void waitForUpload() {
-        try {
-            upload.waitForCompletion();
-        } catch (InterruptedException e) {
-            log.error("S3 upload interrupted", e);
-            progress.setStatus(FilesystemMigrationStatus.FAILED);
-        } catch (AmazonServiceException e) {
-            log.error("S3 upload failed - Amazon service experienced issue", e);
-            progress.setStatus(FilesystemMigrationStatus.FAILED);
-        } catch (AmazonClientException e) {
-            log.error("S3 upload failed - Amazon client had a problem", e);
-            progress.setStatus(FilesystemMigrationStatus.FAILED);
-        }
-        progress.setStatus(FilesystemMigrationStatus.DONE);
+    private String getS3Bucket() {
+        return "slingshot-test-2";
+    }
+
+    private Path getSharedHomeDir() {
+        return jiraHome.getHome().toPath();
     }
 
     @Override

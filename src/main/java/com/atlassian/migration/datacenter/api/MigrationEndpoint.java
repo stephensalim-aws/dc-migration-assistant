@@ -2,7 +2,6 @@ package com.atlassian.migration.datacenter.api;
 
 import com.atlassian.migration.datacenter.spi.MigrationService;
 import com.atlassian.migration.datacenter.spi.MigrationStage;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -69,8 +68,8 @@ public class MigrationEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/filesystem")
-    public Response runFileMigration(FilesystemMigrationConfig config) {
-        boolean started = migrationService.startFilesystemMigration(config);
+    public Response runFileMigration() {
+        boolean started = migrationService.startFilesystemMigration();
         return Response.status(Response.Status.ACCEPTED).entity("S3 Migration started = " + started).build();
     }
 }

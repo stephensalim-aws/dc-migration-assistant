@@ -1,7 +1,6 @@
 package com.atlassian.migration.datacenter.spi;
 
 import com.atlassian.activeobjects.tx.Transactional;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
 import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 
 import java.util.Optional;
@@ -33,7 +32,6 @@ public interface MigrationService {
     String provisionInfrastructure(ProvisioningConfig provisioningConfig);
 
     Optional<String> getInfrastructureProvisioningStatus(String stackId);
-
-    boolean startFilesystemMigration(FilesystemMigrationConfig config);
-
+  
+    boolean startFilesystemMigration();
 }

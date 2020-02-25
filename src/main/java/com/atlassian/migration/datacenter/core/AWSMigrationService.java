@@ -8,7 +8,6 @@ import com.atlassian.migration.datacenter.core.fs.S3UploadJobRunner;
 import com.atlassian.migration.datacenter.dto.Migration;
 import com.atlassian.migration.datacenter.spi.MigrationService;
 import com.atlassian.migration.datacenter.spi.MigrationStage;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -18,7 +17,6 @@ import com.atlassian.scheduler.config.JobConfig;
 import com.atlassian.scheduler.config.JobId;
 import com.atlassian.scheduler.config.JobRunnerKey;
 import com.atlassian.scheduler.config.RunMode;
-import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -130,7 +128,7 @@ public class AWSMigrationService implements MigrationService {
         migration.save();
     }
 
-    public boolean startFilesystemMigration(FilesystemMigrationConfig config) {
+    public boolean startFilesystemMigration() {
         final Migration migration = getMigration();
         if (migration.getStage() == MigrationStage.NOT_STARTED) {
             return false;
@@ -153,8 +151,7 @@ public class AWSMigrationService implements MigrationService {
 
         JobConfig jobConfig = JobConfig.forJobRunnerKey(runnerKey)
                 .withSchedule(null) // run now
-                .withRunMode(RunMode.RUN_ONCE_PER_CLUSTER)
-                .withParameters(ImmutableMap.of("s3bucket", config.getS3Bucket(), "directory", config.getDirectory()));
+                .withRunMode(RunMode.RUN_ONCE_PER_CLUSTER);
         try {
             log.info("Scheduling new job for S3 upload runner");
             schedulerService.scheduleJob(jobId, jobConfig);
