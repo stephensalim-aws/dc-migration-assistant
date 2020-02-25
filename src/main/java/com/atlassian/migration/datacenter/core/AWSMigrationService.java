@@ -19,6 +19,7 @@ import com.atlassian.scheduler.config.JobRunnerKey;
 import com.atlassian.scheduler.config.RunMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.cloudformation.model.StackInstanceNotFoundException;
 import software.amazon.awssdk.services.cloudformation.model.StackStatus;
@@ -34,23 +35,21 @@ import static java.util.Objects.requireNonNull;
 public class AWSMigrationService implements MigrationService {
     private static final Logger log = LoggerFactory.getLogger(AWSMigrationService.class);
     private final FilesystemMigrationService fsService;
-    private final CfnApi cfnApi;
     private final SchedulerService schedulerService;
     private ActiveObjects ao;
     private Migration migration;
-
+    private Optional<CfnApi> cfnApi;
 
     /**
      * Creates a new, unstarted AWS Migration
      */
     public AWSMigrationService(@ComponentImport ActiveObjects ao,
                                FilesystemMigrationService fileService,
-                               CfnApi cfnApi,
                                @ComponentImport SchedulerService schedulerService) {
         this.ao = requireNonNull(ao);
         this.fsService = fileService;
-        this.cfnApi = cfnApi;
         this.schedulerService = schedulerService;
+        this.cfnApi = Optional.empty();
     }
 
     /**
@@ -93,6 +92,22 @@ public class AWSMigrationService implements MigrationService {
     }
 
     /**
+     * Fetch a CfnApi implementation.
+     *
+     * FIXME: We should implement a teardown of the object once finished?
+     */
+    private CfnApi getCfnApi() {
+        if (cfnApi.isPresent()) {
+            return cfnApi.get();
+        }
+
+        // FIXME: This could potentially be a BeanFactory lookup, but we currently only have a single impl.
+        CfnApi api = new CfnApi();
+        this.cfnApi = Optional.of(api);
+        return api;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -103,7 +118,7 @@ public class AWSMigrationService implements MigrationService {
             throw new InvalidMigrationStageError(String.format("Expected migration stage was %s, but found %s", MigrationStage.READY_TO_PROVISION, currentMigrationStage));
         }
 
-        Optional<String> stackIdentifier = this.cfnApi.provisionStack(config.getTemplateUrl(), config.getStackName(), config.getParams());
+        Optional<String> stackIdentifier = getCfnApi().provisionStack(config.getTemplateUrl(), config.getStackName(), config.getParams());
         if (stackIdentifier.isPresent()) {
             updateMigrationStage(MigrationStage.PROVISIONING_IN_PROGRESS);
             return stackIdentifier.get();
@@ -116,7 +131,7 @@ public class AWSMigrationService implements MigrationService {
     @Override
     public Optional<String> getInfrastructureProvisioningStatus(String stackId) {
         try {
-            StackStatus status = this.cfnApi.getStatus(stackId);
+            StackStatus status = getCfnApi().getStatus(stackId);
             return Optional.of(status.toString());
         } catch (StackInstanceNotFoundException e) {
             return Optional.empty();
