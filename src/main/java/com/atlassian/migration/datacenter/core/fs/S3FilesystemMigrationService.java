@@ -37,7 +37,7 @@ import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatu
 public class S3FilesystemMigrationService implements FilesystemMigrationService {
     private static final Logger logger = LoggerFactory.getLogger(S3FilesystemMigrationService.class);
 
-    public static final int NUM_UPLOAD_THREADS = 2;
+    private static final int NUM_UPLOAD_THREADS = Integer.getInteger("NUM_UPLOAD_THREADS", 2);
 
     private final AtlassianPluginAWSCredentialsProvider credentialsProvider;
     private final RegionService regionService;

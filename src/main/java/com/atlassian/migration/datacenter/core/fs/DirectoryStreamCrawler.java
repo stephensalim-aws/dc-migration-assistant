@@ -14,6 +14,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class DirectoryStreamCrawler implements Crawler {
     private static final Logger logger = LoggerFactory.getLogger(DirectoryStreamCrawler.class);
+    // TODO storing the full Exception might have impact to memory footprint
+    // We should assess the impact after running some larger migration
     private final Map<String, Exception> failedPaths = new HashMap<>();
 
     @Override
