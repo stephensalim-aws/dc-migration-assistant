@@ -31,6 +31,6 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
       - name: Test with maven
-        run: mvn -B verify
+        run: mvn -B clean verify
       - name: Integration tests
-        run: mvn -B verify -Pintegration
+        run: mvn -B clean verify -Pintegration

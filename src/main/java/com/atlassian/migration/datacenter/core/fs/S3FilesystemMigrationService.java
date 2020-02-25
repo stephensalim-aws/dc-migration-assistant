@@ -76,6 +76,10 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
             Uploader uploader = new S3Uploader(config);
             Future<?> uploadResult = uploadService.submit(() -> {
                 uploader.upload(uploadQueue, isDoneCrawling);
+                final Map<String, Exception> failedUploads = uploader.getFailed();
+                if (failedUploads.size() != 0) {
+
+                }
             });
             uploadResults.add(uploadResult);
         });
