@@ -20,6 +20,8 @@ import com.atlassian.scheduler.config.RunMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.services.cloudformation.model.StackInstanceNotFoundException;
+import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 
 import java.util.Optional;
 
@@ -95,9 +97,9 @@ public class AWSMigrationService implements MigrationService {
      */
     @Override
     public String provisionInfrastructure(ProvisioningConfig config) {
-        //TODO: Refactor this to a state machine as part of https://aws-partner.atlassian.net/browse/CHET-101
+        //TODO: Refactor this to a state machine as part of https://aws-partner.atlassian.net/browse/CHET-101. This will be extracted to a different class then
         MigrationStage currentMigrationStage = getMigrationStage();
-        if (currentMigrationStage != MigrationStage.READY_TO_PROVISION) {
+        if (currentMigrationStage != MigrationStage.STARTED) {
             throw new InvalidMigrationStageError(String.format("Expected migration stage was %s, but found %s", MigrationStage.READY_TO_PROVISION, currentMigrationStage));
         }
 
@@ -108,6 +110,16 @@ public class AWSMigrationService implements MigrationService {
         } else {
             updateMigrationStage(MigrationStage.PROVISIONING_ERROR);
             throw new InfrastructureProvisioningError(String.format("Unable to provision stack (URL - %s) with name - %s", config.getTemplateUrl(), config.getStackName()));
+        }
+    }
+
+    @Override
+    public Optional<String> getInfrastructureProvisioningStatus(String stackId) {
+        try {
+            StackStatus status = this.cfnApi.getStatus(stackId);
+            return Optional.of(status.toString());
+        } catch (StackInstanceNotFoundException e) {
+            return Optional.empty();
         }
     }
 

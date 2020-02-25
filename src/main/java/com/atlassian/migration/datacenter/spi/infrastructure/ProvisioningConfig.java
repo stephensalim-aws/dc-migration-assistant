@@ -5,9 +5,12 @@ import java.util.Map;
 
 public class ProvisioningConfig {
 
-    private final String templateUrl;
-    private final String stackName;
-    private final Map<String,String> params;
+    private String templateUrl;
+    private String stackName;
+    private Map<String, String> params;
+
+    public ProvisioningConfig() {
+    }
 
     public ProvisioningConfig(String templateUrl, String stackName, Map<String, String> params) {
         this.templateUrl = templateUrl;

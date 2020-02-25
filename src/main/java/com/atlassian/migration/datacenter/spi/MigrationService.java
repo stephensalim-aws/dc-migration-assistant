@@ -3,6 +3,8 @@ package com.atlassian.migration.datacenter.spi;
 import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 
+import java.util.Optional;
+
 /**
  * Abstraction of an on-premise to cloud migration modeled as a finite state machine.
  */
@@ -29,5 +31,7 @@ public interface MigrationService {
      */
     String provisionInfrastructure(ProvisioningConfig provisioningConfig);
 
+    Optional<String> getInfrastructureProvisioningStatus(String stackId);
+  
     boolean startFilesystemMigration();
 }
