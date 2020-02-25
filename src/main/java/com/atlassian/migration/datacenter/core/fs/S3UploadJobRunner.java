@@ -45,7 +45,7 @@ public class S3UploadJobRunner implements JobRunner {
                     (String) parameters.get("s3bucket"), (String) parameters.get("directory"));
 
             log.debug("Starting S3 migration with config {}", config);
-            s3Service.startMigration(config);
+            s3Service.startMigration();
             return JobRunnerResponse.success("S3 upload was successful.");
         } else {
             return JobRunnerResponse.failed("S3 upload configuration is missing.");
