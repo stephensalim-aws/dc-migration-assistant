@@ -215,6 +215,13 @@
             <version>1.7.30</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>cloud.localstack</groupId>
+            <artifactId>localstack-utils</artifactId>
+            <version>0.2.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

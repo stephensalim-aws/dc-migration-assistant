@@ -2,11 +2,19 @@ package com.atlassian.migration.datacenter.core.fs;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.http.SdkHttpResponse;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -16,26 +24,44 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-public class S3UploaderTest {
+@ExtendWith(MockitoExtension.class)
+class S3UploaderTest {
+    S3UploadConfig config;
+    PutObjectResponse putObjectResponse;
+
+    @Mock
+    S3AsyncClient s3AsyncClient;
+
+    @Mock
+    CompletableFuture<PutObjectResponse> s3response;
+
+    @Mock
+    SdkHttpResponse sdkHttpResponse;
+    ConcurrentLinkedQueue<Path> queue = new ConcurrentLinkedQueue<>();
+    S3Uploader uploader;
+    AtomicBoolean isCrawlDone;
     @TempDir
     Path tempDir;
-    private ConcurrentLinkedQueue<Path> queue;
-    private Uploader uploader;
-    private AtomicBoolean isCrawlDone;
 
     @BeforeEach
     void setup() {
+        config = new S3UploadConfig("bucket-name", s3AsyncClient, tempDir);
         queue = new ConcurrentLinkedQueue<>();
-        uploader = new S3Uploader();
+        uploader = new S3Uploader(config);
         isCrawlDone = new AtomicBoolean(false);
     }
 
     @Test
     void uploadShouldConsumePathsWhileCrawlingIsRunning() throws IOException, InterruptedException, ExecutionException {
-        final Path file = tempDir.resolve("file");
-        Files.write(file, "".getBytes());
-        queue.add(file);
+        putObjectResponse = (PutObjectResponse) PutObjectResponse.builder().sdkHttpResponse(sdkHttpResponse).build();
+        when(sdkHttpResponse.isSuccessful()).thenReturn(true);
+        when(s3response.get()).thenReturn(putObjectResponse);
+        when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(Path.class))).thenReturn(s3response);
+
+        addFileToQueue("file1");
 
         final Future<?> submit = Executors.newFixedThreadPool(1).submit(() -> {
             uploader.upload(queue, isCrawlDone);
@@ -47,9 +73,7 @@ public class S3UploaderTest {
         assertTrue(queue.isEmpty());
 
         // add new file when the crawler isn't finish
-        final Path file2 = tempDir.resolve("file");
-        Files.write(file2, "".getBytes());
-        queue.add(file2);
+        addFileToQueue("file2");
 
         // finish crawling
         isCrawlDone.set(true);
@@ -64,11 +88,18 @@ public class S3UploaderTest {
     @Test
     void uploadNonExistentDirectoryShouldReturnFailedCollection() {
         final Path nonExistentFile = tempDir.resolve("non-existent");
-        isCrawlDone.set(true);
         queue.add(nonExistentFile);
+        isCrawlDone.set(true);
 
         uploader.upload(queue, isCrawlDone);
 
         assertEquals(uploader.getFailed().size(), 1);
+    }
+
+    Path addFileToQueue(String fileName) throws IOException {
+        final Path file = tempDir.resolve(fileName);
+        Files.write(file, "".getBytes());
+        queue.add(file);
+        return file;
     }
 }

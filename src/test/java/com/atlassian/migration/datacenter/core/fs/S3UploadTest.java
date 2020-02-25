@@ -1,5 +1,6 @@
 package com.atlassian.migration.datacenter.core.fs;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -21,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Disabled("Exploratory test")
 public class S3UploadTest {
 
     public static final String FOLDER = "/Users/abrokes/code/taskcat";
@@ -87,17 +89,4 @@ public class S3UploadTest {
         });
     }
 
-//    @Test
-//    @Disabled
-//    void testWalk() throws IOException {
-//        AtomicInteger i = new AtomicInteger();
-//        try (Stream<Path> paths = Files.walk(Paths.get(FOLDER), Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS)) {
-//            paths.forEach(p -> {
-//                if (!Files.isDirectory(p)) {
-//                    i.incrementAndGet();
-//                }
-//            });
-//        }
-//        System.out.println(i);
-//    }
 }
