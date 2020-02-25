@@ -32,6 +32,3 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Test with maven
         run: mvn -B clean verify
-      - name: Integration tests
-        uses: localstack/localstack:0.10.7
-        run: mvn -B clean verify -Pintegration
