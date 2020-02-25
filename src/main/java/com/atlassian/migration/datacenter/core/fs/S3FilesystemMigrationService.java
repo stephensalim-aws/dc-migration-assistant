@@ -20,10 +20,17 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
+
+import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.FAILED;
 
 @Component
 public class S3FilesystemMigrationService implements FilesystemMigrationService {
@@ -55,27 +62,39 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
                 .build();
         S3UploadConfig config = new S3UploadConfig(getS3Bucket(), s3AsyncClient, getSharedHomeDir());
 
-        Crawler homeCrawler = new DirectoryStreamCrawler();
-        ExecutorService service = Executors.newSingleThreadExecutor();
 
-        ConcurrentLinkedQueue uploadQueue = new ConcurrentLinkedQueue();
+        AtomicBoolean isDoneCrawling = new AtomicBoolean(false);
+        ConcurrentLinkedQueue<Path> uploadQueue = new ConcurrentLinkedQueue<>();
 
-        service.submit(() -> {
-            try {
-                homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
-            } catch (IOException e) {
-                logger.error("Failed to traverse home directory for S3 transfer", e);
-                progress.setStatus(FilesystemMigrationStatus.FAILED);
-            }
-        });
-
-
+        Queue<Future<?>> uploadResults = new LinkedList<>();
         ExecutorService uploadService = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
         IntStream.range(0, NUM_UPLOAD_THREADS).forEach(i -> {
-            uploadService.submit(() -> {
-
+            Uploader uploader = new S3Uploader(config);
+            Future<?> uploadResult = uploadService.submit(() -> {
+                uploader.upload(uploadQueue, isDoneCrawling);
             });
+            uploadResults.add(uploadResult);
         });
+
+        Crawler homeCrawler = new DirectoryStreamCrawler();
+        try {
+            homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
+        } catch (IOException e) {
+            logger.error("Failed to traverse home directory for S3 transfer", e);
+            progress.setStatus(FAILED);
+        } finally {
+            isDoneCrawling.set(true);
+        }
+
+        while(!uploadResults.isEmpty()) {
+            Future<?> uploadResult = uploadResults.poll();
+            try {
+                uploadResult.get();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("Failed to upload home directory to S3", e);
+                progress.setStatus(FAILED);
+            }
+        }
     }
 
     private String getS3Bucket() {
