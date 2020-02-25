@@ -32,7 +32,10 @@ export const callAppRest = (
         headers: { 'Content-Type': 'application/json', ...headers },
     };
 
-    options = addToOptionsIfexists(body, options);
+    if (body) {
+        options = {...options, body: JSON.stringify(body)}
+    }
+
     options = addToOptionsIfexists(headers, options);
 
     const basePath = `${contextPath()}/rest/dc-migration/1.0/${path}`;

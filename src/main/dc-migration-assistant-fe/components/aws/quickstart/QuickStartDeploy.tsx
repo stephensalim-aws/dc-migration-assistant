@@ -9,13 +9,13 @@ import styled from 'styled-components';
 
 import {createQuickstartFormField} from './quickstartToAtlaskit';
 import {
-    QuickstartParameter,
     QuickstartParameterGroup,
     QuickStartParameterYamlNode,
     QuickstartParamGroupYamlNode,
     QuickstartParamLabelYamlNode,
 } from './QuickStartTypes';
-import contextPath from "wrm/context-path";
+
+import {callAppRest} from "../../../utils/api";
 
 const QUICKSTART_PARAMS_URL =
     'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/test-create-s3-bucket.parameters.yaml';
@@ -58,18 +58,12 @@ const QuickstartForm = ({
                 }
             });
 
-            // eslint-disable-next-line no-console
-            console.log(transformedCfnParams);
-            //TODO: Use callAppRest after fixing the body parameter issue.
-            const url = `${contextPath()}/rest/dc-migration/1.0/aws/cloudformation/create`;
-            fetch(url, {
-                method: 'POST',
-                body: JSON.stringify({templateUrl: "https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml",
-                    stackName: stackName,
-                    params: transformedCfnParams
-                    }),
-                headers: {'content-type': 'application/json'}
+            callAppRest('POST', 'aws/cloudformation/create', {
+                templateUrl: 'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml',
+                stackName: stackName,
+                params: transformedCfnParams,
             }).then(x => x.text())
+                // eslint-disable-next-line no-console
                 .then(console.log);
         }}
     >
@@ -80,14 +74,8 @@ const QuickstartForm = ({
                 />
 
                 {quickstartParamGroups.map(group => {
-                    let stackNameField : React.ReactElement = createQuickstartFormField({
-                        paramKey: STACK_NAME_FIELD_NAME,
-                        paramLabel: "Name of the Quickstart Stack",
-                        paramProperties: {Type: "String",Default: "", Description: "Name of the stack", ConstraintDescription: "^[a-zA-Z.-]+$"}
-                    });
                     return (
                         <FormSection key={group.groupLabel} title={group.groupLabel}>
-                            {stackNameField}
                             {group.parameters.map(parameter => {
                                 return createQuickstartFormField(parameter);
                             })}
@@ -102,13 +90,29 @@ const QuickstartForm = ({
     </Form>
 );
 
+const buildAdditionalParameters = () : Array<QuickstartParameterGroup> => {
+  return [{
+          groupLabel: 'default',
+          parameters: [{
+              paramKey: STACK_NAME_FIELD_NAME,
+              paramLabel: 'Name of the Quickstart Stack',
+              paramProperties: {
+                  Type: 'String',
+                  Default: '',
+                  Description: 'Name of the stack',
+                  ConstraintDescription: '^[a-zA-Z.-]+$'
+              }
+          }]
+      }];
+};
+
 const buildQuickstartParams = (quickstartParamDoc: any): Array<QuickstartParameterGroup> => {
     const params: Record<string, QuickStartParameterYamlNode> = quickstartParamDoc.Parameters;
     const paramLabels: Record<string, QuickstartParamLabelYamlNode> =
         quickstartParamDoc.ParameterLabels;
     const paramGroups: Array<QuickstartParamGroupYamlNode> = quickstartParamDoc.ParameterGroups;
 
-    return paramGroups.map(group => {
+    const formParameters = paramGroups.map(group => {
         const { Label, Parameters } = group;
         const paramGroupLabel = Label;
         return {
@@ -122,6 +126,7 @@ const buildQuickstartParams = (quickstartParamDoc: any): Array<QuickstartParamet
             }),
         };
     });
+    return [...buildAdditionalParameters(), ...formParameters];
 };
 
 const QuickStartDeployContainer = styled.div`
