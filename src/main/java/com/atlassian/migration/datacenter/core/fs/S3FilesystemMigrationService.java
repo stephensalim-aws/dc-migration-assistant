@@ -6,11 +6,13 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.migration.datacenter.core.aws.auth.AtlassianPluginAWSCredentialsProvider;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationProgress;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -19,7 +21,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -36,19 +37,21 @@ import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatu
 public class S3FilesystemMigrationService implements FilesystemMigrationService {
     private static final Logger logger = LoggerFactory.getLogger(S3FilesystemMigrationService.class);
 
-    private static final String S3_PREFIX = "";
-    private static final boolean INCLUDE_SUBDIRECTORIES = true;
     public static final int NUM_UPLOAD_THREADS = 2;
 
     private final AtlassianPluginAWSCredentialsProvider credentialsProvider;
     private final RegionService regionService;
+    private final JiraHome jiraHome;
 
     private MultipleFileUpload upload;
     private FilesystemMigrationProgress progress = new FilesystemMigrationProgress(FilesystemMigrationStatus.NOT_STARTED);
 
-    public S3FilesystemMigrationService(RegionService regionService, AtlassianPluginAWSCredentialsProvider credentialsProvider) {
+    public S3FilesystemMigrationService(RegionService regionService,
+                                        AtlassianPluginAWSCredentialsProvider credentialsProvider,
+                                        @ComponentImport JiraHome jiraHome) {
         this.regionService = regionService;
         this.credentialsProvider = credentialsProvider;
+        this.jiraHome = jiraHome;
     }
 
     /**
@@ -102,7 +105,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     }
 
     private Path getSharedHomeDir() {
-        return Paths.get("/fake/shared/home");
+        return jiraHome.getHome().toPath();
     }
 
     @Override

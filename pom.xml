@@ -123,7 +123,7 @@
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-api</artifactId>
-            <version>8.6.1</version>
+            <version>8.5.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -391,7 +391,7 @@
             </properties>
         </profile>
         <profile>
-            <id>integration-tests</id>
+            <id>integration</id>
             <build>
                 <plugins>
                     <plugin>

@@ -113,7 +113,7 @@ public class AWSMigrationServiceTest {
         boolean success = sut.startFilesystemMigration(fsConfig);
         // then
         assertFalse(success);
-        verify(this.filesystemMigrationService, never()).startMigration(any());
+        verify(this.filesystemMigrationService, never()).startMigration();
     }
 
     @Test

@@ -33,8 +33,9 @@ public class S3Uploader implements Uploader {
 
     @Override
     public void upload(ConcurrentLinkedQueue<Path> queue, AtomicBoolean isCrawlDone) {
-        while (!queue.isEmpty() || !isCrawlDone.get()) {
-            if (queue.isEmpty()) {
+        Path path;
+        while (!((path = queue.poll()) == null) || !isCrawlDone.get()) {
+            if (path == null) {
                 try {
                     Thread.sleep(SLEEP_TO_WAIT_FOR_CRAWLER);
                 } catch (InterruptedException e) {
@@ -42,7 +43,9 @@ public class S3Uploader implements Uploader {
                     queue.forEach(p -> addFailedFile(p, e));
                 }
             } else {
-                final Path path = queue.poll();
+                if (path == null) {
+
+                }
 
                 if (Files.exists(path)) {
                     String key = config.getSharedHome().relativize(path).toString();
