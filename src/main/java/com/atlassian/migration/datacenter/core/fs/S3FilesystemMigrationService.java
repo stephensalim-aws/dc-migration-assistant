@@ -22,7 +22,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -76,10 +75,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
             Uploader uploader = new S3Uploader(config);
             Future<?> uploadResult = uploadService.submit(() -> {
                 uploader.upload(uploadQueue, isDoneCrawling);
-                final Map<String, Exception> failedUploads = uploader.getFailed();
-                if (failedUploads.size() != 0) {
-
-                }
+                // TODO surface failed uploads
             });
             uploadResults.add(uploadResult);
         });
