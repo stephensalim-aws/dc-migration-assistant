@@ -3,7 +3,6 @@ package com.atlassian.migration.datacenter.core.fs;
 import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.migration.datacenter.core.aws.auth.AtlassianPluginAWSCredentialsProvider;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationConfig;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +32,7 @@ class S3FilesystemMigrationServiceTest {
     void migrationShouldFailWithIncorrectDirectory() {
         // given
         Path nonexistentDir = Paths.get(UUID.randomUUID().toString());
-        FilesystemMigrationConfig config = new FilesystemMigrationConfig("s3bucket", nonexistentDir.toString());
+        when(jiraHome.getHome()).thenReturn(nonexistentDir.toFile());
 
         when(regionService.getRegion()).thenReturn(Region.US_EAST_1.toString());
         S3FilesystemMigrationService fsService = new S3FilesystemMigrationService(regionService, credentialsProvider, jiraHome);
