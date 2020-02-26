@@ -20,7 +20,7 @@ public class FilesystemMigrationProgress {
     public void accumulateFileFailures(FailedFileMigrationReport newReport) {
         newReport.getFailedFiles()
                 .parallelStream()
-                .forEach(failure -> report.reportFileNotMigrated(failure.getFilePath(), failure.getReason()));
+                .forEach(failure -> report.reportFileNotMigrated(failure));
     }
 
     public FilesystemMigrationStatus getStatus() {

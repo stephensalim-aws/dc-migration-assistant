@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.core.fs;
 
 import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
+import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport.FailedFileMigration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class DirectoryStreamCrawler implements Crawler {
                     listDirectories(queue, newPaths);
                 } catch (IOException e) {
                     logger.error("Error when traversing directory {}, with exception {}", p, e);
-                    failedPaths.reportFileNotMigrated(p, e.getMessage());
+                    failedPaths.reportFileNotMigrated(new FailedFileMigration(p, e.getMessage()));
                 }
             } else {
                 queue.add(p);

@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.core.fs;
 
 import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
+import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport.FailedFileMigration;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,7 @@ public class S3Uploader implements Uploader {
     }
 
     private void addFailedFile(Path path, String reason) {
-        failedFiles.reportFileNotMigrated(path, reason);
+        failedFiles.reportFileNotMigrated(new FailedFileMigration(path, reason));
     }
 
     private static class S3UploadOperation {

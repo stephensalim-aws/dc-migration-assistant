@@ -14,15 +14,15 @@ public class FailedFileMigrationReport {
         this.failedMigrations = new LinkedList<>();
     }
 
-    public void reportFileNotMigrated(Path path, String reason) {
-        failedMigrations.add(new FailedFileMigration(path, reason));
+    public void reportFileNotMigrated(FailedFileMigration failedFileMigration) {
+        failedMigrations.add(failedFileMigration);
     }
 
     public List<FailedFileMigration> getFailedFiles() {
         return ImmutableList.copyOf(failedMigrations);
     }
 
-    public class FailedFileMigration {
+    public static class FailedFileMigration {
         private final Path filePath;
 
         private final String reason;
