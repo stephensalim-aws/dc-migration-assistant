@@ -9,14 +9,16 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class DirectoryStreamCrawler implements Crawler {
     private static final Logger logger = LoggerFactory.getLogger(DirectoryStreamCrawler.class);
-    private final FailedFileMigrationReport failedPaths = new FailedFileMigrationReport();
+
+    private FailedFileMigrationReport report;
+
+    public DirectoryStreamCrawler(FailedFileMigrationReport report) {
+        this.report = report;
+    }
 
     @Override
     public void crawlDirectory(Path start, ConcurrentLinkedQueue<Path> queue) throws IOException {
@@ -32,16 +34,11 @@ public class DirectoryStreamCrawler implements Crawler {
                     listDirectories(queue, newPaths);
                 } catch (IOException e) {
                     logger.error("Error when traversing directory {}, with exception {}", p, e);
-                    failedPaths.reportFileNotMigrated(new FailedFileMigration(p, e.getMessage()));
+                    report.reportFileNotMigrated(new FailedFileMigration(p, e.getMessage()));
                 }
             } else {
                 queue.add(p);
             }
         });
-    }
-
-    @Override
-    public FailedFileMigrationReport getFileMigrationFailureReport() {
-        return failedPaths;
     }
 }

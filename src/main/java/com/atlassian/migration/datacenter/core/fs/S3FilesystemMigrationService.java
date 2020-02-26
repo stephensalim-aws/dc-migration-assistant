@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -41,6 +40,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     private final JiraHome jiraHome;
 
     private FilesystemMigrationProgress progress = new FilesystemMigrationProgress(FilesystemMigrationStatus.NOT_STARTED);
+    private FailedFileMigrationReport errorReport;
     private AtomicBoolean isDoneCrawling;
     private ConcurrentLinkedQueue<Path> uploadQueue;
     private S3UploadConfig config;
@@ -70,6 +70,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     public void startMigration() {
         progress.setStatus(RUNNING);
 
+        errorReport = new FailedFileMigrationReport();
         isDoneCrawling = new AtomicBoolean(false);
         uploadQueue = new ConcurrentLinkedQueue<>();
 
@@ -93,7 +94,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     }
 
     private void populateUploadQueue() {
-        Crawler homeCrawler = new DirectoryStreamCrawler();
+        Crawler homeCrawler = new DirectoryStreamCrawler(errorReport);
         try {
             homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
         } catch (IOException e) {
@@ -107,18 +108,17 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     private List<Future<FailedFileMigrationReport>> startUploadingFromQueue() {
         ExecutorService uploadService = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
 
-        Callable<FailedFileMigrationReport> uploaderFunction = () -> {
-            Uploader uploader = new S3Uploader(config);
+        Runnable uploaderFunction = () -> {
+            Uploader uploader = new S3Uploader(config, errorReport);
             uploader.upload(uploadQueue, isDoneCrawling);
-            return uploader.getFileMigrationFailureReport();
         };
 
-        try {
-            return uploadService.invokeAll(Collections.nCopies(NUM_UPLOAD_THREADS, uploaderFunction));
-        } catch (InterruptedException e) {
-            logger.error("Interrupted while uploading files, at least {} files remaining", uploadQueue.size());
-            progress.setStatus(FAILED);
-        }
+//        try {
+//            return uploadService.invokeAll(Collections.nCopies(NUM_UPLOAD_THREADS, uploaderFunction));
+//        } catch (InterruptedException e) {
+//            logger.error("Interrupted while uploading files, at least {} files remaining", uploadQueue.size());
+//            progress.setStatus(FAILED);
+//        }
         return Collections.emptyList();
     }
 

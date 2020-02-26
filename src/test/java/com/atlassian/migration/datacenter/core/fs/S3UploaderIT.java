@@ -5,6 +5,7 @@ import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -28,11 +29,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(LocalstackDockerExtension.class)
 @LocalstackDockerProperties(services = {"s3"})
 class S3UploaderIT {
-    static final String LOCALSTACK_S3_ENDPOINT = "http://localhost:4572";
-    static final String TREBUCHET_LOCALSTACK_BUCKET = "trebuchet-localstack-bucket";
-    ConcurrentLinkedQueue<Path> queue = new ConcurrentLinkedQueue<>();
-    S3Uploader uploader;
-    AtomicBoolean isCrawlDone;
+    private static final String LOCALSTACK_S3_ENDPOINT = "http://localhost:4572";
+    private static final String TREBUCHET_LOCALSTACK_BUCKET = "trebuchet-localstack-bucket";
+    private ConcurrentLinkedQueue<Path> queue = new ConcurrentLinkedQueue<>();
+    private S3Uploader uploader;
+    private AtomicBoolean isCrawlDone;
+    private FailedFileMigrationReport errorReport;
+
     @TempDir
     Path tempDir;
 
@@ -44,9 +47,10 @@ class S3UploaderIT {
                 .build();
         S3UploadConfig config = new S3UploadConfig(TREBUCHET_LOCALSTACK_BUCKET, localStackS3Client, tempDir);
 
+        errorReport = new FailedFileMigrationReport();
         isCrawlDone = new AtomicBoolean(false);
         queue = new ConcurrentLinkedQueue<>();
-        uploader = new S3Uploader(config);
+        uploader = new S3Uploader(config, errorReport);
     }
 
     @Test

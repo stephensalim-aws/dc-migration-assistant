@@ -1,5 +1,6 @@
 package com.atlassian.migration.datacenter.core.fs;
 
+import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,20 +30,24 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class S3UploaderTest {
-    S3UploadConfig config;
-    PutObjectResponse putObjectResponse;
+    private S3UploadConfig config;
+    private PutObjectResponse putObjectResponse;
+
+    private FailedFileMigrationReport errorReport;
 
     @Mock
-    S3AsyncClient s3AsyncClient;
+    private S3AsyncClient s3AsyncClient;
 
     @Mock
-    CompletableFuture<PutObjectResponse> s3response;
+    private CompletableFuture<PutObjectResponse> s3response;
 
     @Mock
-    SdkHttpResponse sdkHttpResponse;
-    ConcurrentLinkedQueue<Path> queue = new ConcurrentLinkedQueue<>();
-    S3Uploader uploader;
-    AtomicBoolean isCrawlDone;
+    private SdkHttpResponse sdkHttpResponse;
+
+    private ConcurrentLinkedQueue<Path> queue = new ConcurrentLinkedQueue<>();
+    private S3Uploader uploader;
+    private AtomicBoolean isCrawlDone;
+
     @TempDir
     Path tempDir;
 
@@ -50,7 +55,8 @@ class S3UploaderTest {
     void setup() {
         config = new S3UploadConfig("bucket-name", s3AsyncClient, tempDir);
         queue = new ConcurrentLinkedQueue<>();
-        uploader = new S3Uploader(config);
+        errorReport = new FailedFileMigrationReport();
+        uploader = new S3Uploader(config, errorReport);
         isCrawlDone = new AtomicBoolean(false);
     }
 
@@ -82,7 +88,7 @@ class S3UploaderTest {
         // upload should finish and there shouldn't be more paths to process
         assertTrue(submit.isDone());
         assertTrue(queue.isEmpty());
-        assertTrue(uploader.getFileMigrationFailureReport().getFailedFiles().isEmpty());
+        assertTrue(errorReport.getFailedFiles().isEmpty());
     }
 
     @Test
@@ -93,7 +99,7 @@ class S3UploaderTest {
 
         uploader.upload(queue, isCrawlDone);
 
-        assertEquals(uploader.getFileMigrationFailureReport().getFailedFiles().size(), 1);
+        assertEquals(errorReport.getFailedFiles().size(), 1);
     }
 
     Path addFileToQueue(String fileName) throws IOException {

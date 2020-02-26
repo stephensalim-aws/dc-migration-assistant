@@ -1,5 +1,6 @@
 package com.atlassian.migration.datacenter.core.fs;
 
+import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -25,12 +26,14 @@ class DirectoryStreamCrawlerTest {
     private Crawler directoryStreamCrawler;
     private ConcurrentLinkedQueue<Path> queue;
     private Set<Path> expectedPaths;
+    private FailedFileMigrationReport errorReport;
 
     @BeforeEach
     void createFiles() throws Exception {
         queue = new ConcurrentLinkedQueue<>();
         expectedPaths = new HashSet<>();
-        directoryStreamCrawler = new DirectoryStreamCrawler();
+        errorReport = new FailedFileMigrationReport();
+        directoryStreamCrawler = new DirectoryStreamCrawler(errorReport);
 
         expectedPaths.add(Files.write(tempDir.resolve("newfile.txt"), "newfile content".getBytes()));
         final Path subdirectory = Files.createDirectory(tempDir.resolve("subdirectory"));
@@ -39,7 +42,7 @@ class DirectoryStreamCrawlerTest {
 
     @Test
     void shouldListAllSubdirectories() throws Exception {
-        directoryStreamCrawler = new DirectoryStreamCrawler();
+        directoryStreamCrawler = new DirectoryStreamCrawler(errorReport);
         directoryStreamCrawler.crawlDirectory(tempDir, queue);
 
         expectedPaths.forEach(path -> assertTrue(queue.contains(path), String.format("Expected %s is absent from crawler queue", path)));
@@ -58,6 +61,6 @@ class DirectoryStreamCrawlerTest {
 
         directoryStreamCrawler.crawlDirectory(tempDir, queue);
 
-        assertEquals(directoryStreamCrawler.getFileMigrationFailureReport().getFailedFiles().size(), 1);
+        assertEquals(errorReport.getFailedFiles().size(), 1);
     }
 }

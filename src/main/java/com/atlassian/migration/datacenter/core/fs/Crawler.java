@@ -1,11 +1,11 @@
 package com.atlassian.migration.datacenter.core.fs;
 
-import com.atlassian.migration.datacenter.spi.fs.FailableFileOperation;
+import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public interface Crawler extends FailableFileOperation {
+public interface Crawler {
     void crawlDirectory(Path start, ConcurrentLinkedQueue<Path> queue) throws IOException;
 }
