@@ -20,7 +20,7 @@ import java.util.Optional;
 /**
  * REST API Endpoint for managing AWS provisioning.
  */
-@Path("/aws/cloudformation")
+@Path("/aws/stack")
 public class CloudFormationEndpoint {
 
     private MigrationService migrationService;

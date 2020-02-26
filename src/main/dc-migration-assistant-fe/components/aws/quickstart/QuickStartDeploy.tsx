@@ -1,13 +1,14 @@
-import React, {FunctionComponent, ReactElement, useEffect, useState} from 'react';
+import React, { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import yaml from 'yaml';
-import Form, {FormHeader, FormSection} from '@atlaskit/form';
+import Form, { ErrorMessage, Field, FormHeader, FormSection } from '@atlaskit/form';
+import TextField from '@atlaskit/textfield';
 import Button from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
-import {OptionType} from '@atlaskit/select';
-import {I18n} from '@atlassian/wrm-react-i18n';
+import { OptionType } from '@atlaskit/select';
+import { I18n } from '@atlassian/wrm-react-i18n';
 import styled from 'styled-components';
 
-import {createQuickstartFormField} from './quickstartToAtlaskit';
+import { createQuickstartFormField } from './quickstartToAtlaskit';
 import {
     QuickstartParameterGroup,
     QuickStartParameterYamlNode,
@@ -15,7 +16,7 @@ import {
     QuickstartParamLabelYamlNode,
 } from './QuickStartTypes';
 
-import {callAppRest} from "../../../utils/api";
+import { callAppRest } from '../../../utils/api';
 
 const QUICKSTART_PARAMS_URL =
     'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/test-create-s3-bucket.parameters.yaml';
@@ -36,33 +37,63 @@ const QuickstartSubmitButton = styled(Button)`
     margin-top: 10px;
 `;
 
-const STACK_NAME_FIELD_NAME = "QSStackName";
+const StackNameField = (): ReactElement => {
+    const fieldNameValidator = (stackName: string): string => {
+        const regExpMatch = stackName.match('^[a-zA-Z.-]+$');
+        return regExpMatch != null
+            ? undefined
+            : I18n.getText(
+                  'atlassian.migration.datacenter.provision.aws.form.stackName.validationMessage'
+              );
+    };
+
+    return (
+        <Field
+            validate={fieldNameValidator}
+            defaultValue=""
+            label={I18n.getText(
+                'atlassian.migration.datacenter.provision.aws.form.stackName.label'
+            )}
+            name="stackName"
+        >
+            {({ fieldProps, error }: any): ReactElement => (
+                <>
+                    <TextField width="medium" {...fieldProps} />
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                </>
+            )}
+        </Field>
+    );
+};
+
+const STACK_NAME_FIELD_NAME = 'QSStackName';
 const QuickstartForm = ({
     quickstartParamGroups,
 }: Record<string, Array<QuickstartParameterGroup>>): ReactElement => (
     <Form
         onSubmit={(data: Record<string, any>): void => {
             const transformedCfnParams = data;
-            let stackName = "";
+            let stackName = '';
             Object.entries(data).forEach(entry => {
                 // Hoist value from Select/Multiselect inputs to root of form value
                 const [key, value] = entry;
-                if (key == STACK_NAME_FIELD_NAME){
+                if (key == STACK_NAME_FIELD_NAME) {
                     stackName = value;
                     delete transformedCfnParams[key];
-                }
-                else if (isOptionType(value)) {
+                } else if (isOptionType(value)) {
                     transformedCfnParams[key] = value.value;
                 } else if (isArrayOfOptionType(value)) {
                     transformedCfnParams[key] = value.map(option => option.value);
                 }
             });
 
-            callAppRest('POST', 'aws/cloudformation/create', {
-                templateUrl: 'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml',
+            callAppRest('POST', 'aws/stack/create', {
+                templateUrl:
+                    'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml',
                 stackName: stackName,
                 params: transformedCfnParams,
-            }).then(x => x.text())
+            })
+                .then(x => x.text())
                 // eslint-disable-next-line no-console
                 .then(console.log);
         }}
@@ -72,7 +103,7 @@ const QuickstartForm = ({
                 <FormHeader
                     title={I18n.getText('atlassian.migration.datacenter.provision.aws.form.title')}
                 />
-
+                <StackNameField />
                 {quickstartParamGroups.map(group => {
                     return (
                         <FormSection key={group.groupLabel} title={group.groupLabel}>
@@ -90,29 +121,13 @@ const QuickstartForm = ({
     </Form>
 );
 
-const buildAdditionalParameters = () : Array<QuickstartParameterGroup> => {
-  return [{
-          groupLabel: 'default',
-          parameters: [{
-              paramKey: STACK_NAME_FIELD_NAME,
-              paramLabel: 'Name of the Quickstart Stack',
-              paramProperties: {
-                  Type: 'String',
-                  Default: '',
-                  Description: 'Name of the stack',
-                  ConstraintDescription: '^[a-zA-Z.-]+$'
-              }
-          }]
-      }];
-};
-
 const buildQuickstartParams = (quickstartParamDoc: any): Array<QuickstartParameterGroup> => {
     const params: Record<string, QuickStartParameterYamlNode> = quickstartParamDoc.Parameters;
     const paramLabels: Record<string, QuickstartParamLabelYamlNode> =
         quickstartParamDoc.ParameterLabels;
     const paramGroups: Array<QuickstartParamGroupYamlNode> = quickstartParamDoc.ParameterGroups;
 
-    const formParameters = paramGroups.map(group => {
+    return paramGroups.map(group => {
         const { Label, Parameters } = group;
         const paramGroupLabel = Label;
         return {
@@ -126,7 +141,6 @@ const buildQuickstartParams = (quickstartParamDoc: any): Array<QuickstartParamet
             }),
         };
     });
-    return [...buildAdditionalParameters(), ...formParameters];
 };
 
 const QuickStartDeployContainer = styled.div`
