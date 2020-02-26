@@ -64,7 +64,7 @@ public class S3Uploader implements Uploader {
     }
 
     @Override
-    public FailedFileMigrationReport getFailed() {
+    public FailedFileMigrationReport getFileMigrationFailureReport() {
         return failedFiles;
     }
 

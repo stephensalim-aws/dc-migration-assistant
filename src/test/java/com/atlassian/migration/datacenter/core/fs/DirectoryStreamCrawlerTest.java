@@ -58,6 +58,6 @@ class DirectoryStreamCrawlerTest {
 
         directoryStreamCrawler.crawlDirectory(tempDir, queue);
 
-        assertEquals(directoryStreamCrawler.getFailed().size(), 1);
+        assertEquals(directoryStreamCrawler.getFileMigrationFailureReport().getFailedFiles().size(), 1);
     }
 }

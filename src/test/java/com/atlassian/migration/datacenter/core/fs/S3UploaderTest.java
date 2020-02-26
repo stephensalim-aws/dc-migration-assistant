@@ -82,7 +82,7 @@ class S3UploaderTest {
         // upload should finish and there shouldn't be more paths to process
         assertTrue(submit.isDone());
         assertTrue(queue.isEmpty());
-        assertTrue(uploader.getFailed().isEmpty());
+        assertTrue(uploader.getFileMigrationFailureReport().getFailedFiles().isEmpty());
     }
 
     @Test
@@ -93,7 +93,7 @@ class S3UploaderTest {
 
         uploader.upload(queue, isCrawlDone);
 
-        assertEquals(uploader.getFailed().size(), 1);
+        assertEquals(uploader.getFileMigrationFailureReport().getFailedFiles().size(), 1);
     }
 
     Path addFileToQueue(String fileName) throws IOException {

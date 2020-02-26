@@ -18,7 +18,7 @@ public class FailedFileMigrationReport {
         failedMigrations.add(new FailedFileMigration(path, reason));
     }
 
-    public List<FailedFileMigration> getFailedMigrations() {
+    public List<FailedFileMigration> getFailedFiles() {
         return ImmutableList.copyOf(failedMigrations);
     }
 
