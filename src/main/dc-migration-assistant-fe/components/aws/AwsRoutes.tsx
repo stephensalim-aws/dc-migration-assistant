@@ -1,8 +1,9 @@
 import React, { FunctionComponent } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
-import { quickstartPath, awsAuthPath } from '../../utils/RoutePaths';
+import { quickstartPath, awsAuthPath, quickstartStatusPath } from '../../utils/RoutePaths';
 import { QuickStartDeploy } from './quickstart/QuickStartDeploy';
+import { QuickStartStatus } from './quickstart/QuickStartStatus';
 import { AuthenticateAWS, QueryRegionFun } from './auth/AuthenticateAWS';
 import { callAppRest } from '../../utils/api';
 
@@ -17,6 +18,7 @@ export const AWSRoutes: FunctionComponent = () => (
         <Route exact path={quickstartPath}>
             <QuickStartDeploy />
         </Route>
+        <Route exact path={quickstartStatusPath} component={QuickStartStatus} />
         <Route exact path={awsAuthPath}>
             <AuthenticateAWS
                 getRegions={getRegions}

@@ -17,6 +17,7 @@ import {
 } from './QuickStartTypes';
 
 import { callAppRest } from '../../../utils/api';
+import { awsStackCreateRestPath } from '../../../utils/RoutePaths';
 
 const QUICKSTART_PARAMS_URL =
     'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/test-create-s3-bucket.parameters.yaml';
@@ -87,15 +88,12 @@ const QuickstartForm = ({
                 }
             });
 
-            callAppRest('POST', 'aws/stack/create', {
+            callAppRest('POST', awsStackCreateRestPath, {
                 templateUrl:
                     'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml',
                 stackName: stackNameValue,
                 params: transformedCfnParams,
-            })
-                .then(x => x.text())
-                // eslint-disable-next-line no-console
-                .then(console.log);
+            }).then(x => x.text());
         }}
     >
         {({ formProps }: any): ReactElement => (

@@ -17,4 +17,8 @@ export const overviewPath = `${routePrefix}/overview`;
 
 export const awsBasePath = `${routePrefix}/aws`;
 export const quickstartPath = `${awsBasePath}/provision`;
+export const quickstartStatusPath = `${awsBasePath}/:stackId/status`;
 export const awsAuthPath = `${awsBasePath}/auth`;
+
+export const awsStackCreateRestPath = `aws/stack/create`;
+export const awsStackStatusRestPath = `aws/stack/:stackId:/status`;
