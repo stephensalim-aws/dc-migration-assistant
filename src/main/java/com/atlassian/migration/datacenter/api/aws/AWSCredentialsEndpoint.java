@@ -1,9 +1,7 @@
 package com.atlassian.migration.datacenter.api.aws;
 
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.atlassian.migration.datacenter.core.aws.auth.ReadCredentialsService;
-import com.atlassian.migration.datacenter.core.aws.auth.WriteCredentialsService;
 import com.atlassian.migration.datacenter.core.aws.auth.ProbeAWSAuth;
+import com.atlassian.migration.datacenter.core.aws.auth.WriteCredentialsService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.springframework.beans.factory.annotation.Autowired;
 import software.amazon.awssdk.services.cloudformation.model.CloudFormationException;
@@ -38,23 +36,6 @@ public class AWSCredentialsEndpoint {
         return Response
                 .noContent()
                 .build();
-    }
-
-    @POST
-    @Path("v1/test")
-    @Produces(APPLICATION_JSON)
-    public Response testCredentialsSDKV1() {
-        try {
-            return Response.ok(probe.probeSDKV1()).build();
-        } catch(AmazonS3Exception s3e) {
-            if (s3e.getStatusCode() == 401 || s3e.getStatusCode() == 403) {
-                return Response
-                        .status(Response.Status.BAD_REQUEST)
-                        .entity(s3e.getMessage())
-                        .build();
-            }
-            throw s3e;
-        }
     }
 
     @POST

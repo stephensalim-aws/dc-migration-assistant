@@ -1,12 +1,12 @@
 package com.atlassian.migration.datacenter.core.aws.region;
 
-import com.amazonaws.regions.Regions;
 import com.atlassian.migration.datacenter.core.aws.GlobalInfrastructure;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.regions.Region;
 
 /**
  * Manages the persistence and retrieval of the region used to make AWS SDK API calls.
@@ -35,8 +35,8 @@ public class PluginSettingsRegionManager implements RegionService {
     public String getRegion() {
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String pluginSettingsRegion = (String) pluginSettings.get(AWS_REGION_PLUGIN_STORAGE_KEY + REGION_PLUGIN_STORAGE_SUFFIX);
-        if (pluginSettingsRegion == null || pluginSettingsRegion == "") {
-            return Regions.DEFAULT_REGION.getName();
+        if (pluginSettingsRegion == null || "".equals(pluginSettingsRegion)) {
+            return Region.US_EAST_1.toString();
         }
         return pluginSettingsRegion;
     }

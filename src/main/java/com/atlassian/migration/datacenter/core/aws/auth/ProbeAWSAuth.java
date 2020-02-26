@@ -1,12 +1,8 @@
 package com.atlassian.migration.datacenter.core.aws.auth;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.Bucket;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudformation.CloudFormationAsyncClient;
@@ -27,26 +23,9 @@ public class ProbeAWSAuth {
     private AtlassianPluginAWSCredentialsProvider credentialsProvider;
     private RegionService regionService;
 
-    @Autowired
     public ProbeAWSAuth(AtlassianPluginAWSCredentialsProvider credentialsProvider, RegionService regionService) {
         this.credentialsProvider = credentialsProvider;
         this.regionService = regionService;
-    }
-
-    /**
-     * Queries the S3 buckets in the AWS account using the AWS Java SDK V1 to test that the credentials have S3 access.
-     * @return A list containing the names of the buckets in the account in the current region
-     */
-    public List<String> probeSDKV1() {
-        AmazonS3 s3 = AmazonS3ClientBuilder
-                .standard()
-                .withRegion(regionService.getRegion())
-                .withCredentials(credentialsProvider).build();
-        List<Bucket> buckets = s3.listBuckets();
-        return buckets
-                .stream()
-                .map(Bucket::getName)
-                .collect(Collectors.toList());
     }
 
     /**
