@@ -73,12 +73,12 @@ const QuickstartForm = ({
     <Form
         onSubmit={(data: Record<string, any>): void => {
             const transformedCfnParams = data;
-            let stackName = '';
+            let stackNameValue = '';
             Object.entries(data).forEach(entry => {
                 // Hoist value from Select/Multiselect inputs to root of form value
                 const [key, value] = entry;
-                if (key == STACK_NAME_FIELD_NAME) {
-                    stackName = value;
+                if (key === STACK_NAME_FIELD_NAME) {
+                    stackNameValue = value;
                     delete transformedCfnParams[key];
                 } else if (isOptionType(value)) {
                     transformedCfnParams[key] = value.value;
@@ -90,7 +90,7 @@ const QuickstartForm = ({
             callAppRest('POST', 'aws/stack/create', {
                 templateUrl:
                     'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml',
-                stackName: stackName,
+                stackName: stackNameValue,
                 params: transformedCfnParams,
             })
                 .then(x => x.text())

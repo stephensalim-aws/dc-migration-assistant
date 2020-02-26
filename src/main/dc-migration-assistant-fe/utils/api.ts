@@ -33,7 +33,7 @@ export const callAppRest = (
     };
 
     if (body) {
-        options = {...options, body: JSON.stringify(body)}
+        options = { ...options, body: JSON.stringify(body) };
     }
 
     options = addToOptionsIfexists(headers, options);
