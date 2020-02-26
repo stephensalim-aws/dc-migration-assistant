@@ -23,7 +23,7 @@ export const QuickStartStatus: FunctionComponent = (props: Record<any, any>): Re
     const [inProgress, setInProgress]: [boolean, Function] = useState(true);
     const [provisioningFailed, setProvisioningFailed]: [boolean, Function] = useState(false);
 
-    function getStackStatusFromApi(stackIdentifier: string): Promise<any> {
+    const getStackStatusFromApi = (stackIdentifier: string): Promise<any> => {
         return callAppRest('GET', awsStackStatusRestPath.replace(':stackId:', stackIdentifier))
             .then(response => {
                 if (response.status !== 200) {
@@ -42,7 +42,7 @@ export const QuickStartStatus: FunctionComponent = (props: Record<any, any>): Re
                 setProvisioningFailed(true);
                 setInProgress(false);
             });
-    }
+    };
 
     useEffect(() => {
         const { match } = props;

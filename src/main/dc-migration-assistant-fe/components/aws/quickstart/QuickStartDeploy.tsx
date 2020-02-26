@@ -22,6 +22,10 @@ import { awsStackCreateRestPath } from '../../../utils/RoutePaths';
 const QUICKSTART_PARAMS_URL =
     'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/test-create-s3-bucket.parameters.yaml';
 
+const STACK_NAME_FIELD_NAME = 'QSStackName';
+const stackProvisioningTemplateUrl =
+    'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml';
+
 const isOptionType = (obj: any): obj is OptionType => {
     return obj.label && obj.value;
 };
@@ -67,7 +71,6 @@ const StackNameField = (): ReactElement => {
     );
 };
 
-const STACK_NAME_FIELD_NAME = 'QSStackName';
 const QuickstartForm = ({
     quickstartParamGroups,
 }: Record<string, Array<QuickstartParameterGroup>>): ReactElement => (
@@ -89,11 +92,20 @@ const QuickstartForm = ({
             });
 
             callAppRest('POST', awsStackCreateRestPath, {
-                templateUrl:
-                    'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml',
+                templateUrl: stackProvisioningTemplateUrl,
                 stackName: stackNameValue,
                 params: transformedCfnParams,
-            }).then(x => x.text());
+            })
+                .then(response => {
+                    if (response.status !== 202) {
+                        throw Error('Stack provisioning failed');
+                    }
+                    return response;
+                })
+                .then(x => x.text())
+                .catch(err => {
+                    console.log(err);
+                });
         }}
     >
         {({ formProps }: any): ReactElement => (
