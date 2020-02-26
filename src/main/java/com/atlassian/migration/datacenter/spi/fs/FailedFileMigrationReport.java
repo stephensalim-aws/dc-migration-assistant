@@ -3,15 +3,15 @@ package com.atlassian.migration.datacenter.spi.fs;
 import com.google.common.collect.ImmutableList;
 
 import java.nio.file.Path;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FailedFileMigrationReport {
 
-    private final List<FailedFileMigration> failedMigrations;
+    private final ConcurrentLinkedQueue<FailedFileMigration> failedMigrations;
 
     public FailedFileMigrationReport() {
-        this.failedMigrations = new LinkedList<>();
+        this.failedMigrations = new ConcurrentLinkedQueue<>();
     }
 
     public void reportFileNotMigrated(FailedFileMigration failedFileMigration) {
