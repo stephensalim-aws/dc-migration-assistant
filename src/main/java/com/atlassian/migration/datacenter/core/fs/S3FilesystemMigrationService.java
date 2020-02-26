@@ -16,15 +16,15 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.IntStream;
 
 import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.FAILED;
 import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.RUNNING;
@@ -76,20 +76,19 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         S3AsyncClient s3AsyncClient = buildS3Client();
         config = new S3UploadConfig(getS3Bucket(), s3AsyncClient, getSharedHomeDir());
 
-        Queue<Future<FailedFileMigrationReport>> uploadResults = startUploadingFromQueue();
+        List<Future<FailedFileMigrationReport>> uploadResults = startUploadingFromQueue();
 
         populateUploadQueue();
 
-        while (!uploadResults.isEmpty()) {
-            Future<?> uploadResult = uploadResults.poll();
+        uploadResults.forEach(result -> {
             try {
-                uploadResult.get();
+                FailedFileMigrationReport report = result.get();
             } catch (InterruptedException | ExecutionException e) {
                 logger.error("Failed to upload home directory to S3", e);
                 progress.setStatus(FAILED);
                 return;
             }
-        }
+        });
     }
 
     private void populateUploadQueue() {
@@ -104,18 +103,22 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         }
     }
 
-    private Queue<Future<FailedFileMigrationReport>> startUploadingFromQueue() {
-        Queue<Future<FailedFileMigrationReport>> uploadResults = new LinkedList<>();
+    private List<Future<FailedFileMigrationReport>> startUploadingFromQueue() {
         ExecutorService uploadService = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
-        IntStream.range(0, NUM_UPLOAD_THREADS).forEach(i -> {
+
+        Callable<FailedFileMigrationReport> uploaderFunction = () -> {
             Uploader uploader = new S3Uploader(config);
-            Future<FailedFileMigrationReport> uploadResult = uploadService.submit(() -> {
-                uploader.upload(uploadQueue, isDoneCrawling);
-                return uploader.getFileMigrationFailureReport();
-            });
-            uploadResults.add(uploadResult);
-        });
-        return uploadResults;
+            uploader.upload(uploadQueue, isDoneCrawling);
+            return uploader.getFileMigrationFailureReport();
+        };
+
+        try {
+            return uploadService.invokeAll(Collections.nCopies(NUM_UPLOAD_THREADS, uploaderFunction));
+        } catch (InterruptedException e) {
+            logger.error("Interrupted while uploading files, at least {} files remaining", uploadQueue.size());
+            progress.setStatus(FAILED);
+        }
+        return Collections.emptyList();
     }
 
     private S3AsyncClient buildS3Client() {
