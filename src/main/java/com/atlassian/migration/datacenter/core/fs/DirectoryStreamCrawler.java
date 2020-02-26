@@ -40,7 +40,7 @@ public class DirectoryStreamCrawler implements Crawler {
     }
 
     @Override
-    public FailedFileMigrationReport getFailed() {
+    public FailedFileMigrationReport getFileMigrationFailureReport() {
         return failedPaths;
     }
 }
