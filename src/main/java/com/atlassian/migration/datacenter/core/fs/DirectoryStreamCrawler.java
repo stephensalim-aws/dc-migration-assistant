@@ -1,5 +1,6 @@
 package com.atlassian.migration.datacenter.core.fs;
 
+import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class DirectoryStreamCrawler implements Crawler {
     private static final Logger logger = LoggerFactory.getLogger(DirectoryStreamCrawler.class);
-    // TODO storing the full Exception might have impact to memory footprint
-    // We should assess the impact after running some larger migration
-    private final Map<String, Exception> failedPaths = new HashMap<>();
+    private final FailedFileMigrationReport failedPaths = new FailedFileMigrationReport();
 
     @Override
     public void crawlDirectory(Path start, ConcurrentLinkedQueue<Path> queue) throws IOException {
@@ -32,7 +31,7 @@ public class DirectoryStreamCrawler implements Crawler {
                     listDirectories(queue, newPaths);
                 } catch (IOException e) {
                     logger.error("Error when traversing directory {}, with exception {}", p, e);
-                    failedPaths.put(p.toString(), e);
+                    failedPaths.reportFileNotMigrated(p, e.getMessage());
                 }
             } else {
                 queue.add(p);
@@ -41,7 +40,7 @@ public class DirectoryStreamCrawler implements Crawler {
     }
 
     @Override
-    public Map<String, Exception> getFailed() {
-        return Collections.unmodifiableMap(failedPaths);
+    public FailedFileMigrationReport getFailed() {
+        return failedPaths;
     }
 }

@@ -1,5 +1,7 @@
 package com.atlassian.migration.datacenter.core.fs;
 
+import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
+import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -23,7 +25,7 @@ public class S3Uploader implements Uploader {
     private static final Logger logger = LoggerFactory.getLogger(S3Uploader.class);
     private static final int MS_TO_WAIT_FOR_CRAWLER = 500; // ms
 
-    private final Map<String, Exception> failedFiles = new HashMap<>();
+    private final FailedFileMigrationReport failedFiles = new FailedFileMigrationReport();
     private final Queue<S3UploadOperation> responsesQueue = new LinkedList<>();
     private final S3UploadConfig config;
 
@@ -40,7 +42,7 @@ public class S3Uploader implements Uploader {
                     Thread.sleep(MS_TO_WAIT_FOR_CRAWLER);
                 } catch (InterruptedException e) {
                     logger.error("Interrupted S3 upload, adding all remaining files to failed collection");
-                    queue.forEach(p -> addFailedFile(p, e));
+                    queue.forEach(p -> addFailedFile(p, e.getMessage()));
                 }
             } else {
                 if (Files.exists(path)) {
@@ -54,30 +56,32 @@ public class S3Uploader implements Uploader {
 
                     responsesQueue.add(uploadOperation);
                 } else {
-                    addFailedFile(path, new FileNotFoundException(String.format("File doesn't exist: %s", path)));
+                    addFailedFile(path, String.format("File doesn't exist: %s", path));
                 }
             }
         }
-        responsesQueue.forEach(operation -> {
-            try {
-                final PutObjectResponse evaluatedResponse = operation.response.get();
-                if (!evaluatedResponse.sdkHttpResponse().isSuccessful()) {
-                    final String errorMessage = String.format("Error when uploading to S3, %s", evaluatedResponse.sdkHttpResponse().statusText());
-                    addFailedFile(operation.path, S3Exception.builder().message(errorMessage).build());
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                addFailedFile(operation.path, e);
-            }
-        });
+        responsesQueue.forEach(this::handlePutObjectResponse);
     }
 
     @Override
-    public Map<String, Exception> getFailed() {
-        return Collections.unmodifiableMap(failedFiles);
+    public FailedFileMigrationReport getFailed() {
+        return failedFiles;
     }
 
-    private void addFailedFile(Path path, Exception reason) {
-        failedFiles.put(path.toString(), reason);
+    private void handlePutObjectResponse(S3UploadOperation operation) {
+        try {
+            final PutObjectResponse evaluatedResponse = operation.response.get();
+            if (!evaluatedResponse.sdkHttpResponse().isSuccessful()) {
+                final String errorMessage = String.format("Error when uploading to S3, %s", evaluatedResponse.sdkHttpResponse().statusText());
+                addFailedFile(operation.path, errorMessage);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            addFailedFile(operation.path, e.getMessage());
+        }
+    }
+
+    private void addFailedFile(Path path, String reason) {
+        failedFiles.reportFileNotMigrated(path, reason);
     }
 
     private static class S3UploadOperation {
