@@ -2,6 +2,7 @@ package com.atlassian.migration.datacenter.core.fs;
 
 import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
+import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationProgress;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus;
@@ -25,7 +26,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
-import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.DONE;
 import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.FAILED;
 import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.RUNNING;
 
@@ -41,6 +41,9 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     private final JiraHome jiraHome;
 
     private FilesystemMigrationProgress progress = new FilesystemMigrationProgress(FilesystemMigrationStatus.NOT_STARTED);
+    private AtomicBoolean isDoneCrawling;
+    private ConcurrentLinkedQueue<Path> uploadQueue;
+    private S3UploadConfig config;
 
     public S3FilesystemMigrationService(RegionService regionService,
                                         AwsCredentialsProvider credentialsProvider,
@@ -50,6 +53,16 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         this.jiraHome = jiraHome;
     }
 
+    @Override
+    public FilesystemMigrationProgress getProgress() {
+        return progress;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return progress.getStatus().equals(RUNNING);
+    }
+
     /**
      * Start filesystem migration to S3 bucket. This is a blocking operation and should be started from ExecutorService
      * or preferably from ScheduledJob
@@ -57,35 +70,15 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     public void startMigration() {
         progress.setStatus(RUNNING);
 
-        S3AsyncClient s3AsyncClient = S3AsyncClient.builder()
-                .credentialsProvider(credentialsProvider)
-                .region(Region.of(regionService.getRegion()))
-                .build();
-        S3UploadConfig config = new S3UploadConfig(getS3Bucket(), s3AsyncClient, getSharedHomeDir());
+        isDoneCrawling = new AtomicBoolean(false);
+        uploadQueue = new ConcurrentLinkedQueue<>();
 
-        AtomicBoolean isDoneCrawling = new AtomicBoolean(false);
-        ConcurrentLinkedQueue<Path> uploadQueue = new ConcurrentLinkedQueue<>();
-        Queue<Future<?>> uploadResults = new LinkedList<>();
-        ExecutorService uploadService = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
+        S3AsyncClient s3AsyncClient = buildS3Client();
+        config = new S3UploadConfig(getS3Bucket(), s3AsyncClient, getSharedHomeDir());
 
-        IntStream.range(0, NUM_UPLOAD_THREADS).forEach(i -> {
-            Uploader uploader = new S3Uploader(config);
-            Future<?> uploadResult = uploadService.submit(() -> {
-                uploader.upload(uploadQueue, isDoneCrawling);
-                // TODO surface failed uploads
-            });
-            uploadResults.add(uploadResult);
-        });
+        Queue<Future<FailedFileMigrationReport>> uploadResults = startUploadingFromQueue();
 
-        Crawler homeCrawler = new DirectoryStreamCrawler();
-        try {
-            homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
-        } catch (IOException e) {
-            logger.error("Failed to traverse home directory for S3 transfer", e);
-            progress.setStatus(FAILED);
-        } finally {
-            isDoneCrawling.set(true);
-        }
+        populateUploadQueue();
 
         while (!uploadResults.isEmpty()) {
             Future<?> uploadResult = uploadResults.poll();
@@ -97,26 +90,46 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
                 return;
             }
         }
-        if (progress.getStatus() != FAILED) {
-            progress.setStatus(DONE);
+    }
+
+    private void populateUploadQueue() {
+        Crawler homeCrawler = new DirectoryStreamCrawler();
+        try {
+            homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
+        } catch (IOException e) {
+            logger.error("Failed to traverse home directory for S3 transfer", e);
+            progress.setStatus(FAILED);
+        } finally {
+            isDoneCrawling.set(true);
         }
     }
 
+    private Queue<Future<FailedFileMigrationReport>> startUploadingFromQueue() {
+        Queue<Future<FailedFileMigrationReport>> uploadResults = new LinkedList<>();
+        ExecutorService uploadService = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
+        IntStream.range(0, NUM_UPLOAD_THREADS).forEach(i -> {
+            Uploader uploader = new S3Uploader(config);
+            Future<FailedFileMigrationReport> uploadResult = uploadService.submit(() -> {
+                uploader.upload(uploadQueue, isDoneCrawling);
+                return uploader.getFileMigrationFailureReport();
+            });
+            uploadResults.add(uploadResult);
+        });
+        return uploadResults;
+    }
+
+    private S3AsyncClient buildS3Client() {
+        return S3AsyncClient.builder()
+                .credentialsProvider(credentialsProvider)
+                .region(Region.of(regionService.getRegion()))
+                .build();
+    }
+
     private String getS3Bucket() {
-        return BUCKET_NAME;
+        return "slingshot-test-2";
     }
 
     private Path getSharedHomeDir() {
         return jiraHome.getHome().toPath();
-    }
-
-    @Override
-    public FilesystemMigrationProgress getProgress() {
-        return progress;
-    }
-
-    @Override
-    public boolean isRunning() {
-        return progress.getStatus() != RUNNING;
     }
 }
