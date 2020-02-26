@@ -16,6 +16,7 @@ Build the plugin via `mvn package` then install the plugin into your Jira instan
 * Node/NPM ([NVM](https://github.com/nvm-sh/nvm) is recommended to manage
   versions)
 * Yarn (can be installed from package or with `npm install -g yarn`)
+* [Atlassian SDK])(https://developer.atlassian.com/server/framework/atlassian-sdk/) (optional)
 
 ### Frontend
 
@@ -36,9 +37,9 @@ It builds the frontend and puts it in the watch mode with hot reload.
 In other words, if you have the whole plugin and an instance already working, 
 this will enable you to make quick changes with instant preview.
 
-Go to localhost:3333 to run the frontend without Jira
+Go to `http://localhost:3333` to run the frontend without Jira
 
-If you want to test in-app, run atlas-run --product \[jira|refapp|confluence\] while the dev server is running
+If you want to test in-app, run `mvn amps:run --product [jira|refapp|confluence]` while the dev server is running
 
 ### Backend
 
