@@ -22,7 +22,7 @@ public class FailedFileMigrationReport {
         return ImmutableList.copyOf(failedMigrations);
     }
 
-    private class FailedFileMigration {
+    public class FailedFileMigration {
         private final Path filePath;
 
         private final String reason;

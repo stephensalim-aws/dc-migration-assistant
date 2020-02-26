@@ -83,6 +83,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         uploadResults.forEach(result -> {
             try {
                 FailedFileMigrationReport report = result.get();
+                progress.accumulateFileFailures(report);
             } catch (InterruptedException | ExecutionException e) {
                 logger.error("Failed to upload home directory to S3", e);
                 progress.setStatus(FAILED);
