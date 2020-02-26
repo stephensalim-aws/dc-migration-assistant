@@ -2,6 +2,7 @@ package com.atlassian.migration.datacenter.core;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.migration.datacenter.core.aws.CfnApi;
+import com.atlassian.migration.datacenter.core.aws.CfnApiFactory;
 import com.atlassian.migration.datacenter.core.exceptions.InfrastructureProvisioningError;
 import com.atlassian.migration.datacenter.core.exceptions.InvalidMigrationStageError;
 import com.atlassian.migration.datacenter.core.fs.S3UploadJobRunner;
@@ -37,18 +38,19 @@ public class AWSMigrationService implements MigrationService {
     private final SchedulerService schedulerService;
     private ActiveObjects ao;
     private Migration migration;
-    private Optional<CfnApi> cfnApi;
+    private CfnApiFactory cfnApiFactory;
 
     /**
      * Creates a new, unstarted AWS Migration
      */
     public AWSMigrationService(@ComponentImport ActiveObjects ao,
                                FilesystemMigrationService fileService,
+                               CfnApiFactory cfnApiFactory,
                                @ComponentImport SchedulerService schedulerService) {
         this.ao = requireNonNull(ao);
         this.fsService = fileService;
         this.schedulerService = schedulerService;
-        this.cfnApi = Optional.empty();
+        this.cfnApiFactory = cfnApiFactory;
     }
 
     /**
@@ -90,21 +92,6 @@ public class AWSMigrationService implements MigrationService {
         return migration;
     }
 
-    /**
-     * Fetch a CfnApi implementation.
-     *
-     * FIXME: We should implement a teardown of the object once finished?
-     */
-    private CfnApi getCfnApi() {
-        if (cfnApi.isPresent()) {
-            return cfnApi.get();
-        }
-
-        // FIXME: This could potentially be a BeanFactory lookup, but we currently only have a single impl.
-        CfnApi api = new CfnApi();
-        this.cfnApi = Optional.of(api);
-        return api;
-    }
 
     /**
      * {@inheritDoc}
@@ -117,7 +104,7 @@ public class AWSMigrationService implements MigrationService {
             throw new InvalidMigrationStageError(String.format("Expected migration stage was %s, but found %s", MigrationStage.READY_TO_PROVISION, currentMigrationStage));
         }
 
-        Optional<String> stackIdentifier = getCfnApi().provisionStack(config.getTemplateUrl(), config.getStackName(), config.getParams());
+        Optional<String> stackIdentifier = cfnApiFactory.getCfnApi().provisionStack(config.getTemplateUrl(), config.getStackName(), config.getParams());
         if (stackIdentifier.isPresent()) {
             updateMigrationStage(MigrationStage.PROVISIONING_IN_PROGRESS);
             return stackIdentifier.get();
@@ -130,7 +117,7 @@ public class AWSMigrationService implements MigrationService {
     @Override
     public Optional<String> getInfrastructureProvisioningStatus(String stackId) {
         try {
-            StackStatus status = getCfnApi().getStatus(stackId);
+            StackStatus status = cfnApiFactory.getCfnApi().getStatus(stackId);
             return Optional.of(status.toString());
         } catch (StackInstanceNotFoundException e) {
             return Optional.empty();

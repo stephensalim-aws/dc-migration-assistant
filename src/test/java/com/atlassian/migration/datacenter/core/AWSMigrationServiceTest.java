@@ -3,6 +3,7 @@ package com.atlassian.migration.datacenter.core;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.test.TestActiveObjects;
 import com.atlassian.migration.datacenter.core.aws.CfnApi;
+import com.atlassian.migration.datacenter.core.aws.CfnApiFactory;
 import com.atlassian.migration.datacenter.core.exceptions.InfrastructureProvisioningError;
 import com.atlassian.migration.datacenter.core.exceptions.InvalidMigrationStageError;
 import com.atlassian.migration.datacenter.dto.Migration;
@@ -41,6 +42,7 @@ public class AWSMigrationServiceTest {
     private EntityManager entityManager;
     private AWSMigrationService sut;
     private CfnApi cfnApi;
+    private CfnApiFactory cfnApiFactory;
     private FilesystemMigrationService filesystemMigrationService;
     private SchedulerService schedulerService;
 
@@ -51,9 +53,11 @@ public class AWSMigrationServiceTest {
         ao = new TestActiveObjects(entityManager);
         filesystemMigrationService = mock(FilesystemMigrationService.class);
         cfnApi = mock(CfnApi.class);
+        cfnApiFactory = mock(CfnApiFactory.class);
+        when(cfnApiFactory.getCfnApi()).thenReturn(cfnApi);
         schedulerService = mock(SchedulerService.class);
 
-        sut = new AWSMigrationService(ao, filesystemMigrationService, cfnApi, schedulerService);
+        sut = new AWSMigrationService(ao, filesystemMigrationService, cfnApiFactory, schedulerService);
     }
 
     @Test
