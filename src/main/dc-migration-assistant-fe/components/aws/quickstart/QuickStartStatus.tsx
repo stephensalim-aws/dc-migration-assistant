@@ -41,6 +41,7 @@ const stageStatusFlag = (currentProvisioningStatus: string): ReactElement => {
 export const QuickStartStatus: FunctionComponent = (props: Record<any, any>): ReactElement => {
     const [inProgress, setInProgress]: [boolean, Function] = useState(true);
     const [provisioningStatus, setProvisioningStatus]: [string, Function] = useState('UNKNOWN');
+    let intervalId: any = 0;
 
     const getStackStatusFromApi = (stackIdentifier: string): Promise<any> => {
         return callAppRest('GET', awsStackStatusRestPath.replace(':stackId:', stackIdentifier))
@@ -55,6 +56,7 @@ export const QuickStartStatus: FunctionComponent = (props: Record<any, any>): Re
                 if (status === 'CREATE_COMPLETE') {
                     setInProgress(false);
                     setProvisioningStatus(status);
+                    clearInterval(intervalId);
                 } else {
                     setProvisioningStatus(status);
                     setInProgress(true);
@@ -63,17 +65,25 @@ export const QuickStartStatus: FunctionComponent = (props: Record<any, any>): Re
             .catch(err => {
                 setProvisioningStatus(err.toString());
                 setInProgress(false);
+                clearInterval(intervalId);
             });
     };
 
     useEffect(() => {
         const { match } = props;
         const stackIdentifier = match.params.stackId;
-        getStackStatusFromApi(stackIdentifier).then(() => {
-            console.log(
-                'Retrieved status from API once. TODO: periodically poll this API endpoint'
-            );
-        });
+
+        intervalId = setInterval(() => {
+            getStackStatusFromApi(stackIdentifier).then(() => {
+                console.log(
+                    'Retrieved status from API once. TODO: periodically poll this API endpoint'
+                );
+            });
+        }, 5000);
+
+        return () => {
+            clearInterval(intervalId);
+        };
     }, []);
 
     return (
