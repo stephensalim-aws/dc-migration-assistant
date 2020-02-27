@@ -1,8 +1,8 @@
-package com.atlassian.migration.datacenter.spi.fs;
+package com.atlassian.migration.datacenter.core.fs.reporting;
 
+import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport;
 import com.google.common.collect.ImmutableList;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * This class is threadsafe and is intended to be added to by any agents which
  * are a part of the file system migration
  */
-public class FailedFileMigrationReport {
+public class DefaultFileSystemMigrationErrorReport implements FileSystemMigrationErrorReport {
 
     private final ConcurrentLinkedQueue<FailedFileMigration> failedMigrations;
 
-    public FailedFileMigrationReport() {
+    public DefaultFileSystemMigrationErrorReport() {
         this.failedMigrations = new ConcurrentLinkedQueue<>();
     }
 
@@ -29,24 +29,5 @@ public class FailedFileMigrationReport {
      */
     public List<FailedFileMigration> getFailedFiles() {
         return ImmutableList.copyOf(failedMigrations);
-    }
-
-    public static class FailedFileMigration {
-        private final Path filePath;
-
-        private final String reason;
-
-        public FailedFileMigration(Path filePath, String reason) {
-            this.filePath = filePath;
-            this.reason = reason;
-        }
-
-        public Path getFilePath() {
-            return filePath;
-        }
-
-        public String getReason() {
-            return reason;
-        }
     }
 }

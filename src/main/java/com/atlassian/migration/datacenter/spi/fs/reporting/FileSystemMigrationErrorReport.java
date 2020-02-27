@@ -1,4 +1,6 @@
-package com.atlassian.migration.datacenter.spi.fs;
+package com.atlassian.migration.datacenter.spi.fs.reporting;
+
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -10,7 +12,7 @@ public interface FileSystemMigrationErrorReport {
 
     List<FailedFileMigration> getFailedFiles();
 
-    void reportFileNotMigrated(FailedFileMigrationReport.FailedFileMigration failedFileMigration);
+    void reportFileNotMigrated(DefaultFileSystemMigrationErrorReport.FailedFileMigration failedFileMigration);
 
     class FailedFileMigration {
         private final Path filePath;

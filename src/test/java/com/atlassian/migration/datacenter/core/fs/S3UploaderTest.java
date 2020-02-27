@@ -1,6 +1,6 @@
 package com.atlassian.migration.datacenter.core.fs;
 
-import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,7 @@ class S3UploaderTest {
     private S3UploadConfig config;
     private PutObjectResponse putObjectResponse;
 
-    private FailedFileMigrationReport errorReport;
+    private DefaultFileSystemMigrationErrorReport errorReport;
 
     @Mock
     private S3AsyncClient s3AsyncClient;
@@ -55,7 +55,7 @@ class S3UploaderTest {
     void setup() {
         config = new S3UploadConfig("bucket-name", s3AsyncClient, tempDir);
         queue = new ConcurrentLinkedQueue<>();
-        errorReport = new FailedFileMigrationReport();
+        errorReport = new DefaultFileSystemMigrationErrorReport();
         uploader = new S3Uploader(config, errorReport);
         isCrawlDone = new AtomicBoolean(false);
     }

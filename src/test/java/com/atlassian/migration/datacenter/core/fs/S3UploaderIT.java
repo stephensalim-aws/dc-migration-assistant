@@ -3,10 +3,9 @@ package com.atlassian.migration.datacenter.core.fs;
 import cloud.localstack.TestUtils;
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
-import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
-import javax.security.auth.callback.TextOutputCallback;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -41,7 +39,7 @@ class S3UploaderIT {
     private ConcurrentLinkedQueue<Path> queue = new ConcurrentLinkedQueue<>();
     private S3Uploader uploader;
     private AtomicBoolean isCrawlDone;
-    private FailedFileMigrationReport errorReport;
+    private DefaultFileSystemMigrationErrorReport errorReport;
 
     @Mock
     private AwsCredentialsProvider mockCredentialsProvider;
@@ -70,7 +68,7 @@ class S3UploaderIT {
             }
         });
 
-        errorReport = new FailedFileMigrationReport();
+        errorReport = new DefaultFileSystemMigrationErrorReport();
         isCrawlDone = new AtomicBoolean(false);
         queue = new ConcurrentLinkedQueue<>();
         uploader = new S3Uploader(config, errorReport);

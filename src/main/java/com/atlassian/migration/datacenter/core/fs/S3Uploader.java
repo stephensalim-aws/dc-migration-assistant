@@ -1,7 +1,7 @@
 package com.atlassian.migration.datacenter.core.fs;
 
-import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
-import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport.FailedFileMigration;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport.FailedFileMigration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -20,11 +20,11 @@ public class S3Uploader implements Uploader {
     private static final Logger logger = LoggerFactory.getLogger(S3Uploader.class);
     private static final int MS_TO_WAIT_FOR_CRAWLER = 500;
 
-    private final FailedFileMigrationReport report;
+    private final DefaultFileSystemMigrationErrorReport report;
     private final Queue<S3UploadOperation> responsesQueue = new LinkedList<>();
     private final S3UploadConfig config;
 
-    public S3Uploader(S3UploadConfig config, FailedFileMigrationReport report) {
+    public S3Uploader(S3UploadConfig config, DefaultFileSystemMigrationErrorReport report) {
         this.report = report;
         this.config = config;
     }

@@ -2,10 +2,10 @@ package com.atlassian.migration.datacenter.core.fs;
 
 import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
-import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
-import com.atlassian.migration.datacenter.spi.fs.DefaultFilesystemMigrationProgress;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFilesystemMigrationProgress;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +26,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
-import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.FAILED;
-import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.RUNNING;
+import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.FAILED;
+import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
 
 @Component
 public class S3FilesystemMigrationService implements FilesystemMigrationService {
@@ -41,7 +41,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     private final JiraHome jiraHome;
 
     private DefaultFilesystemMigrationProgress progress = new DefaultFilesystemMigrationProgress(FilesystemMigrationStatus.NOT_STARTED);
-    private FailedFileMigrationReport errorReport;
+    private DefaultFileSystemMigrationErrorReport errorReport;
     private AtomicBoolean isDoneCrawling;
     private ConcurrentLinkedQueue<Path> uploadQueue;
     private S3UploadConfig config;
@@ -71,7 +71,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     public void startMigration() {
         progress.setStatus(RUNNING);
 
-        errorReport = new FailedFileMigrationReport();
+        errorReport = new DefaultFileSystemMigrationErrorReport();
         isDoneCrawling = new AtomicBoolean(false);
         uploadQueue = new ConcurrentLinkedQueue<>();
 

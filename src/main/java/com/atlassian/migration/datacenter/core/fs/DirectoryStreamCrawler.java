@@ -1,7 +1,7 @@
 package com.atlassian.migration.datacenter.core.fs;
 
-import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
-import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport.FailedFileMigration;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport.FailedFileMigration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +14,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class DirectoryStreamCrawler implements Crawler {
     private static final Logger logger = LoggerFactory.getLogger(DirectoryStreamCrawler.class);
 
-    private FailedFileMigrationReport report;
+    private DefaultFileSystemMigrationErrorReport report;
 
-    public DirectoryStreamCrawler(FailedFileMigrationReport report) {
+    public DirectoryStreamCrawler(DefaultFileSystemMigrationErrorReport report) {
         this.report = report;
     }
 

@@ -1,4 +1,4 @@
-package com.atlassian.migration.datacenter.spi.fs;
+package com.atlassian.migration.datacenter.spi.fs.reporting;
 
 import java.nio.file.Path;
 import java.util.List;
