@@ -38,9 +38,7 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     public void setStatus(FilesystemMigrationStatus status) {
         if (isStartingMigration(status)) {
             startTime = Instant.now(clock);
-        }
-
-        if (isendingMigration(status)) {
+        } else if (isEndingMigration(status)) {
             completeTime = Instant.now(clock);
         }
 
@@ -93,7 +91,7 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
         return this.status != RUNNING && status == RUNNING;
     }
 
-    private boolean isendingMigration(FilesystemMigrationStatus status) {
+    private boolean isEndingMigration(FilesystemMigrationStatus status) {
         return this.status == RUNNING && isTerminalState(status);
     }
 
