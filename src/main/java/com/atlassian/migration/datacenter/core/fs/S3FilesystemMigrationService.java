@@ -55,19 +55,20 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     }
 
     @Override
-    public DefaultFilesystemMigrationProgress getProgress() {
-        throw new UnsupportedOperationException();
+    public boolean isRunning() {
+        return report.getStatus().equals(RUNNING);
     }
 
     @Override
-    public boolean isRunning() {
-        return report.getStatus().equals(RUNNING);
+    public FileSystemMigrationReport getReport() {
+        return report;
     }
 
     /**
      * Start filesystem migration to S3 bucket. This is a blocking operation and should be started from ExecutorService
      * or preferably from ScheduledJob
      */
+    @Override
     public void startMigration() {
         report.setStatus(RUNNING);
 
@@ -84,28 +85,11 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         waitForUploadsToComplete(uploadResults);
     }
 
-    private void waitForUploadsToComplete(CompletionService<Void> uploadResults) {
-        IntStream.range(0, NUM_UPLOAD_THREADS)
-                .forEach(i -> {
-                    try {
-                        uploadResults.take().get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        logger.error("Failed to upload home directory to S3", e);
-                        report.setStatus(FAILED);
-                    }
-                });
-    }
-
-    private void populateUploadQueue() {
-        Crawler homeCrawler = new DirectoryStreamCrawler(report);
-        try {
-            homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
-        } catch (IOException e) {
-            logger.error("Failed to traverse home directory for S3 transfer", e);
-            report.setStatus(FAILED);
-        } finally {
-            isDoneCrawling.set(true);
-        }
+    private S3AsyncClient buildS3Client() {
+        return S3AsyncClient.builder()
+                .credentialsProvider(credentialsProvider)
+                .region(Region.of(regionService.getRegion()))
+                .build();
     }
 
     private CompletionService<Void> startUploadingFromQueue() {
@@ -123,11 +107,28 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         return completionService;
     }
 
-    private S3AsyncClient buildS3Client() {
-        return S3AsyncClient.builder()
-                .credentialsProvider(credentialsProvider)
-                .region(Region.of(regionService.getRegion()))
-                .build();
+    private void populateUploadQueue() {
+        Crawler homeCrawler = new DirectoryStreamCrawler(report);
+        try {
+            homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
+        } catch (IOException e) {
+            logger.error("Failed to traverse home directory for S3 transfer", e);
+            report.setStatus(FAILED);
+        } finally {
+            isDoneCrawling.set(true);
+        }
+    }
+
+    private void waitForUploadsToComplete(CompletionService<Void> uploadResults) {
+        IntStream.range(0, NUM_UPLOAD_THREADS)
+                .forEach(i -> {
+                    try {
+                        uploadResults.take().get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        logger.error("Failed to upload home directory to S3", e);
+                        report.setStatus(FAILED);
+                    }
+                });
     }
 
     private String getS3Bucket() {
