@@ -35,9 +35,9 @@ import static org.mockito.Mockito.when;
 
 @Tag("integration")
 @ExtendWith({LocalstackDockerExtension.class, MockitoExtension.class})
-@LocalstackDockerProperties(services = {"s3"}, imageTag = "0.10.6")
+@LocalstackDockerProperties(services = {"s3:70707"}, imageTag = "0.10.6")
 class S3UploaderIT {
-    private static final String LOCALSTACK_S3_ENDPOINT = "http://localhost:4572";
+    private static final String LOCALSTACK_S3_ENDPOINT = "http://localhost:70707";
     private static final String TREBUCHET_LOCALSTACK_BUCKET = "trebuchet-localstack-bucket";
     private ConcurrentLinkedQueue<Path> queue = new ConcurrentLinkedQueue<>();
     private S3Uploader uploader;

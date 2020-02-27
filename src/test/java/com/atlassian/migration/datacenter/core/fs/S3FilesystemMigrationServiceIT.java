@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 @Tag("integration")
 @ExtendWith({LocalstackDockerExtension.class, MockitoExtension.class})
-@LocalstackDockerProperties(services = {"s3"})
+//@LocalstackDockerProperties(services = {"s3"})
 class S3FilesystemMigrationServiceIT {
     @TempDir
     Path dir;
