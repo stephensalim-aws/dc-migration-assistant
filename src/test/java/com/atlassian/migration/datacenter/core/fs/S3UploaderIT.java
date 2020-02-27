@@ -3,6 +3,7 @@ package com.atlassian.migration.datacenter.core.fs;
 import cloud.localstack.TestUtils;
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
@@ -11,9 +12,14 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
+import javax.security.auth.callback.TextOutputCallback;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -24,10 +30,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @Tag("integration")
-@ExtendWith(LocalstackDockerExtension.class)
-@LocalstackDockerProperties(services = {"s3"})
+@ExtendWith({LocalstackDockerExtension.class, MockitoExtension.class})
+@LocalstackDockerProperties(services = {"s3"}, imageTag="0.10.6")
 class S3UploaderIT {
     private static final String LOCALSTACK_S3_ENDPOINT = "http://localhost:4572";
     private static final String TREBUCHET_LOCALSTACK_BUCKET = "trebuchet-localstack-bucket";
@@ -36,16 +43,32 @@ class S3UploaderIT {
     private AtomicBoolean isCrawlDone;
     private FailedFileMigrationReport errorReport;
 
+    @Mock
+    private AwsCredentialsProvider mockCredentialsProvider;
+
     @TempDir
     Path tempDir;
 
     @BeforeEach
     void setup() {
         S3AsyncClient localStackS3Client = S3AsyncClient.builder()
+                .credentialsProvider(mockCredentialsProvider)
                 .endpointOverride(URI.create(LOCALSTACK_S3_ENDPOINT))
                 .region(Region.US_EAST_1)
                 .build();
         S3UploadConfig config = new S3UploadConfig(TREBUCHET_LOCALSTACK_BUCKET, localStackS3Client, tempDir);
+
+        when(mockCredentialsProvider.resolveCredentials()).thenReturn(new AwsCredentials() {
+            @Override
+            public String accessKeyId() {
+                return "fake-access-key";
+            }
+
+            @Override
+            public String secretAccessKey() {
+                return "fake-secret-key";
+            }
+        });
 
         errorReport = new FailedFileMigrationReport();
         isCrawlDone = new AtomicBoolean(false);
@@ -67,6 +90,16 @@ class S3UploaderIT {
 
         final List<S3ObjectSummary> objectSummaries = s3Client.listObjects(TREBUCHET_LOCALSTACK_BUCKET).getObjectSummaries();
 
+        assertEquals(
+                errorReport.getFailedFiles().size(),
+                0,
+                String.format(
+                        "expected no upload errors but found %s",
+                        errorReport.getFailedFiles()
+                                .stream()
+                                .reduce("",
+                                        (acc, failedMigration) -> String.format("%s%s: %s\n", acc, failedMigration.getFilePath().toString(),
+                                                failedMigration.getReason()), (acc, partial) -> acc + "\n" + partial)));
         assertEquals(objectSummaries.size(), 1);
         assertEquals(objectSummaries.get(0).getKey(), tempDir.relativize(file).toString());
     }
