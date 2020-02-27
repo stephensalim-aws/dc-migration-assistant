@@ -12,19 +12,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.FAILED;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.NOT_STARTED;
+import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultFileSystemMigrationReportTest {
 
     private DefaultFileSystemMigrationReport sut;
-
 
     @Spy
     FileSystemMigrationProgress progress;
@@ -72,5 +74,20 @@ public class DefaultFileSystemMigrationReportTest {
         sut.getMigratedFiles();
 
         verify(progress).getMigratedFiles();
+    }
+
+    @Test
+    void shouldGiveDurationBetweenStartedAndGetElapsedTime() {
+        Clock testClock = Clock.fixed(Instant.ofEpochMilli(0), ZoneId.systemDefault());
+        sut.setClock(testClock);
+
+        sut.setStatus(RUNNING);
+
+        assertEquals(Duration.ZERO, sut.getElapsedTime());
+
+        sut.setClock(Clock.offset(testClock, Duration.ofDays(1).plusSeconds(5)));
+
+        assertEquals(1L, sut.getElapsedTime().toDays());
+        assertEquals(5L, sut.getElapsedTime().minusDays(1).getSeconds());
     }
 }
