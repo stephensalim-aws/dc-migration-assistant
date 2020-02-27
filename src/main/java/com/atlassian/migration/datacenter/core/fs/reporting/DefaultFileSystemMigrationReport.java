@@ -25,12 +25,12 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
 
     private Instant startTime;
     private Instant completeTime;
-    private FilesystemMigrationStatus status;
+    private FilesystemMigrationStatus currentStatus;
 
     public DefaultFileSystemMigrationReport(FileSystemMigrationErrorReport errorReport, FileSystemMigrationProgress progress) {
         this.errorReport = errorReport;
         this.progress = progress;
-        this.status = NOT_STARTED;
+        this.currentStatus = NOT_STARTED;
         this.clock = Clock.systemUTC();
     }
 
@@ -42,12 +42,12 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
             completeTime = Instant.now(clock);
         }
 
-        this.status = status;
+        this.currentStatus = status;
     }
 
     @Override
     public FilesystemMigrationStatus getStatus() {
-        return status;
+        return currentStatus;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     }
 
     private boolean isRunning() {
-        return status == RUNNING;
+        return currentStatus == RUNNING;
     }
 
     @Override
@@ -87,16 +87,16 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
         this.clock = clock;
     }
 
-    private boolean isStartingMigration(FilesystemMigrationStatus status) {
-        return this.status != RUNNING && status == RUNNING;
+    private boolean isStartingMigration(FilesystemMigrationStatus toStatus) {
+        return this.currentStatus != RUNNING && toStatus == RUNNING;
     }
 
-    private boolean isEndingMigration(FilesystemMigrationStatus status) {
-        return this.status == RUNNING && isTerminalState(status);
+    private boolean isEndingMigration(FilesystemMigrationStatus toStatus) {
+        return this.currentStatus == RUNNING && isTerminalState(toStatus);
     }
 
-    private boolean isTerminalState(FilesystemMigrationStatus status) {
-        return status == DONE || status == FAILED;
+    private boolean isTerminalState(FilesystemMigrationStatus toStatus) {
+        return toStatus == DONE || toStatus == FAILED;
     }
 }
 
