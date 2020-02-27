@@ -43,7 +43,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     private final RegionService regionService;
     private final JiraHome jiraHome;
 
-    private FileSystemMigrationReport report = new DefaultFileSystemMigrationReport(new DefaultFileSystemMigrationErrorReport(), new DefaultFilesystemMigrationProgress());
+    private FileSystemMigrationReport report;
     private AtomicBoolean isDoneCrawling;
     private ConcurrentLinkedQueue<Path> uploadQueue;
     private S3UploadConfig config;
@@ -58,7 +58,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
 
     @Override
     public boolean isRunning() {
-        return report.getStatus().equals(RUNNING);
+        return report != null && report.getStatus().equals(RUNNING);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     }
 
     private void initialiseMigration() {
-        report.setStatus(RUNNING);
+        report = new DefaultFileSystemMigrationReport(new DefaultFileSystemMigrationErrorReport(), new DefaultFilesystemMigrationProgress());
         isDoneCrawling = new AtomicBoolean(false);
         uploadQueue = new ConcurrentLinkedQueue<>();
         S3AsyncClient s3AsyncClient = buildS3Client();

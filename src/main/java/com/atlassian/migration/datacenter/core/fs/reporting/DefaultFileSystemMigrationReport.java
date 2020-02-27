@@ -8,6 +8,8 @@ import com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationSt
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.NOT_STARTED;
+
 public class DefaultFileSystemMigrationReport implements FileSystemMigrationReport {
 
     private final FileSystemMigrationErrorReport errorReport;
@@ -18,6 +20,7 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     public DefaultFileSystemMigrationReport(FileSystemMigrationErrorReport errorReport, FileSystemMigrationProgress progress) {
         this.errorReport = errorReport;
         this.progress = progress;
+        this.status = NOT_STARTED;
     }
 
     @Override
