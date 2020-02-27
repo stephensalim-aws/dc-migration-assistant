@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.core.aws;
 
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
+import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudformation.CloudFormationAsyncClient;
@@ -23,6 +24,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+@Component
 public class CfnApi {
     private AwsCredentialsProvider credentialsProvider;
     private RegionService regionManager;
