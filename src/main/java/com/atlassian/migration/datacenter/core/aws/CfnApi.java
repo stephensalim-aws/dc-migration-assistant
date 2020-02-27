@@ -1,7 +1,9 @@
 package com.atlassian.migration.datacenter.core.aws;
 
+import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudformation.CloudFormationAsyncClient;
 import software.amazon.awssdk.services.cloudformation.model.CreateStackRequest;
 import software.amazon.awssdk.services.cloudformation.model.CreateStackResponse;
@@ -24,20 +26,33 @@ import java.util.stream.Collectors;
 
 @Component
 public class CfnApi {
+    private AwsCredentialsProvider credentialsProvider;
+    private RegionService regionManager;
 
-    private final CloudFormationAsyncClient client;
+    private Optional<CloudFormationAsyncClient> client;
 
-    public CfnApi() {
-        this(buildCloudFormationClient());
+    public CfnApi(AwsCredentialsProvider credentialsProvider, RegionService regionManager)
+    {
+        this.credentialsProvider = credentialsProvider;
+        this.regionManager = regionManager;
+        this.client = Optional.empty();
     }
 
-    public CfnApi(CloudFormationAsyncClient cloudFormationClient) {
-        this.client = cloudFormationClient;
-    }
+    /**
+     * Lazily create a CFN client; should only be called after necessary AWS information has been provided.
+     */
+    private CloudFormationAsyncClient getClient() {
+        if (client.isPresent()) {
+            return client.get();
+        }
 
-    private static CloudFormationAsyncClient buildCloudFormationClient() {
-        return CloudFormationAsyncClient.builder().credentialsProvider(DefaultCredentialsProvider.create()).build();
+        CloudFormationAsyncClient client = CloudFormationAsyncClient.builder()
+            .credentialsProvider(credentialsProvider)
+            .region(Region.of(regionManager.getRegion()))
+            .build();
 
+        this.client = Optional.of(client);
+        return client;
     }
 
     public StackStatus getStatus(String stackName) {
@@ -70,10 +85,11 @@ public class CfnApi {
                 .build();
 
         try {
-            return Optional.ofNullable(this.client
-                    .createStack(createStackRequest)
-                    .thenApply(CreateStackResponse::stackId)
-                    .get());
+            String stackId = this.getClient()
+                .createStack(createStackRequest)
+                .thenApply(CreateStackResponse::stackId)
+                .get();
+            return Optional.ofNullable(stackId);
         } catch (InterruptedException | ExecutionException e) {
             return Optional.empty();
         }
@@ -84,7 +100,8 @@ public class CfnApi {
                 .stackName(stackName)
                 .build();
 
-        CompletableFuture<DescribeStacksResponse> asyncResponse = this.client.describeStacks(request);
+        CompletableFuture<DescribeStacksResponse> asyncResponse = getClient()
+            .describeStacks(request);
 
         try {
             DescribeStacksResponse response = asyncResponse.join();

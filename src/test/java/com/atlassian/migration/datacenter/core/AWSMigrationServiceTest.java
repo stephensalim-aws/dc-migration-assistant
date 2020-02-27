@@ -13,25 +13,20 @@ import com.atlassian.scheduler.SchedulerService;
 import net.java.ao.EntityManager;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.HashMap;
 import java.util.Optional;
 
-import static com.atlassian.migration.datacenter.spi.MigrationStage.NOT_STARTED;
-import static com.atlassian.migration.datacenter.spi.MigrationStage.READY_FS_MIGRATION;
-import static com.atlassian.migration.datacenter.spi.MigrationStage.STARTED;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 // We have to use the JUnit 4 API because there is no JUnit 5 active objects extension :(
 @RunWith(ActiveObjectsJUnitRunner.class)
@@ -40,18 +35,17 @@ public class AWSMigrationServiceTest {
     private ActiveObjects ao;
     private EntityManager entityManager;
     private AWSMigrationService sut;
-    private CfnApi cfnApi;
-    private FilesystemMigrationService filesystemMigrationService;
-    private SchedulerService schedulerService;
+
+    @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Mock private CfnApi cfnApi;
+    @Mock private FilesystemMigrationService filesystemMigrationService;
+    @Mock private SchedulerService schedulerService;
 
     @Before
     public void setup() {
         assertNotNull(entityManager);
 
         ao = new TestActiveObjects(entityManager);
-        filesystemMigrationService = mock(FilesystemMigrationService.class);
-        cfnApi = mock(CfnApi.class);
-        schedulerService = mock(SchedulerService.class);
 
         sut = new AWSMigrationService(ao, filesystemMigrationService, cfnApi, schedulerService);
     }

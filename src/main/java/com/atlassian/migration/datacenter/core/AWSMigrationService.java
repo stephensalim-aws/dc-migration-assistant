@@ -34,11 +34,10 @@ import static java.util.Objects.requireNonNull;
 public class AWSMigrationService implements MigrationService {
     private static final Logger log = LoggerFactory.getLogger(AWSMigrationService.class);
     private final FilesystemMigrationService fsService;
-    private final CfnApi cfnApi;
     private final SchedulerService schedulerService;
+    private final CfnApi cfnApi;
     private ActiveObjects ao;
     private Migration migration;
-
 
     /**
      * Creates a new, unstarted AWS Migration
@@ -91,6 +90,7 @@ public class AWSMigrationService implements MigrationService {
         }
         return migration;
     }
+
 
     /**
      * {@inheritDoc}
