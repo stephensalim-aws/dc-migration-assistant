@@ -23,8 +23,9 @@ const QUICKSTART_PARAMS_URL =
     'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/test-create-s3-bucket.parameters.yaml';
 
 const STACK_NAME_FIELD_NAME = 'QSStackName';
+// TODO: Automatically, change this to 'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml' during development/testing.
 const stackProvisioningTemplateUrl =
-    'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml';
+    'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-jira/templates/quickstart-jira-dc-with-vpc.template.yaml';
 
 const isOptionType = (obj: any): obj is OptionType => {
     return obj.label && obj.value;
@@ -82,6 +83,7 @@ const QuickstartForm = ({
                 // Hoist value from Select/Multiselect inputs to root of form value
                 const [key, value] = entry;
                 if (key === STACK_NAME_FIELD_NAME) {
+                    // stackName is handled separately as it is sent as a separate parameter to AWS API
                     stackNameValue = value;
                     delete transformedCfnParams[key];
                 } else if (isOptionType(value)) {
@@ -102,9 +104,9 @@ const QuickstartForm = ({
                     }
                     return response;
                 })
-                .then(x => x.text())
+                .then(r => r.text())
                 .catch(err => {
-                    console.log(err);
+                    console.error(err);
                 });
         }}
     >
