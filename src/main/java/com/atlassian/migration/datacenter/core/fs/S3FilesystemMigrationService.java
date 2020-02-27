@@ -17,13 +17,14 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
 
 import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.FAILED;
 import static com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus.RUNNING;
@@ -77,20 +78,19 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         S3AsyncClient s3AsyncClient = buildS3Client();
         config = new S3UploadConfig(getS3Bucket(), s3AsyncClient, getSharedHomeDir());
 
-        List<Future<FailedFileMigrationReport>> uploadResults = startUploadingFromQueue();
+        CompletionService<Void> uploadResults = startUploadingFromQueue();
 
         populateUploadQueue();
 
-        uploadResults.forEach(result -> {
-            try {
-                FailedFileMigrationReport report = result.get();
-                progress.accumulateFileFailures(report);
-            } catch (InterruptedException | ExecutionException e) {
-                logger.error("Failed to upload home directory to S3", e);
-                progress.setStatus(FAILED);
-                return;
-            }
-        });
+        IntStream.range(0, NUM_UPLOAD_THREADS)
+                .forEach(i -> {
+                    try {
+                        uploadResults.take().get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        logger.error("Failed to upload home directory to S3", e);
+                        progress.setStatus(FAILED);
+                    }
+                });
     }
 
     private void populateUploadQueue() {
@@ -105,21 +105,19 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         }
     }
 
-    private List<Future<FailedFileMigrationReport>> startUploadingFromQueue() {
+    private CompletionService<Void> startUploadingFromQueue() {
         ExecutorService uploadService = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
+        CompletionService<Void> completionService = new ExecutorCompletionService<>(uploadService);
 
         Runnable uploaderFunction = () -> {
             Uploader uploader = new S3Uploader(config, errorReport);
             uploader.upload(uploadQueue, isDoneCrawling);
         };
 
-//        try {
-//            return uploadService.invokeAll(Collections.nCopies(NUM_UPLOAD_THREADS, uploaderFunction));
-//        } catch (InterruptedException e) {
-//            logger.error("Interrupted while uploading files, at least {} files remaining", uploadQueue.size());
-//            progress.setStatus(FAILED);
-//        }
-        return Collections.emptyList();
+        Collections.nCopies(NUM_UPLOAD_THREADS, uploaderFunction)
+                .forEach(runnable -> completionService.submit(runnable, null));
+
+        return completionService;
     }
 
     private S3AsyncClient buildS3Client() {
@@ -130,7 +128,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     }
 
     private String getS3Bucket() {
-        return "slingshot-test-2";
+        return BUCKET_NAME;
     }
 
     private Path getSharedHomeDir() {
