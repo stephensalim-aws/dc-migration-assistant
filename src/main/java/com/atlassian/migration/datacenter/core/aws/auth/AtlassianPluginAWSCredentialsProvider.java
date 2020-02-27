@@ -26,11 +26,12 @@ public class AtlassianPluginAWSCredentialsProvider implements AwsCredentialsProv
 
     /**
      * AWS SDK V2 credentials API
+     *
      * @return AWS Credentials to be used with SDK V2 clients
      */
     @Override
     public AwsCredentials resolveCredentials() {
-        if(accessKeyIsDefined() && secretKeyIsDefined()) {
+        if (accessKeyIsDefined() && secretKeyIsDefined()) {
             return new AwsCredentials() {
                 @Override
                 public String accessKeyId() {

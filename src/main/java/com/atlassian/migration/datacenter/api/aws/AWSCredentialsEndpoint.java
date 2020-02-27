@@ -44,7 +44,7 @@ public class AWSCredentialsEndpoint {
     public Response testCredentialsSDKV2() {
         try {
             return Response.ok(probe.probeSDKV2()).build();
-        } catch(CloudFormationException cfne) {
+        } catch (CloudFormationException cfne) {
             if (cfne.statusCode() == 401 || cfne.statusCode() == 403) {
                 return Response
                         .status(Response.Status.BAD_REQUEST)
