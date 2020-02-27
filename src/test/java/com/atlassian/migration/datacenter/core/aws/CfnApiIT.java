@@ -1,9 +1,14 @@
 package com.atlassian.migration.datacenter.core.aws;
 
+import com.atlassian.migration.datacenter.core.aws.auth.AtlassianPluginAWSCredentialsProvider;
+import com.atlassian.migration.datacenter.core.aws.region.InvalidAWSRegionException;
+import com.atlassian.migration.datacenter.core.aws.region.PluginSettingsRegionManager;
+import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.services.cloudformation.model.Stack;
 import software.amazon.awssdk.services.cloudformation.model.StackInstanceNotFoundException;
 import software.amazon.awssdk.services.cloudformation.model.StackStatus;
@@ -32,7 +37,14 @@ class CfnApiIT {
 
     @BeforeEach
     void setUp() {
-        cfnApi = new CfnApi();
+        RegionService regionManager = new RegionService() {
+            @Override
+            public String getRegion() { return System.getenv("AWS_DEFAULT_REGION"); }
+
+            @Override
+            public void storeRegion(String string) { throw new UnsupportedOperationException(); }
+        };
+        cfnApi = new CfnApi(DefaultCredentialsProvider.create(), regionManager);
     }
 
     @Test
