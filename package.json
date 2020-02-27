@@ -5,7 +5,10 @@
     "author": "Atlassian Pty Ltd",
     "license": "Apache 2",
     "dependencies": {
+        "@atlaskit/icon": "^20.0.1",
+        "@atlaskit/css-reset": "latest",
         "@atlaskit/button": "^13.3.5",
+        "@atlaskit/flag": "^12.3.8",
         "@atlaskit/form": "^6.3.2",
         "@atlaskit/select": "^11.0.5",
         "@atlaskit/spinner": "^12.1.3",

@@ -12,6 +12,16 @@
     tslib "^1.9.3"
     use-memo-one "^1.1.1"
 
+"@atlaskit/analytics-next@^6.3.5":
+  version "6.3.5"
+  resolved "https://registry.yarnpkg.com/@atlaskit/analytics-next/-/analytics-next-6.3.5.tgz#3a43de9d94e74773e2268fcaa40058ca6326128e"
+  integrity sha512-jbwmHEXj4ZgzVeLMmqzKNPM0SDhYWYHCzzkIKt/YUcZBX8LxgSLj68VyxrQY8RpuFWHlbcKhnO7biD6cZVu53A==
+  dependencies:
+    "@atlaskit/type-helpers" "^4.2.3"
+    prop-types "^15.5.10"
+    tslib "^1.9.3"
+    use-memo-one "^1.1.1"
+
 "@atlaskit/button@^13.3.5":
   version "13.3.5"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/button/-/button-13.3.5.tgz#6afd8f5cfc6e07ecfa7858fc689fe4bf5b28ca9c"
@@ -24,6 +34,42 @@
     "@emotion/core" "^10.0.9"
     memoize-one "^5.1.0"
     tslib "^1.9.3"
+
+"@atlaskit/button@^13.3.7":
+  version "13.3.7"
+  resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-13.3.7.tgz#21388e3430faf44cead7f7a0912f190595773229"
+  integrity sha512-jt66+i7RwoA4s94gpxawTLDnGHkMKb36K8rrpejS+ZqHL6qUisiRv7dVaMatvUyOZYdOkHWc71pMYasRPi5+lg==
+  dependencies:
+    "@atlaskit/analytics-next" "^6.3.5"
+    "@atlaskit/spinner" "^12.1.4"
+    "@atlaskit/theme" "^9.5.1"
+    "@atlaskit/type-helpers" "^4.2.3"
+    "@emotion/core" "^10.0.9"
+    memoize-one "^5.1.0"
+    tslib "^1.9.3"
+
+"@atlaskit/css-reset@latest":
+  version "5.0.10"
+  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-5.0.10.tgz#a3fcd9df79eeca8c1a4399d6512b591ae8d6ea42"
+  integrity sha512-Tio6V4u3wAIAAXPcsbKSc/dDSYWBZjZAT1NGkmj9c85koM4TSvG7quzlyAh8XuGfwqanwLCHex4897uCIEaEWQ==
+  dependencies:
+    "@atlaskit/theme" "^9.5.1"
+    fbjs "^1.0.0"
+    mkdirp "^0.5.1"
+
+"@atlaskit/flag@^12.3.8":
+  version "12.3.8"
+  resolved "https://registry.yarnpkg.com/@atlaskit/flag/-/flag-12.3.8.tgz#265036065ae83d9f71c0776519cf4b70f6215ab8"
+  integrity sha512-e+dGxAu7xSDw19wmqQg2klN0pgu98e8dZsuNUZK/LiUB1c/+h2mspOPjZK+LeUMoNYKUnYJsq0bnTNPS9ModzQ==
+  dependencies:
+    "@atlaskit/analytics-next" "^6.3.5"
+    "@atlaskit/button" "^13.3.7"
+    "@atlaskit/icon" "^20.0.2"
+    "@atlaskit/portal" "^3.1.6"
+    "@atlaskit/theme" "^9.5.1"
+    react-transition-group "^2.2.1"
+    tslib "^1.9.3"
+    uuid "^3.1.0"
 
 "@atlaskit/form@^6.3.2":
   version "6.3.2"
@@ -48,6 +94,25 @@
     "@atlaskit/theme" "^9.5.0"
     tslib "^1.9.3"
     uuid "^3.1.0"
+
+"@atlaskit/icon@^20.0.1", "@atlaskit/icon@^20.0.2":
+  version "20.0.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-20.0.2.tgz#cd2b358b387c30001d220bc2e00477f08e40d267"
+  integrity sha512-/dv1HxD36LaR7QNbtKMl7pfe9akYu/9sLrOjlcI9Oh0rVIMaRTwFufOyWQi9DeRqjkAmCVLT+uht+kfqaI/48A==
+  dependencies:
+    "@atlaskit/theme" "^9.5.1"
+    tslib "^1.9.3"
+    uuid "^3.1.0"
+
+"@atlaskit/portal@^3.1.6":
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/@atlaskit/portal/-/portal-3.1.6.tgz#a7493bb327ecc4a744bd747c020068af16d8d1fd"
+  integrity sha512-HyMZWGnn84YTzHA1fDA0NN/KdsHEFYCLngL1NyFufpJmFs/4Nri14WRetYnQSuC0aXdC/RDlYbGUEiXo2pY6nQ==
+  dependencies:
+    "@atlaskit/theme" "^9.5.1"
+    exenv "^1.2.2"
+    tiny-invariant "^0.0.3"
+    tslib "^1.9.3"
 
 "@atlaskit/select@^11.0.5":
   version "11.0.5"
@@ -78,6 +143,15 @@
     react-transition-group "^2.2.1"
     tslib "^1.9.3"
 
+"@atlaskit/spinner@^12.1.4":
+  version "12.1.4"
+  resolved "https://registry.yarnpkg.com/@atlaskit/spinner/-/spinner-12.1.4.tgz#0dcd0e30c3fadc83f5398103382f87d1e3dfeb1b"
+  integrity sha512-2vF6y0IjiLhTzFtHIlFpVu/LzdDcAYypRV4ywxQQrsAtDJU+f+dc5P2tgmIaUVsOb4slhRGlf2kwfdNp1RJoDA==
+  dependencies:
+    "@atlaskit/theme" "^9.5.1"
+    react-transition-group "^2.2.1"
+    tslib "^1.9.3"
+
 "@atlaskit/textfield@^3.1.4":
   version "3.1.4"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/textfield/-/textfield-3.1.4.tgz#cec0b4843472937a917a261f5abfdad385715a8e"
@@ -97,6 +171,15 @@
     prop-types "^15.5.10"
     tslib "^1.9.3"
 
+"@atlaskit/theme@^9.5.1":
+  version "9.5.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-9.5.1.tgz#c866806dd0cc140524ba1083cdba250021914251"
+  integrity sha512-GTTqNfrPuoGC9Yvpu604iIrsFy5ljHcVt19yjpw9QQ5c0cRl+6suAVSJN38OA9+AfACvvPd38UaDbn9xoTAuOQ==
+  dependencies:
+    exenv "^1.2.2"
+    prop-types "^15.5.10"
+    tslib "^1.9.3"
+
 "@atlaskit/toggle@^8.1.3":
   version "8.1.3"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/toggle/-/toggle-8.1.3.tgz#2f4b531e471eca7a734913ac290482ace93d742c"
@@ -111,6 +194,11 @@
   version "4.2.2"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/@atlaskit/type-helpers/-/type-helpers-4.2.2.tgz#fb1524ad9745e879fb051cabf3012c3a95d05407"
   integrity sha1-+xUkrZdF6Hn7BRyr8wEsOpXQVAc=
+
+"@atlaskit/type-helpers@^4.2.3":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/@atlaskit/type-helpers/-/type-helpers-4.2.3.tgz#64a183f3d5e499303e6bf494c7012f4fa54d8a7b"
+  integrity sha512-0lcdjiQdKQXoXq/V4fzJRjnhbSsto93oZuMEEJRQE9Jyr3Y7HvAcoG09EzIwPbhS1o7ddov22Uv649q+4TVi1A==
 
 "@atlassian/i18n-properties-loader@^0.7.3":
   version "0.7.3"
@@ -3322,10 +3410,10 @@ core-js-pure@^3.0.0:
   resolved "https://packages.atlassian.com/api/npm/npm-remote/core-js-pure/-/core-js-pure-3.6.4.tgz#4bf1ba866e25814f149d4e9aaa08c36173506e3a"
   integrity sha1-S/G6hm4lgU8UnU6aqgjDYXNQbjo=
 
-core-js@^2.4.0, core-js@^2.6.5:
+core-js@^2.4.0, core-js@^2.4.1, core-js@^2.6.5:
   version "2.6.11"
-  resolved "https://packages.atlassian.com/api/npm/npm-remote/core-js/-/core-js-2.6.11.tgz#38831469f9922bded8ee21c9dc46985e0399308c"
-  integrity sha1-OIMUafmSK97Y7iHJ3EaYXgOZMIw=
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.11.tgz#38831469f9922bded8ee21c9dc46985e0399308c"
+  integrity sha512-5wjnpaT/3dV+XB4borEsnAYQchn00XSgTAWKDkEqv+K8KevjbzmofK6hfJ9TZIlpj2N0xQpazy7PiRQiWHqzWg==
 
 core-js@^3.5.0:
   version "3.6.4"
@@ -4103,6 +4191,13 @@ encodeurl@~1.0.2:
   resolved "https://packages.atlassian.com/api/npm/npm-remote/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
   integrity sha1-rT/0yG7C0CkyL1oCw6mmBslbP1k=
 
+encoding@^0.1.11:
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/encoding/-/encoding-0.1.12.tgz#538b66f3ee62cd1ab51ec323829d1f9480c74beb"
+  integrity sha1-U4tm8+5izRq1HsMjgp0flIDHS+s=
+  dependencies:
+    iconv-lite "~0.4.13"
+
 end-of-stream@^1.0.0, end-of-stream@^1.1.0:
   version "1.4.4"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/end-of-stream/-/end-of-stream-1.4.4.tgz#5ae64a5f45057baf3626ec14da0ca5e4b2431eb0"
@@ -4832,6 +4927,25 @@ fb-watchman@^2.0.0:
   integrity sha1-/IT7OdJwnPP/bXQ3BhV7tXCKioU=
   dependencies:
     bser "2.1.1"
+
+fbjs-css-vars@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/fbjs-css-vars/-/fbjs-css-vars-1.0.2.tgz#216551136ae02fe255932c3ec8775f18e2c078b8"
+  integrity sha512-b2XGFAFdWZWg0phtAWLHCk836A1Xann+I+Dgd3Gk64MHKZO44FfoD1KxyvbSh0qZsIoXQGGlVztIY+oitJPpRQ==
+
+fbjs@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-1.0.0.tgz#52c215e0883a3c86af2a7a776ed51525ae8e0a5a"
+  integrity sha512-MUgcMEJaFhCaF1QtWGnmq9ZDRAzECTCRAF7O6UZIlAlkTs1SasiX9aP0Iw7wfD2mJ7wDTNfg2w7u5fSCwJk1OA==
+  dependencies:
+    core-js "^2.4.1"
+    fbjs-css-vars "^1.0.0"
+    isomorphic-fetch "^2.1.1"
+    loose-envify "^1.0.0"
+    object-assign "^4.1.0"
+    promise "^7.1.1"
+    setimmediate "^1.0.5"
+    ua-parser-js "^0.7.18"
 
 figgy-pudding@^3.5.1:
   version "3.5.1"
@@ -5660,10 +5774,10 @@ https-browserify@^1.0.0:
   resolved "https://packages.atlassian.com/api/npm/npm-remote/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
   integrity sha1-7AbBDgo0wPL68Zn3/X/Hj//QPHM=
 
-iconv-lite@0.4.24, iconv-lite@^0.4.24:
+iconv-lite@0.4.24, iconv-lite@^0.4.24, iconv-lite@~0.4.13:
   version "0.4.24"
-  resolved "https://packages.atlassian.com/api/npm/npm-remote/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
-  integrity sha1-ICK0sl+93CHS9SSXSkdKr+czkIs=
+  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
+  integrity sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
@@ -6203,9 +6317,9 @@ is-root@2.1.0:
   resolved "https://packages.atlassian.com/api/npm/npm-remote/is-root/-/is-root-2.1.0.tgz#809e18129cf1129644302a4f8544035d51984a9c"
   integrity sha1-gJ4YEpzxEpZEMCpPhUQDXVGYSpw=
 
-is-stream@^1.1.0:
+is-stream@^1.0.1, is-stream@^1.1.0:
   version "1.1.0"
-  resolved "https://packages.atlassian.com/api/npm/npm-remote/is-stream/-/is-stream-1.1.0.tgz#12d4a3dd4e68e0b79ceb8dbc84173ae80d91ca44"
+  resolved "https://registry.yarnpkg.com/is-stream/-/is-stream-1.1.0.tgz#12d4a3dd4e68e0b79ceb8dbc84173ae80d91ca44"
   integrity sha1-EtSj3U5o4Lec6428hBc66A2RykQ=
 
 is-string@^1.0.5:
@@ -6268,6 +6382,14 @@ isobject@^3.0.0, isobject@^3.0.1:
   version "3.0.1"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
   integrity sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
+
+isomorphic-fetch@^2.1.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/isomorphic-fetch/-/isomorphic-fetch-2.2.1.tgz#611ae1acf14f5e81f729507472819fe9733558a9"
+  integrity sha1-YRrhrPFPXoH3KVB0coGf6XM1WKk=
+  dependencies:
+    node-fetch "^1.0.1"
+    whatwg-fetch ">=0.10.0"
 
 isstream@~0.1.2:
   version "0.1.2"
@@ -7630,6 +7752,14 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
+node-fetch@^1.0.1:
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-1.7.3.tgz#980f6f72d85211a5347c6b2bc18c5b84c3eb47ef"
+  integrity sha512-NhZ4CsKx7cYm2vSrBAr2PvFOe6sWDf0UYLRqA6svUYg7+/TSfVAu49jYC4BvQ4Sms9SZgdqGBgroqfDhJdTyKQ==
+  dependencies:
+    encoding "^0.1.11"
+    is-stream "^1.0.1"
+
 node-forge@0.9.0:
   version "0.9.0"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/node-forge/-/node-forge-0.9.0.tgz#d624050edbb44874adca12bb9a52ec63cb782579"
@@ -7758,7 +7888,7 @@ oauth-sign@~0.9.0:
   resolved "https://packages.atlassian.com/api/npm/npm-remote/oauth-sign/-/oauth-sign-0.9.0.tgz#47a7b016baa68b5fa0ecf3dee08a85c679ac6455"
   integrity sha1-R6ewFrqmi1+g7PPe4IqFxnmsZFU=
 
-object-assign@^4.0.1, object-assign@^4.1.1:
+object-assign@^4.0.1, object-assign@^4.1.0, object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
   integrity sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=
@@ -10134,9 +10264,9 @@ set-value@^2.0.0, set-value@^2.0.1:
     is-plain-object "^2.0.3"
     split-string "^3.0.1"
 
-setimmediate@^1.0.4:
+setimmediate@^1.0.4, setimmediate@^1.0.5:
   version "1.0.5"
-  resolved "https://packages.atlassian.com/api/npm/npm-remote/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
+  resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
   integrity sha1-KQy7Iy4waULX1+qbg3Mqt4VvgoU=
 
 setprototypeof@1.1.0:
@@ -11099,6 +11229,11 @@ typescript@^3.6.3:
   resolved "https://packages.atlassian.com/api/npm/npm-remote/typescript/-/typescript-3.7.5.tgz#0692e21f65fd4108b9330238aac11dd2e177a1ae"
   integrity sha1-BpLiH2X9QQi5MwI4qsEd0uF3oa4=
 
+ua-parser-js@^0.7.18:
+  version "0.7.21"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.21.tgz#853cf9ce93f642f67174273cc34565ae6f308777"
+  integrity sha512-+O8/qh/Qj8CgC6eYBVBykMrNtp5Gebn4dlGD/kKXVkJNDwyrAwSIqwz8CDf+tsAIWVycKcku6gIXJ0qwx/ZXaQ==
+
 uglify-js@3.4.x:
   version "3.4.10"
   resolved "https://packages.atlassian.com/api/npm/npm-remote/uglify-js/-/uglify-js-3.4.10.tgz#9ad9563d8eb3acdfb8d38597d2af1d815f6a755f"
@@ -11629,10 +11764,10 @@ whatwg-encoding@^1.0.1, whatwg-encoding@^1.0.3, whatwg-encoding@^1.0.5:
   dependencies:
     iconv-lite "0.4.24"
 
-whatwg-fetch@^3.0.0:
+whatwg-fetch@>=0.10.0, whatwg-fetch@^3.0.0:
   version "3.0.0"
-  resolved "https://packages.atlassian.com/api/npm/npm-remote/whatwg-fetch/-/whatwg-fetch-3.0.0.tgz#fc804e458cc460009b1a2b966bc8817d2578aefb"
-  integrity sha1-/IBORYzEYACbGiuWa8iBfSV4rvs=
+  resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-3.0.0.tgz#fc804e458cc460009b1a2b966bc8817d2578aefb"
+  integrity sha512-9GSJUgz1D4MfyKU7KRqwOjXCXTqWdFNvEr7eUBYchQiVc744mqK/MzXPNR2WsPkmkOa4ywfg8C2n8h+13Bey1Q==
 
 whatwg-mimetype@^2.1.0, whatwg-mimetype@^2.2.0, whatwg-mimetype@^2.3.0:
   version "2.3.0"
