@@ -35,9 +35,9 @@ public class AWSMigrationService implements MigrationService {
     private static final Logger log = LoggerFactory.getLogger(AWSMigrationService.class);
     private final FilesystemMigrationService fsService;
     private final SchedulerService schedulerService;
+    private final CfnApi cfnApi;
     private ActiveObjects ao;
     private Migration migration;
-    private CfnApi cfnApi;
 
     /**
      * Creates a new, unstarted AWS Migration
@@ -48,8 +48,8 @@ public class AWSMigrationService implements MigrationService {
                                @ComponentImport SchedulerService schedulerService) {
         this.ao = requireNonNull(ao);
         this.fsService = fileService;
-        this.schedulerService = schedulerService;
         this.cfnApi = cfnApi;
+        this.schedulerService = schedulerService;
     }
 
     /**
@@ -103,7 +103,7 @@ public class AWSMigrationService implements MigrationService {
             throw new InvalidMigrationStageError(String.format("Expected migration stage was %s, but found %s", MigrationStage.READY_TO_PROVISION, currentMigrationStage));
         }
 
-        Optional<String> stackIdentifier = cfnApi.provisionStack(config.getTemplateUrl(), config.getStackName(), config.getParams());
+        Optional<String> stackIdentifier = this.cfnApi.provisionStack(config.getTemplateUrl(), config.getStackName(), config.getParams());
         if (stackIdentifier.isPresent()) {
             updateMigrationStage(MigrationStage.PROVISIONING_IN_PROGRESS);
             return stackIdentifier.get();
@@ -116,7 +116,7 @@ public class AWSMigrationService implements MigrationService {
     @Override
     public Optional<String> getInfrastructureProvisioningStatus(String stackId) {
         try {
-            StackStatus status = cfnApi.getStatus(stackId);
+            StackStatus status = this.cfnApi.getStatus(stackId);
             return Optional.of(status.toString());
         } catch (StackInstanceNotFoundException e) {
             return Optional.empty();
