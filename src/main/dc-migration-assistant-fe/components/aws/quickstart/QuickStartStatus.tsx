@@ -12,23 +12,24 @@ const QuickStartStatusContainer = styled.div`
 `;
 
 const stageStatusFlag = (currentProvisioningStatus: string): ReactElement => {
+    const renderProvisioningStatus = (status: string) => {
+        if (status === 'CREATE_COMPLETE') {
+            return <SuccessIcon primaryColor="#36B37E" label="Success" />;
+        }
+        if (status === 'CREATE_IN_PROGRESS') {
+            return <SuccessIcon primaryColor="#FFC400" label="InProgress" />;
+        }
+        return <ErrorIcon primaryColor="#FF5630" label="Failure" />;
+    };
+
     return (
         <Flag
             actions={[
                 {
                     content: 'CloudFormation Console',
-                    onClick: () => {},
                 },
             ]}
-            icon={
-                currentProvisioningStatus === 'CREATE_COMPLETE' ? (
-                    <SuccessIcon primaryColor="#36B37E" label="Success" />
-                ) : currentProvisioningStatus === 'CREATE_IN_PROGRESS' ? (
-                    <SuccessIcon primaryColor="#FFC400" label="InProgress" />
-                ) : (
-                    <ErrorIcon primaryColor="#FF5630" label="Failure" />
-                )
-            }
+            icon={renderProvisioningStatus(currentProvisioningStatus)}
             description="All good things take time. Like your next Uber Eats delivery!"
             id="1"
             key="1"
