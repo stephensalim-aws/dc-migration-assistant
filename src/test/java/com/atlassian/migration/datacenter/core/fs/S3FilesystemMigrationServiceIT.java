@@ -56,6 +56,6 @@ class S3FilesystemMigrationServiceIT {
 
         fsService.startMigration();
 
-        Assertions.assertNotEquals(FilesystemMigrationStatus.FAILED, fsService.getProgress().getStatus());
+        Assertions.assertNotEquals(FilesystemMigrationStatus.FAILED, fsService.);
     }
 }

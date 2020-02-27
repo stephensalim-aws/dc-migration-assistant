@@ -19,7 +19,7 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
         this.errorReport = errorReport;
         this.progress = progress;
     }
-    
+
     @Override
     public void setStatus(FilesystemMigrationStatus status) {
         this.status = status;

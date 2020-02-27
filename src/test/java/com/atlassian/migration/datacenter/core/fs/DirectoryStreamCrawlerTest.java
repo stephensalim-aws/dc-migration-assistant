@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.core.fs;
 
 import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class DirectoryStreamCrawlerTest {
     private Crawler directoryStreamCrawler;
     private ConcurrentLinkedQueue<Path> queue;
     private Set<Path> expectedPaths;
-    private DefaultFileSystemMigrationErrorReport errorReport;
+    private FileSystemMigrationErrorReport errorReport;
 
     @BeforeEach
     void createFiles() throws Exception {
