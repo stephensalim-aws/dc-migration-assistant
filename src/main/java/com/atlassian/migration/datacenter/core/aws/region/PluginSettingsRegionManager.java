@@ -43,13 +43,14 @@ public class PluginSettingsRegionManager implements RegionService {
 
     /**
      * Sets the region to be used for AWS API calls
+     *
      * @param region the id of the region to use e.g. us-east-1, eu-central-1
      * @throws InvalidAWSRegionException if the region id provided is not a supported AWS region.
      * @see GlobalInfrastructure
      */
     @Override
     public void storeRegion(String region) throws InvalidAWSRegionException {
-        if(!isValidRegion(region)) {
+        if (!isValidRegion(region)) {
             throw new InvalidAWSRegionException();
         }
 

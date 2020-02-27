@@ -31,6 +31,7 @@ public class ProbeAWSAuth {
     /**
      * Queries the Cloudformation stacks in the AWS account using the AWS Java SDK V2 to test the credentials
      * have Cloudformation access
+     *
      * @return a list containing the names of the stacks in the account in the current region
      */
     public List<String> probeSDKV2() {
@@ -51,7 +52,7 @@ public class ProbeAWSAuth {
                     .collect(Collectors.toList());
             return stackNames;
         } catch (InterruptedException | ExecutionException e) {
-            if(e.getCause() instanceof CloudFormationException) {
+            if (e.getCause() instanceof CloudFormationException) {
                 throw (CloudFormationException) e.getCause();
             }
             logger.error("unable to get DescribeStacksResponse", e);

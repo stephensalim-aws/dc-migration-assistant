@@ -35,7 +35,7 @@ public class AWSRegionEndpoint {
     public Response setRegion(AWSRegionWebObject region) {
         try {
             regionService.storeRegion(region.getRegion());
-        } catch(InvalidAWSRegionException e) {
+        } catch (InvalidAWSRegionException e) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage())

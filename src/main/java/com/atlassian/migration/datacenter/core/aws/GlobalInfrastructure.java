@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class GlobalInfrastructure {
 
     public List<String> getRegions() {
-       return Region.regions()
+        return Region.regions()
                 .stream()
                 .filter(region -> {
                     RegionMetadata regionMetadata = RegionMetadata.of(region);

@@ -3,7 +3,7 @@ package com.atlassian.migration.datacenter.core.fs;
 import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.migration.datacenter.core.aws.auth.AtlassianPluginAWSCredentialsProvider;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -39,6 +39,6 @@ class S3FilesystemMigrationServiceTest {
         // when
         fsService.startMigration();
         // then
-        assertEquals(FilesystemMigrationStatus.FAILED, fsService.getProgress().getStatus());
+        assertEquals(FilesystemMigrationStatus.FAILED, fsService.getReport().getStatus());
     }
 }
