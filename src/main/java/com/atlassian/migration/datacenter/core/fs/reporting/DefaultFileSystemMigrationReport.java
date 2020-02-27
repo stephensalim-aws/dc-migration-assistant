@@ -11,6 +11,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.DONE;
+import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.FAILED;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.NOT_STARTED;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
 
@@ -22,6 +24,7 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     private final FileSystemMigrationProgress progress;
 
     private Instant startTime;
+    private Instant completeTime;
     private FilesystemMigrationStatus status;
 
     public DefaultFileSystemMigrationReport(FileSystemMigrationErrorReport errorReport, FileSystemMigrationProgress progress) {
@@ -36,6 +39,11 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
         if (isStartingMigration(status)) {
             startTime = Instant.now(clock);
         }
+
+        if (isendingMigration(status)) {
+            completeTime = Instant.now(clock);
+        }
+
         this.status = status;
     }
 
@@ -46,7 +54,15 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
 
     @Override
     public Duration getElapsedTime() {
-        return Duration.between(startTime, Instant.now(clock));
+        Instant end = completeTime;
+        if (isRunning()) {
+            end = Instant.now(clock);
+        }
+        return Duration.between(startTime, end);
+    }
+
+    private boolean isRunning() {
+        return status == RUNNING;
     }
 
     @Override
@@ -75,6 +91,14 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
 
     private boolean isStartingMigration(FilesystemMigrationStatus status) {
         return this.status != RUNNING && status == RUNNING;
+    }
+
+    private boolean isendingMigration(FilesystemMigrationStatus status) {
+        return this.status == RUNNING && isTerminalState(status);
+    }
+
+    private boolean isTerminalState(FilesystemMigrationStatus status) {
+        return status == DONE || status == FAILED;
     }
 }
 

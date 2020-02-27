@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 
+import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.DONE;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.FAILED;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.NOT_STARTED;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
@@ -89,5 +90,20 @@ public class DefaultFileSystemMigrationReportTest {
 
         assertEquals(1L, sut.getElapsedTime().toDays());
         assertEquals(5L, sut.getElapsedTime().minusDays(1).getSeconds());
+    }
+
+    @Test
+    void shouldNotIncrementElapsedTimeAfterMigrationEnds() {
+        Clock testClock = Clock.fixed(Instant.ofEpochMilli(0), ZoneId.systemDefault());
+        sut.setClock(testClock);
+
+        sut.setStatus(RUNNING);
+
+        sut.setClock(Clock.offset(testClock, Duration.ofSeconds(10)));
+        assertEquals(10L, sut.getElapsedTime().getSeconds());
+
+        sut.setStatus(DONE);
+        sut.setClock(Clock.offset(testClock, Duration.ofSeconds(20)));
+        assertEquals(10L, sut.getElapsedTime().getSeconds());
     }
 }
