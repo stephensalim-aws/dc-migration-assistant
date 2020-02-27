@@ -1,15 +1,15 @@
 package com.atlassian.migration.datacenter.spi.fs;
 
-public class FilesystemMigrationProgress {
+public class DefaultFilesystemMigrationProgress {
     private FilesystemMigrationStatus status;
 
     private FailedFileMigrationReport report;
 
-    public FilesystemMigrationProgress() {
+    public DefaultFilesystemMigrationProgress() {
         this(FilesystemMigrationStatus.NOT_STARTED);
     }
 
-    public FilesystemMigrationProgress(FilesystemMigrationStatus status) {
+    public DefaultFilesystemMigrationProgress(FilesystemMigrationStatus status) {
         this.status = status;
     }
 

@@ -3,7 +3,7 @@ package com.atlassian.migration.datacenter.core.fs;
 import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import com.atlassian.migration.datacenter.spi.fs.FailedFileMigrationReport;
-import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationProgress;
+import com.atlassian.migration.datacenter.spi.fs.DefaultFilesystemMigrationProgress;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationStatus;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -40,7 +40,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     private final RegionService regionService;
     private final JiraHome jiraHome;
 
-    private FilesystemMigrationProgress progress = new FilesystemMigrationProgress(FilesystemMigrationStatus.NOT_STARTED);
+    private DefaultFilesystemMigrationProgress progress = new DefaultFilesystemMigrationProgress(FilesystemMigrationStatus.NOT_STARTED);
     private FailedFileMigrationReport errorReport;
     private AtomicBoolean isDoneCrawling;
     private ConcurrentLinkedQueue<Path> uploadQueue;
@@ -55,7 +55,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     }
 
     @Override
-    public FilesystemMigrationProgress getProgress() {
+    public DefaultFilesystemMigrationProgress getProgress() {
         return progress;
     }
 
@@ -82,6 +82,10 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
 
         populateUploadQueue();
 
+        waitForUploadsToComplete(uploadResults);
+    }
+
+    private void waitForUploadsToComplete(CompletionService<Void> uploadResults) {
         IntStream.range(0, NUM_UPLOAD_THREADS)
                 .forEach(i -> {
                     try {
