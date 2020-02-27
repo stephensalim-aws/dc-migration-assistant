@@ -97,7 +97,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         CompletionService<Void> completionService = new ExecutorCompletionService<>(uploadService);
 
         Runnable uploaderFunction = () -> {
-            Uploader uploader = new S3Uploader(config, report);
+            Uploader uploader = new S3Uploader(config, report, report);
             uploader.upload(uploadQueue, isDoneCrawling);
         };
 

@@ -6,7 +6,9 @@ import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFilesystemMigrationProgress;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationProgress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,7 @@ class S3UploaderIT {
     private S3Uploader uploader;
     private AtomicBoolean isCrawlDone;
     private FileSystemMigrationErrorReport errorReport;
+    private FileSystemMigrationProgress progress;
 
     @Mock
     private AwsCredentialsProvider mockCredentialsProvider;
@@ -70,9 +73,10 @@ class S3UploaderIT {
         });
 
         errorReport = new DefaultFileSystemMigrationErrorReport();
+        progress = new DefaultFilesystemMigrationProgress();
         isCrawlDone = new AtomicBoolean(false);
         queue = new ConcurrentLinkedQueue<>();
-        uploader = new S3Uploader(config, errorReport);
+        uploader = new S3Uploader(config, errorReport, progress);
     }
 
     @Test

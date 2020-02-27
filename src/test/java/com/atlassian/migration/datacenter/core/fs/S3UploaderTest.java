@@ -1,6 +1,9 @@
 package com.atlassian.migration.datacenter.core.fs;
 
 import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMigrationErrorReport;
+import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFilesystemMigrationProgress;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationProgress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,10 +33,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class S3UploaderTest {
-    private S3UploadConfig config;
-    private PutObjectResponse putObjectResponse;
-
-    private DefaultFileSystemMigrationErrorReport errorReport;
 
     @Mock
     private S3AsyncClient s3AsyncClient;
@@ -44,25 +43,29 @@ class S3UploaderTest {
     @Mock
     private SdkHttpResponse sdkHttpResponse;
 
+
     private ConcurrentLinkedQueue<Path> queue = new ConcurrentLinkedQueue<>();
     private S3Uploader uploader;
     private AtomicBoolean isCrawlDone;
+    private FileSystemMigrationErrorReport errorReport;
+    private FileSystemMigrationProgress progress;
 
     @TempDir
     Path tempDir;
 
     @BeforeEach
     void setup() {
-        config = new S3UploadConfig("bucket-name", s3AsyncClient, tempDir);
+        S3UploadConfig config = new S3UploadConfig("bucket-name", s3AsyncClient, tempDir);
         queue = new ConcurrentLinkedQueue<>();
+        progress = new DefaultFilesystemMigrationProgress();
         errorReport = new DefaultFileSystemMigrationErrorReport();
-        uploader = new S3Uploader(config, errorReport);
+        uploader = new S3Uploader(config, errorReport, progress);
         isCrawlDone = new AtomicBoolean(false);
     }
 
     @Test
     void uploadShouldConsumePathsWhileCrawlingIsRunning() throws IOException, InterruptedException, ExecutionException {
-        putObjectResponse = (PutObjectResponse) PutObjectResponse.builder().sdkHttpResponse(sdkHttpResponse).build();
+        PutObjectResponse putObjectResponse = (PutObjectResponse) PutObjectResponse.builder().sdkHttpResponse(sdkHttpResponse).build();
         when(sdkHttpResponse.isSuccessful()).thenReturn(true);
         when(s3response.get()).thenReturn(putObjectResponse);
         when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(Path.class))).thenReturn(s3response);
@@ -89,6 +92,24 @@ class S3UploaderTest {
         assertTrue(submit.isDone());
         assertTrue(queue.isEmpty());
         assertTrue(errorReport.getFailedFiles().isEmpty());
+    }
+
+    @Test
+    void uploadShouldReportFileAsMigrated() throws IOException, ExecutionException, InterruptedException {
+        PutObjectResponse putObjectResponse = (PutObjectResponse) PutObjectResponse.builder().sdkHttpResponse(sdkHttpResponse).build();
+        when(sdkHttpResponse.isSuccessful()).thenReturn(true);
+        when(s3response.get()).thenReturn(putObjectResponse);
+        when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(Path.class))).thenReturn(s3response);
+
+        Path testPath = addFileToQueue("file1");
+        isCrawlDone.set(true);
+
+        final Future<?> submit = Executors.newFixedThreadPool(1).submit(() -> {
+            uploader.upload(queue, isCrawlDone);
+        });
+
+        submit.get();
+        assertTrue(progress.getMigratedFiles().contains(testPath));
     }
 
     @Test
