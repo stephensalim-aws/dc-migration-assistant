@@ -55,7 +55,6 @@ public class S3Uploader implements Uploader {
 
                     responsesQueue.add(uploadOperation);
                 } else {
-
                     addFailedFile(path, String.format("File doesn't exist: %s", path));
                 }
             }
@@ -69,6 +68,8 @@ public class S3Uploader implements Uploader {
             if (!evaluatedResponse.sdkHttpResponse().isSuccessful()) {
                 final String errorMessage = String.format("Error when uploading to S3, %s", evaluatedResponse.sdkHttpResponse().statusText());
                 addFailedFile(operation.path, errorMessage);
+            } else {
+                progress.reportFileMigrated(operation.path);
             }
         } catch (InterruptedException | ExecutionException e) {
             addFailedFile(operation.path, e.getMessage());

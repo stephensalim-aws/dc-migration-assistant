@@ -105,6 +105,7 @@ class S3UploaderIT {
                                                 failedMigration.getReason()), (acc, partial) -> acc + "\n" + partial)));
         assertEquals(objectSummaries.size(), 1);
         assertEquals(objectSummaries.get(0).getKey(), tempDir.relativize(file).toString());
+        assertTrue(progress.getMigratedFiles().contains(file));
     }
 
     Path addFileToQueue(String fileName) throws IOException {
