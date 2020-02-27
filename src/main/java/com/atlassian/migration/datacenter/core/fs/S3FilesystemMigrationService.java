@@ -7,6 +7,7 @@ import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFileSystemMig
 import com.atlassian.migration.datacenter.core.fs.reporting.DefaultFilesystemMigrationProgress;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
+import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.DONE;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.FAILED;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
 
@@ -70,19 +72,27 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
      */
     @Override
     public void startMigration() {
-        report.setStatus(RUNNING);
+        if (isRunning()) {
+            return;
+        }
 
-        isDoneCrawling = new AtomicBoolean(false);
-        uploadQueue = new ConcurrentLinkedQueue<>();
-
-        S3AsyncClient s3AsyncClient = buildS3Client();
-        config = new S3UploadConfig(getS3Bucket(), s3AsyncClient, getSharedHomeDir());
+        initialiseMigration();
 
         CompletionService<Void> uploadResults = startUploadingFromQueue();
 
         populateUploadQueue();
 
         waitForUploadsToComplete(uploadResults);
+
+        finaliseMigration();
+    }
+
+    private void initialiseMigration() {
+        report.setStatus(RUNNING);
+        isDoneCrawling = new AtomicBoolean(false);
+        uploadQueue = new ConcurrentLinkedQueue<>();
+        S3AsyncClient s3AsyncClient = buildS3Client();
+        config = new S3UploadConfig(getS3Bucket(), s3AsyncClient, getSharedHomeDir());
     }
 
     private S3AsyncClient buildS3Client() {
@@ -129,6 +139,12 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
                         report.setStatus(FAILED);
                     }
                 });
+    }
+
+    private void finaliseMigration() {
+        if (!report.getStatus().equals(FAILED)) {
+            report.setStatus(DONE);
+        }
     }
 
     private String getS3Bucket() {
