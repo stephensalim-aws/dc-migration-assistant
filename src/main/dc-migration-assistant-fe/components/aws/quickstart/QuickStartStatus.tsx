@@ -42,7 +42,6 @@ export const QuickStartStatus: FunctionComponent = (): ReactElement => {
     const { stackId } = useParams();
     const [inProgress, setInProgress]: [boolean, Function] = useState(true);
     const [provisioningStatus, setProvisioningStatus]: [string, Function] = useState('UNKNOWN');
-    let intervalId: NodeJS.Timeout;
 
     const getStackStatusFromApi = (stackIdentifier: string): Promise<any> => {
         return callAppRest(
@@ -60,7 +59,6 @@ export const QuickStartStatus: FunctionComponent = (): ReactElement => {
                 if (status === 'CREATE_COMPLETE') {
                     setInProgress(false);
                     setProvisioningStatus(status);
-                    clearInterval(intervalId);
                 } else {
                     setProvisioningStatus(status);
                     setInProgress(true);
@@ -69,13 +67,12 @@ export const QuickStartStatus: FunctionComponent = (): ReactElement => {
             .catch(err => {
                 setProvisioningStatus(err.toString());
                 setInProgress(false);
-                clearInterval(intervalId);
             });
     };
 
     useEffect(() => {
-        intervalId = setInterval(() => {
-            getStackStatusFromApi(stackId).then(console.log);
+        const intervalId = setInterval(() => {
+            getStackStatusFromApi(stackId).finally(() => clearInterval(intervalId));
         }, 5000);
 
         return () => {
