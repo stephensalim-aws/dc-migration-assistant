@@ -45,27 +45,13 @@ public class FileSystemMigrationProgressEndpoint {
 
     static class FSMigrationProgressWebObject {
         public String status;
-        public List<FailedFileMigrationWebObject> failedFileMigrations;
+        public List<FailedFileMigration> failedFileMigrations;
         public List<String> migratedFiles;
 
         FSMigrationProgressWebObject(String status, List<FailedFileMigration> failedFileMigrations, List<String> migratedFiles) {
             this.status = status;
+            this.failedFileMigrations = failedFileMigrations;
             this.migratedFiles = migratedFiles;
-
-            this.failedFileMigrations = failedFileMigrations
-                    .stream()
-                    .map(failedFileMigration -> new FailedFileMigrationWebObject(failedFileMigration.getFilePath().toString(), failedFileMigration.getReason()))
-                    .collect(Collectors.toList());
-        }
-    }
-
-    static class FailedFileMigrationWebObject {
-        public String path;
-        public String reason;
-
-        public FailedFileMigrationWebObject(String path, String reason) {
-            this.path = path;
-            this.reason = reason;
         }
     }
 }

@@ -56,10 +56,10 @@ public class FileSystemMigrationProgressEndpointTest {
 
         assertEquals(RUNNING.name(), returnedReport.status);
         assertEquals(1, returnedReport.failedFileMigrations.size());
-        assertEquals(testReason, returnedReport.failedFileMigrations.get(0).reason);
-        assertEquals(testFile.toString(), returnedReport.failedFileMigrations.get(0).path);
+        assertEquals(testReason, returnedReport.failedFileMigrations.get(0).getReason());
+        assertEquals(testFile, returnedReport.failedFileMigrations.get(0).getFilePath());
         assertEquals(1, returnedReport.migratedFiles.size());
-        assertEquals(successFileName, returnedReport.migratedFiles.get(0));
+        assertEquals(successFileName, returnedReport.migratedFiles.get(0).toString());
     }
 
     @Test
