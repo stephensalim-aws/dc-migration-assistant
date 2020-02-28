@@ -125,6 +125,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
             logger.error("Failed to traverse home directory for S3 transfer", e);
             report.setStatus(FAILED);
         } finally {
+            // FIXME: the uploader will continue uploading until the queue is empty even though we probably need to abort in this scenario as it's indeterminate whether all files have been uploaded or not (should we try fix this now or create a bug and follow up?)
             isDoneCrawling.set(true);
         }
     }
