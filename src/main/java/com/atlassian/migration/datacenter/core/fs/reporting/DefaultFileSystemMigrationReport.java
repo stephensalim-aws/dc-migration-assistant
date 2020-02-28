@@ -4,6 +4,7 @@ import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationEr
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationProgress;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import java.nio.file.Path;
 import java.time.Clock;
@@ -16,6 +17,7 @@ import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigr
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.NOT_STARTED;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
 
+@JsonAutoDetect
 public class DefaultFileSystemMigrationReport implements FileSystemMigrationReport {
 
     private Clock clock;
