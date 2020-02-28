@@ -16,16 +16,14 @@ import {
     QuickstartParamLabelYamlNode,
 } from './QuickStartTypes';
 
-import { callAppRest } from '../../../utils/api';
-import { awsStackCreateRestPath } from '../../../utils/RoutePaths';
+import { callAppRest, RestApiPathConstants } from '../../../utils/api';
 
-const QUICKSTART_PARAMS_URL =
-    'https://dcd-slinghost-templates.s3.amazonaws.com/mothra/test-create-s3-bucket.parameters.yaml';
-
-const STACK_NAME_FIELD_NAME = 'QSStackName';
-// TODO: Automatically, change this to 'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/test-create-s3-bucket.yaml' during development/testing.
+const QUICKSTART_PARAMETERS_URL =
+    'https://dcd-slinghost-templates.s3-ap-southeast-2.amazonaws.com/mothra/quickstart-jira-dc-with-vpc.template.parameters.yaml';
 const stackProvisioningTemplateUrl =
     'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-jira/templates/quickstart-jira-dc-with-vpc.template.yaml';
+
+const STACK_NAME_FIELD_NAME = 'QSStackName';
 
 const isOptionType = (obj: any): obj is OptionType => {
     return obj.label && obj.value;
@@ -78,22 +76,20 @@ const QuickstartForm = ({
     <Form
         onSubmit={(data: Record<string, any>): void => {
             const transformedCfnParams = data;
-            let stackNameValue = '';
+            const stackNameValue = transformedCfnParams[STACK_NAME_FIELD_NAME];
+            delete transformedCfnParams[STACK_NAME_FIELD_NAME];
+
             Object.entries(data).forEach(entry => {
                 // Hoist value from Select/Multiselect inputs to root of form value
                 const [key, value] = entry;
-                if (key === STACK_NAME_FIELD_NAME) {
-                    // stackName is handled separately as it is sent as a separate parameter to AWS API
-                    stackNameValue = value;
-                    delete transformedCfnParams[key];
-                } else if (isOptionType(value)) {
+                if (isOptionType(value)) {
                     transformedCfnParams[key] = value.value;
                 } else if (isArrayOfOptionType(value)) {
                     transformedCfnParams[key] = value.map(option => option.value);
                 }
             });
 
-            callAppRest('POST', awsStackCreateRestPath, {
+            callAppRest('POST', RestApiPathConstants.awsStackCreateRestPath, {
                 templateUrl: stackProvisioningTemplateUrl,
                 stackName: stackNameValue,
                 params: transformedCfnParams,
@@ -168,7 +164,7 @@ export const QuickStartDeploy: FunctionComponent = (): ReactElement => {
 
     useEffect(() => {
         setLoading(true);
-        fetch(QUICKSTART_PARAMS_URL, {
+        fetch(QUICKSTART_PARAMETERS_URL, {
             method: 'GET',
         })
             .then(resp => resp.text())

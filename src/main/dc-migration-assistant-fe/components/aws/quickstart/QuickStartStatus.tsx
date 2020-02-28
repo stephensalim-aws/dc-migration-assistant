@@ -4,8 +4,7 @@ import SuccessIcon from '@atlaskit/icon/glyph/check-circle';
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 import Spinner from '@atlaskit/spinner';
 import Flag from '@atlaskit/flag';
-import { callAppRest } from '../../../utils/api';
-import { awsStackStatusRestPath } from '../../../utils/RoutePaths';
+import { callAppRest, RestApiPathConstants } from '../../../utils/api';
 
 const QuickStartStatusContainer = styled.div`
     display: flex;
@@ -41,10 +40,13 @@ const stageStatusFlag = (currentProvisioningStatus: string): ReactElement => {
 export const QuickStartStatus: FunctionComponent = (props: Record<any, any>): ReactElement => {
     const [inProgress, setInProgress]: [boolean, Function] = useState(true);
     const [provisioningStatus, setProvisioningStatus]: [string, Function] = useState('UNKNOWN');
-    let intervalId: any = 0;
+    let intervalId: NodeJS.Timeout;
 
     const getStackStatusFromApi = (stackIdentifier: string): Promise<any> => {
-        return callAppRest('GET', awsStackStatusRestPath.replace(':stackId:', stackIdentifier))
+        return callAppRest(
+            'GET',
+            RestApiPathConstants.awsStackStatusRestPath.replace(':stackId:', stackIdentifier)
+        )
             .then(response => {
                 if (response.status !== 200) {
                     throw Error('FAILED');
@@ -74,11 +76,7 @@ export const QuickStartStatus: FunctionComponent = (props: Record<any, any>): Re
         const stackIdentifier = match.params.stackId;
 
         intervalId = setInterval(() => {
-            getStackStatusFromApi(stackIdentifier).then(() => {
-                console.log(
-                    'Retrieved status from API once. TODO: periodically poll this API endpoint'
-                );
-            });
+            getStackStatusFromApi(stackIdentifier).then(console.log);
         }, 5000);
 
         return () => {

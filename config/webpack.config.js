@@ -2,6 +2,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const merge = require('webpack-merge');
 const webpack = require('webpack');
 const path = require('path');
+const dotenv = require('dotenv');
 
 const {
     DEV_SERVER_HOST,
@@ -67,7 +68,24 @@ const prodConfig = {
 };
 
 module.exports = (env, argv = {}) => {
-    const isProduction = argv.mode !== 'development';
+    function isProductionEnv(mode = argv.mode) {
+        return mode !== 'development';
+    }
+
+    function loadDotEnvVariables(mode) {
+        let dotEnvFilePath = path.join(__dirname, '..', '.env');
+        if (!isProductionEnv(mode)) {
+            dotEnvFilePath = dotEnvFilePath + '.' + mode;
+        }
+        const dotEnvOverrides = dotenv.config({ path: dotEnvFilePath }).parsed;
+
+        return Object.keys(dotEnvOverrides).reduce((acc, current) => {
+            acc[`process.env.${current}`] = JSON.stringify(dotEnvOverrides[current]);
+            return acc;
+        }, {});
+    }
+
+    const isProduction = isProductionEnv();
     const modeConfig = isProduction ? prodConfig : devConfig(env);
     return merge([
         {
@@ -80,7 +98,10 @@ module.exports = (env, argv = {}) => {
                 logging: 'info',
             },
             context: FRONTEND_SRC_DIR,
-            plugins: plugins(!isProduction),
+            plugins: [
+                ...plugins(!isProduction),
+                new webpack.DefinePlugin(loadDotEnvVariables(argv.mode)),
+            ],
             module: {
                 rules: loaders(isProduction),
             },
