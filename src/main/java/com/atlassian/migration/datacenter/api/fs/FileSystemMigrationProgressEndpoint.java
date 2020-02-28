@@ -3,6 +3,11 @@ package com.atlassian.migration.datacenter.api.fs;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -24,7 +29,7 @@ public class FileSystemMigrationProgressEndpoint {
 
     @GET
     @Produces(APPLICATION_JSON)
-    public Response getFilesystemMigrationStatus() {
+    public Response getFilesystemMigrationStatus() throws JsonProcessingException {
         FileSystemMigrationReport report = migrationService.getReport();
         if (report == null) {
             return Response
@@ -38,14 +43,31 @@ public class FileSystemMigrationProgressEndpoint {
                 report.getMigratedFiles().stream().map(java.nio.file.Path::toString).collect(Collectors.toList())
         );
 
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+
         return Response
-                .ok(progress)
+                .ok(mapper.writeValueAsString(progress))
                 .build();
     }
 
-    static class FSMigrationProgressWebObject {
+    @JsonAutoDetect
+    public static class FSMigrationProgressWebObject {
         public String status;
         public List<FailedFileMigration> failedFileMigrations;
+
+        public String getStatus() {
+            return status;
+        }
+
+        public List<FailedFileMigration> getFailedFileMigrations() {
+            return failedFileMigrations;
+        }
+
+        public List<String> getMigratedFiles() {
+            return migratedFiles;
+        }
+
         public List<String> migratedFiles;
 
         FSMigrationProgressWebObject(String status, List<FailedFileMigration> failedFileMigrations, List<String> migratedFiles) {

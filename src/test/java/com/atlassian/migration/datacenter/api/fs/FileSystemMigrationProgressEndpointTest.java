@@ -1,6 +1,5 @@
 package com.atlassian.migration.datacenter.api.fs;
 
-import com.atlassian.migration.datacenter.api.fs.FileSystemMigrationProgressEndpoint.FSMigrationProgressWebObject;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
@@ -52,7 +51,7 @@ public class FileSystemMigrationProgressEndpointTest {
 
         final Response response = endpoint.getFilesystemMigrationStatus();
 
-        final FSMigrationProgressWebObject returnedReport = (FSMigrationProgressWebObject) response.getEntity();
+        final FileSystemMigrationProgressEndpoint.FSMigrationProgressWebObject returnedReport = (FileSystemMigrationProgressEndpoint.FSMigrationProgressWebObject) response.getEntity();
 
         assertEquals(RUNNING.name(), returnedReport.status);
         assertEquals(1, returnedReport.failedFileMigrations.size());
