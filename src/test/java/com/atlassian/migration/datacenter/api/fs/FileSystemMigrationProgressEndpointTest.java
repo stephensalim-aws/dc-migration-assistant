@@ -1,5 +1,6 @@
 package com.atlassian.migration.datacenter.api.fs;
 
+import com.atlassian.migration.datacenter.api.fs.FileSystemMigrationProgressEndpoint.FSMigrationProgressWebObject;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
@@ -51,14 +52,14 @@ public class FileSystemMigrationProgressEndpointTest {
 
         final Response response = endpoint.getFilesystemMigrationStatus();
 
-        final FileSystemMigrationReport returnedReport = (FileSystemMigrationReport) response.getEntity();
+        final FSMigrationProgressWebObject returnedReport = (FSMigrationProgressWebObject) response.getEntity();
 
-        assertEquals(RUNNING, returnedReport.getStatus());
-        assertEquals(1, returnedReport.getFailedFiles().size());
-        assertEquals(testReason, returnedReport.getFailedFiles().get(0).getReason());
-        assertEquals(testFile.toString(), returnedReport.getFailedFiles().get(0).getFilePath().toString());
-        assertEquals(1, returnedReport.getMigratedFiles().size());
-        assertEquals(successFileName, returnedReport.getMigratedFiles().get(0).toString());
+        assertEquals(RUNNING.name(), returnedReport.status);
+        assertEquals(1, returnedReport.failedFileMigrations.size());
+        assertEquals(testReason, returnedReport.failedFileMigrations.get(0).reason);
+        assertEquals(testFile.toString(), returnedReport.failedFileMigrations.get(0).path);
+        assertEquals(1, returnedReport.migratedFiles.size());
+        assertEquals(successFileName, returnedReport.migratedFiles.get(0));
     }
 
     @Test
