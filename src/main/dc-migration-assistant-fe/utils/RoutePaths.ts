@@ -19,4 +19,3 @@ export const awsBasePath = `${routePrefix}/aws`;
 export const quickstartPath = `${awsBasePath}/provision`;
 export const quickstartStatusPath = `${awsBasePath}/:stackId/status`;
 export const awsAuthPath = `${awsBasePath}/auth`;
-

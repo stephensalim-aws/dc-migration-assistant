@@ -44,7 +44,7 @@ export const callAppRest = (
     return fetch(callPath, options);
 };
 
-export enum RestApiPathConstants  {
+export enum RestApiPathConstants {
     awsStackCreateRestPath = `aws/stack/create`,
     awsStackStatusRestPath = `aws/stack/:stackId:/status`,
-};
+}
