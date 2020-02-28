@@ -3,9 +3,12 @@ package com.atlassian.migration.datacenter.core.fs.reporting;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationProgress;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -92,8 +95,9 @@ public class DefaultFileSystemMigrationReportTest {
         assertEquals(5L, sut.getElapsedTime().minusDays(1).getSeconds());
     }
 
-    @Test
-    void shouldNotIncrementElapsedTimeAfterMigrationEnds() {
+    @ParameterizedTest
+    @EnumSource(value = FilesystemMigrationStatus.class, names = {"DONE", "FAILED"})
+    void shouldNotIncrementElapsedTimeAfterMigrationEnds(FilesystemMigrationStatus status) {
         Clock testClock = Clock.fixed(Instant.ofEpochMilli(0), ZoneId.systemDefault());
         sut.setClock(testClock);
 
@@ -102,7 +106,7 @@ public class DefaultFileSystemMigrationReportTest {
         sut.setClock(Clock.offset(testClock, Duration.ofSeconds(10)));
         assertEquals(10L, sut.getElapsedTime().getSeconds());
 
-        sut.setStatus(DONE);
+        sut.setStatus(status);
         sut.setClock(Clock.offset(testClock, Duration.ofSeconds(20)));
         assertEquals(10L, sut.getElapsedTime().getSeconds());
     }
