@@ -20,7 +20,15 @@ public class DefaultFileSystemMigrationErrorReport implements FileSystemMigratio
         this.failedMigrations = new ConcurrentLinkedQueue<>();
     }
 
+    /**
+     * tries to report a failed file migration. If 100 files have failed already the report will be dropped to save memory.
+     * In this scenario it is likely the migration will fail and that the lost errors will have the same cause.
+     * @param failedFileMigration the failed file migration to report
+     */
     public void reportFileNotMigrated(FailedFileMigration failedFileMigration) {
+        if (failedMigrations.size() >= 100) {
+            return;
+        }
         failedMigrations.add(failedFileMigration);
     }
 

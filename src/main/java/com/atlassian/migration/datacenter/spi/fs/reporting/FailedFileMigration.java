@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import java.nio.file.Path;
 
-@JsonAutoDetect()
+@JsonAutoDetect
 public class FailedFileMigration {
 
     private Path filePath;
