@@ -15,9 +15,9 @@ public interface FileSystemMigrationErrorReport {
     void reportFileNotMigrated(DefaultFileSystemMigrationErrorReport.FailedFileMigration failedFileMigration);
 
     class FailedFileMigration {
-        private final Path filePath;
+        private Path filePath;
 
-        private final String reason;
+        private String reason;
 
         public FailedFileMigration(Path filePath, String reason) {
             this.filePath = filePath;

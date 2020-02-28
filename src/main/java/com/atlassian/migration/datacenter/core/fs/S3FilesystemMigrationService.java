@@ -89,6 +89,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
 
     private void initialiseMigration() {
         report = new DefaultFileSystemMigrationReport(new DefaultFileSystemMigrationErrorReport(), new DefaultFilesystemMigrationProgress());
+        report.setStatus(RUNNING);
         isDoneCrawling = new AtomicBoolean(false);
         uploadQueue = new ConcurrentLinkedQueue<>();
         S3AsyncClient s3AsyncClient = buildS3Client();
