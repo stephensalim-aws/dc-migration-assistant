@@ -98,5 +98,13 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     private boolean isTerminalState(FilesystemMigrationStatus toStatus) {
         return toStatus == DONE || toStatus == FAILED;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Filesystem migration report = { status: %s, migratedFiles: %d, erroredFiles: %d}",
+                currentStatus,
+                progress.getMigratedFiles().size(),
+                errorReport.getFailedFiles().size());
+    }
 }
 

@@ -4,12 +4,12 @@ import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationEr
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationProgress;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -19,13 +19,17 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.List;
 
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.DONE;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.FAILED;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.NOT_STARTED;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultFileSystemMigrationReportTest {
@@ -125,5 +129,25 @@ public class DefaultFileSystemMigrationReportTest {
         sut.setStatus(status);
         sut.setClock(Clock.offset(testClock, Duration.ofSeconds(20)));
         assertEquals(10L, sut.getElapsedTime().getSeconds());
+    }
+
+    @Test
+    void testToString() {
+        final List migratedList = mock(List.class);
+        final int successfullyMigrated = 888;
+        final int failedFiles = 666;
+        when(migratedList.size()).thenReturn(successfullyMigrated);
+        when(progress.getMigratedFiles()).thenReturn(migratedList);
+
+        final List errorList = mock(List.class);
+        when(errorList.size()).thenReturn(failedFiles);
+        when(errors.getFailedFiles()).thenReturn(errorList);
+
+        sut.setStatus(DONE);
+
+        final String text = sut.toString();
+        Assert.assertThat(text, containsString("DONE"));
+        Assert.assertThat(text, containsString(String.valueOf(successfullyMigrated)));
+        Assert.assertThat(text, containsString(String.valueOf(failedFiles)));
     }
 }

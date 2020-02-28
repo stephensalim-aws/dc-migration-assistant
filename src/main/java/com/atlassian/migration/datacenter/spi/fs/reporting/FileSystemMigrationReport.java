@@ -10,4 +10,9 @@ public interface FileSystemMigrationReport extends FileSystemMigrationErrorRepor
 
     Duration getElapsedTime();
 
+    /**
+     * Text representation of filesystem migration report. This can be used to consume the report in the logs.
+     * @return human readable representation of the migration report
+     */
+    String toString();
 }

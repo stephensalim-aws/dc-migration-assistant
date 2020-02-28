@@ -60,6 +60,7 @@ public class S3Uploader implements Uploader {
             }
         }
         responsesQueue.forEach(this::handlePutObjectResponse);
+        logger.info("Finished uploading files to S3");
     }
 
     private void handlePutObjectResponse(S3UploadOperation operation) {
