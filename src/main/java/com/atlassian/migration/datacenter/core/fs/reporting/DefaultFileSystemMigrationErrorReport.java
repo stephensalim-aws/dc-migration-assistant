@@ -1,5 +1,6 @@
 package com.atlassian.migration.datacenter.core.fs.reporting;
 
+import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport;
 import com.google.common.collect.ImmutableList;
 

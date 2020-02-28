@@ -1,10 +1,8 @@
 package com.atlassian.migration.datacenter.api.fs;
 
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
-import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport.FailedFileMigration;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

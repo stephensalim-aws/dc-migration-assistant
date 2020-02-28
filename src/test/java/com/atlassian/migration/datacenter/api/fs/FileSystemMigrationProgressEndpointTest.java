@@ -2,7 +2,7 @@ package com.atlassian.migration.datacenter.api.fs;
 
 import com.atlassian.migration.datacenter.api.fs.FileSystemMigrationProgressEndpoint.FSMigrationProgressWebObject;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
-import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport.FailedFileMigration;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
