@@ -25,7 +25,7 @@ public class FileSystemMigrationProgressEndpoint {
 
     @GET
     @Produces(APPLICATION_JSON)
-    public Response getFilesystemMigrationStatus() throws JsonProcessingException {
+    public Response getFilesystemMigrationStatus() {
         FileSystemMigrationReport report = migrationService.getReport();
         if (report == null) {
             return Response
@@ -36,8 +36,15 @@ public class FileSystemMigrationProgressEndpoint {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, Visibility.ANY);
 
-        return Response
-                .ok(mapper.writeValueAsString(report))
-                .build();
+        try {
+            return Response
+                    .ok(mapper.writeValueAsString(report))
+                    .build();
+        } catch (JsonProcessingException e) {
+            return Response
+                    .serverError()
+                    .entity(String.format("Unable to get file system status. Please contact support and show them this error: %s", e.getMessage()))
+                    .build();
+        }
     }
 }
