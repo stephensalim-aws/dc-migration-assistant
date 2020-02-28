@@ -8,7 +8,7 @@ import java.nio.file.Path;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-@JsonAutoDetect(fieldVisibility = Visibility.ANY)
+@JsonAutoDetect()
 public class FailedFileMigration {
 
     private Path filePath;
@@ -28,13 +28,5 @@ public class FailedFileMigration {
 
     public String getReason() {
         return reason;
-    }
-
-    public void setFilePath(Path filePath) {
-        this.filePath = filePath;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
     }
 }

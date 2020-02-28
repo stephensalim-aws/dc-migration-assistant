@@ -3,6 +3,7 @@ package com.atlassian.migration.datacenter.api.fs;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +36,7 @@ public class FileSystemMigrationProgressEndpointTest {
     }
 
     @Test
-    void shouldReturnReportWhenMigrationExists() {
+    void shouldReturnReportWhenMigrationExists() throws JsonProcessingException {
         when(migrationService.getReport()).thenReturn(report);
 
         when(report.getStatus()).thenReturn(RUNNING);
@@ -62,7 +63,7 @@ public class FileSystemMigrationProgressEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenNoReportExists() {
+    void shouldReturnBadRequestWhenNoReportExists() throws JsonProcessingException {
         when(migrationService.getReport()).thenReturn(null);
 
         final Response response = endpoint.getFilesystemMigrationStatus();
