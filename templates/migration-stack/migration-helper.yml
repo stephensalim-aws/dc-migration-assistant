@@ -1,0 +1,312 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Jira / Confluence Server to DC (AWS) Helper
+Parameters:
+
+  SolutionStackName:
+    Description: "Elastic Beanstalk Solutions Stack used to define the environment - No need to change"
+    Type: String
+    Default: "64bit Amazon Linux 2018.03 v2.9.5 running Python 3.6"
+  HelperSourceBucket:
+    Description: "Source bucket where you will place migration helper code."
+    Type: String
+    Default: "sssalim-mortha-code-bucket"
+  HelperSourceZipFile:
+    Description: "Source migration helper zip file."
+    Type: String
+    Default: "MigrationHelper.zip"
+  NetworkPublicSubnet:
+    Description: "Public SubnetId where Migration helper will be placed - Must have connection to desitnation Storage"
+    Type: String
+    Default: "subnet-0d82a3a40a689b562"
+  TrustedSourceIP:
+    Description: "Trusted Source IP for Helper Instance"
+    Type: String
+    Default: "121.200.5.142/32"
+  EFSFileSystemId:
+    Description: "The Elastic File System Id we will mount to the Migration Helper EC2 Instance"
+    Type: String
+    Default: "fs-1d888924"
+  EFSSecurityGroup:
+    Description: "The Security Group attached to EFS, access to NFS port will be open from Migration Helper Security Group"
+    Type: String
+    Default: "sg-0c4e900309b248970"
+  HelperInstanceType:
+    Description: "The Instance Type of Helper EC2 Instance"
+    Type: String
+    Default: "m5.2xlarge"
+  HelperVpcId:
+    Description: "The VPC for Helper EC2 Instance"
+    Type: String
+    Default: "vpc-039876f938d90c7a1"
+
+
+Outputs:
+  HelperEnvironment:
+    Value: !Ref HelperEnvironment
+
+Resources:
+
+  #Pending
+  #DatabaseTransferBucketPolicy:
+
+  #S3 Bucket for Database Transfer
+  DatabaseTransferBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'dbtransbucket-${AWS::Region}-${AWS::AccountId}'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+    DeletionPolicy: Delete
+
+
+
+  #EC2 Migration Helper
+  HelperApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      ApplicationVersions:
+        - Description: Version 1.0
+          SourceBundle:
+            S3Bucket: !Ref HelperSourceBucket
+            S3Key: !Ref HelperSourceZipFile
+          VersionLabel: "HelperScript V 1.0"
+      Description: "Jira / Confluence Migration Helper Application"
+  HelperEnvironment:
+    DependsOn:
+      - CreateKeypairCustom
+      - OpenEFSAccessCustom
+    Type: AWS::ElasticBeanstalk::Environment
+    Properties:
+      ApplicationName: !Ref HelperApplication
+      Description: "Jira / Confluence Migration Helper Environment"
+      SolutionStackName: !Ref SolutionStackName
+      VersionLabel: "HelperScript V 1.0"
+      OptionSettings:
+        - Namespace: 'aws:ec2:vpc'
+          OptionName: Subnets
+          Value: !Ref NetworkPublicSubnet
+        - Namespace: 'aws:elasticbeanstalk:environment'
+          OptionName: EnvironmentType
+          Value: SingleInstance
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: EC2KeyName
+          Value: !GetAtt CreateKeypairCustom.KeyPair
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: SSHSourceRestriction
+          Value: !Join [ ",", [ "tcp,22,22", !Ref TrustedSourceIP ] ]
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: SecurityGroups
+          Value: !Ref HelperSecurityGroup
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: IamInstanceProfile
+          Value: !Ref HelperInstanceProfile
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: InstanceType
+          Value: !Ref HelperInstanceType
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: FILE_SYSTEM_ID
+          Value: !Ref EFSFileSystemId
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: MOUNT_DIRECTORY
+          Value: '/efs'
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: REGION
+          Value: !Ref 'AWS::Region'
+  HelperInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref HelperInstanceProfileRole
+  HelperInstanceProfileRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - 'ec2.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: Administrator
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: Administrator
+                Action: '*'
+                Effect: Allow
+                Resource: '*'
+  HelperSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH Port from Trusted
+      VpcId: !Ref HelperVpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref TrustedSourceIP
+  CreateKeypairCustom:
+    Type: Custom::CreateKeypairCustom
+    Version: 1.0
+    Properties:
+      ServiceToken: !GetAtt CreateKeypair.Arn
+      KeyName: !Sub 'mighelper-keypair-${AWS::Region}-${AWS::AccountId}'
+      SSMParamName: !Sub 'mighelper-keypair-${AWS::Region}-${AWS::AccountId}'
+  CreateKeypair:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt CreateKeypaireExecutionRole.Arn
+      Runtime: python3.7
+      Timeout: 120
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import cfnresponse
+
+          ec2client = boto3.client('ec2')
+          ssmclient = boto3.client('ssm')
+
+          def lambda_handler(event, context):
+            try:
+                if event['RequestType'] == 'Delete':
+                      key = event['ResourceProperties']['KeyName']
+                      ssmparamname = event['ResourceProperties']['SSMParamName']
+                      keyresponse = ec2client.delete_key_pair(KeyName=key)
+                      ssmparam = ssmclient.delete_parameter(
+                          Name=ssmparamname
+                      )
+                      responseData = {'Delete': 'SUCCESS'}
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+                if event['RequestType'] == 'Create':
+
+                      key = event['ResourceProperties']['KeyName']
+                      ssmparamname = event['ResourceProperties']['SSMParamName']
+                      keyresponse = ec2client.create_key_pair(KeyName=key)
+                      ssmparam = ssmclient.put_parameter(
+                          Name=ssmparamname,
+                          Description='Migration Helper Public Key',
+                          Value=keyresponse['KeyMaterial'],
+                          Type='String'
+                      )
+                      responseData = {'SSMParameter': ssmparamname, 'KeyPair': key}
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+                if event['RequestType'] == 'Update':
+                      key = event['ResourceProperties']['KeyName']
+                      ssmparamname = event['ResourceProperties']['SSMParamName']
+                      responseData = {'SSMParameter': ssmparamname, 'KeyPair': key}
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+            except Exception as e:
+                responseData = {'Error': str(e)}
+                cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
+
+  CreateKeypaireExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+                - Fn::Join:
+                    - ""
+                    - - "states."
+                      - Ref: "AWS::Region"
+                      - ".amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "Policies"
+          PolicyDocument:
+            Statement:
+              - Effect: "Allow"
+                Action: "*"
+                Resource: "*"
+  OpenEFSAccessCustom:
+    Type: Custom::OpenEFSAccessCustom
+    Version: 1.0
+    Properties:
+      ServiceToken: !GetAtt OpenEFSAccess.Arn
+      HelperSG: !Ref HelperSecurityGroup
+      EFSSG: !Ref EFSSecurityGroup
+  OpenEFSAccess:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt CreateKeypaireExecutionRole.Arn
+      Runtime: python3.7
+      Timeout: 120
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import cfnresponse
+          ec2client = boto3.client('ec2')
+          def lambda_handler(event, context):
+            try:
+                  efssg =  event['ResourceProperties']['EFSSG']
+                  evsg = event['ResourceProperties']['HelperSG']
+                  if event['RequestType'] == 'Delete':
+                      response = ec2client.revoke_security_group_ingress(
+                          GroupId=efssg,
+                          IpPermissions=[
+                              {'IpProtocol': 'tcp',
+                               'FromPort': 2049,
+                               'ToPort': 2049,
+                               'UserIdGroupPairs': [{'GroupId': evsg}]}
+                          ]
+                      )
+                      print(response)
+                      responseData = {'Delete': 'SUCCESS'}
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+                  if event['RequestType'] == 'Create':
+                      response = ec2client.authorize_security_group_ingress(
+                          GroupId=efssg,
+                          IpPermissions=[
+                              {'IpProtocol': 'tcp',
+                               'FromPort': 2049,
+                               'ToPort': 2049,
+                               'UserIdGroupPairs': [{'GroupId': evsg}]}
+                          ]
+                      )
+                      responseData = {'Create': 'SUCCESS'}
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+                  if event['RequestType'] == 'Update':
+                      responseData = {'Update': 'SUCCESS'}
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+            except Exception as e:
+                responseData = {'Error': str(e)}
+                cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
+  OpenEFSAccessExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+                - Fn::Join:
+                    - ""
+                    - - "states."
+                      - Ref: "AWS::Region"
+                      - ".amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "Policies"
+          PolicyDocument:
+            Statement:
+              - Effect: "Allow"
+                Action: "*"
+                Resource: "*"
