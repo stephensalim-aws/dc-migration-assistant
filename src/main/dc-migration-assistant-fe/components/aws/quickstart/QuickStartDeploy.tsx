@@ -58,7 +58,7 @@ const StackNameField = (): ReactElement => {
             label={I18n.getText(
                 'atlassian.migration.datacenter.provision.aws.form.stackName.label'
             )}
-            name="stackName"
+            name={STACK_NAME_FIELD_NAME}
         >
             {({ fieldProps, error }: any): ReactElement => (
                 <>
