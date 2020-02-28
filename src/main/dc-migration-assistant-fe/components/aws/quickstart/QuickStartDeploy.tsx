@@ -23,7 +23,7 @@ const QUICKSTART_PARAMETERS_URL =
 const stackProvisioningTemplateUrl =
     'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-jira/templates/quickstart-jira-dc-with-vpc.template.yaml';
 
-const STACK_NAME_FIELD_NAME = 'QSStackName';
+const STACK_NAME_FIELD_NAME = 'stackName';
 
 const isOptionType = (obj: any): obj is OptionType => {
     return obj.label && obj.value;
@@ -43,7 +43,7 @@ const QuickstartSubmitButton = styled(Button)`
 
 const StackNameField = (): ReactElement => {
     const fieldNameValidator = (stackName: string): string => {
-        const regExpMatch = stackName.match('^[a-zA-Z.-]+$');
+        const regExpMatch = stackName.match('^[a-zA-Z][a-zA-Z0-9-.]{1,126}$');
         return regExpMatch != null
             ? undefined
             : I18n.getText(
@@ -85,7 +85,7 @@ const QuickstartForm = ({
                 if (isOptionType(value)) {
                     transformedCfnParams[key] = value.value;
                 } else if (isArrayOfOptionType(value)) {
-                    transformedCfnParams[key] = value.map(option => option.value);
+                    transformedCfnParams[key] = JSON.stringify(value.map(option => option.value));
                 }
             });
 

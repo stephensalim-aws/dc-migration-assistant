@@ -23,6 +23,8 @@ const createAZSelection: FormElementGenerator = (defaultFieldProps, param) => {
         'us-east-1d',
         'us-east-1e',
         'us-east-1f',
+        'ap-southeast-2a',
+        'ap-southeast-2b',
     ];
 
     // This will be replaced by an API call
