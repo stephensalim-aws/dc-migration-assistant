@@ -92,7 +92,23 @@ public class DefaultFileSystemMigrationReportTest {
         sut.setClock(Clock.offset(testClock, Duration.ofDays(1).plusSeconds(5)));
 
         assertEquals(1L, sut.getElapsedTime().toDays());
-        assertEquals(5L, sut.getElapsedTime().minusDays(1).getSeconds());
+    }
+
+    @Test
+    void shouldNotRestartTimerWhenTransitioningFromRunningToRunning() {
+        Clock testClock = Clock.fixed(Instant.ofEpochMilli(0), ZoneId.systemDefault());
+        sut.setClock(testClock);
+
+        sut.setStatus(RUNNING);
+
+        sut.setClock(Clock.offset(testClock, Duration.ofSeconds(10)));
+        assertEquals(10L, sut.getElapsedTime().getSeconds());
+
+        sut.setStatus(RUNNING);
+        assertEquals(10L, sut.getElapsedTime().getSeconds());
+
+        sut.setClock(Clock.offset(testClock, Duration.ofSeconds(20)));
+        assertEquals(20L, sut.getElapsedTime().getSeconds());
     }
 
     @ParameterizedTest
