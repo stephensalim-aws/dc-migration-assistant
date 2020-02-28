@@ -3,7 +3,12 @@ package com.atlassian.migration.datacenter.api.fs;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,18 +57,28 @@ public class FileSystemMigrationProgressEndpointTest {
 
         final Response response = endpoint.getFilesystemMigrationStatus();
 
-        final FileSystemMigrationProgressEndpoint.FSMigrationProgressWebObject returnedReport = (FileSystemMigrationProgressEndpoint.FSMigrationProgressWebObject) response.getEntity();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.ALL, Visibility.ANY);
 
-        assertEquals(RUNNING.name(), returnedReport.status);
-        assertEquals(1, returnedReport.failedFileMigrations.size());
-        assertEquals(testReason, returnedReport.failedFileMigrations.get(0).getReason());
-        assertEquals(testFile, returnedReport.failedFileMigrations.get(0).getFilePath());
-        assertEquals(1, returnedReport.migratedFiles.size());
-        assertEquals(successFileName, returnedReport.migratedFiles.get(0).toString());
+        final String responseJson = (String) response.getEntity();
+        ObjectReader reader = mapper.reader();
+        JsonNode tree = reader.readTree(responseJson);
+
+        final String responseStatus = tree.at("/status").asText();
+
+        final String responseReason = tree.at("/failedFiles/0/reason").asText();
+        final String responseFailedFile = tree.at("/failedFiles/0/filePath").asText();
+
+        final String responseSuccessFile = tree.at("/migratedFiles/0").asText();
+
+        assertEquals(RUNNING.name(), responseStatus);
+        assertEquals(testReason, responseReason);
+        assertEquals(testFile.toUri().toString(), responseFailedFile);
+        assertEquals(successFile.toUri().toString(), responseSuccessFile);
     }
 
     @Test
-    void shouldReturnBadRequestWhenNoReportExists() throws JsonProcessingException {
+    void shouldReturnBadRequestWhenNoReportExists() {
         when(migrationService.getReport()).thenReturn(null);
 
         final Response response = endpoint.getFilesystemMigrationStatus();
