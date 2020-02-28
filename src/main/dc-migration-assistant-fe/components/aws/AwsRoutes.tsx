@@ -18,7 +18,9 @@ export const AWSRoutes: FunctionComponent = () => (
         <Route exact path={quickstartPath}>
             <QuickStartDeploy />
         </Route>
-        <Route exact path={quickstartStatusPath} component={QuickStartStatus} />
+        <Route exact path={quickstartStatusPath}>
+            <QuickStartStatus/>
+        </Route>
         <Route exact path={awsAuthPath}>
             <AuthenticateAWS
                 getRegions={getRegions}

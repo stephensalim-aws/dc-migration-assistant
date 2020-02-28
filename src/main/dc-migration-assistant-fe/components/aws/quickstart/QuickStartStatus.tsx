@@ -1,4 +1,5 @@
 import React, { FunctionComponent, ReactElement, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import SuccessIcon from '@atlaskit/icon/glyph/check-circle';
 import ErrorIcon from '@atlaskit/icon/glyph/error';
@@ -37,7 +38,8 @@ const stageStatusFlag = (currentProvisioningStatus: string): ReactElement => {
     );
 };
 
-export const QuickStartStatus: FunctionComponent = (props: Record<any, any>): ReactElement => {
+export const QuickStartStatus: FunctionComponent = (): ReactElement => {
+    const { stackId } = useParams();
     const [inProgress, setInProgress]: [boolean, Function] = useState(true);
     const [provisioningStatus, setProvisioningStatus]: [string, Function] = useState('UNKNOWN');
     let intervalId: NodeJS.Timeout;
@@ -72,11 +74,8 @@ export const QuickStartStatus: FunctionComponent = (props: Record<any, any>): Re
     };
 
     useEffect(() => {
-        const { match } = props;
-        const stackIdentifier = match.params.stackId;
-
         intervalId = setInterval(() => {
-            getStackStatusFromApi(stackIdentifier).then(console.log);
+            getStackStatusFromApi(stackId).then(console.log);
         }, 5000);
 
         return () => {
