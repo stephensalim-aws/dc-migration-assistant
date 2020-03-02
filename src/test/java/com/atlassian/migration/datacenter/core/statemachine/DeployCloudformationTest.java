@@ -7,15 +7,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.services.cloudformation.model.StackStatus;
+import software.amazon.awssdk.services.cloudformation.model.Stack;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_IN_PROGRESS;
 
 @ExtendWith(MockitoExtension.class)
 class DeployCloudformationTest {
@@ -61,9 +64,18 @@ class DeployCloudformationTest {
         final String stackName = "stack-name";
         when(mockMigrationContext.getAppStackName()).thenReturn(stackName);
 
-        when(mockCfnApi.getStatus(stackName)).thenReturn(StackStatus.CREATE_IN_PROGRESS);
+        when(mockCfnApi.getStack(stackName)).thenReturn(Optional.of(Stack.builder().build()));
 
         assertTrue(sut.readyToTransition());
     }
 
+    @Test
+    void shouldNotIndicateReadyToTransitionWhenStackIsNotDeploying() {
+        final String stackName = "stack-name";
+        when(mockMigrationContext.getAppStackName()).thenReturn(stackName);
+
+        when(mockCfnApi.getStack(stackName)).thenReturn(Optional.empty());
+
+        assertFalse(sut.readyToTransition());
+    }
 }

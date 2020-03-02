@@ -25,7 +25,7 @@ public class DeployCloudformation implements State {
 
     @Override
     public boolean readyToTransition() {
-        cloudformationApi.getStatus(context.getAppStackName());
-        return true;
+        return cloudformationApi.getStack(context.getAppStackName()).isPresent();
+
     }
 }
