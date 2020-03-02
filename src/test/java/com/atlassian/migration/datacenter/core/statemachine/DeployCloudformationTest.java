@@ -7,11 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,7 +44,7 @@ class DeployCloudformationTest {
     void shouldInitiateDeploymentWhenRun() {
         final Map<String, String> params = new HashMap<>();
         params.put("Parameter1", "value");
-        final String stackName = "stack name";
+        final String stackName = "stack-name";
         final String templateUrl = "s3://bucket/template.yml";
 
         when(mockMigrationContext.getAppStackName()).thenReturn(stackName);
@@ -52,6 +54,16 @@ class DeployCloudformationTest {
         sut.run();
 
         verify(mockCfnApi).provisionStack(templateUrl, stackName, params);
+    }
+
+    @Test
+    void shouldIndicateReadyToTransitionWhenStackHasStartedToDeploy() {
+        final String stackName = "stack-name";
+        when(mockMigrationContext.getAppStackName()).thenReturn(stackName);
+
+        when(mockCfnApi.getStatus(stackName)).thenReturn(StackStatus.CREATE_IN_PROGRESS);
+
+        assertTrue(sut.readyToTransition());
     }
 
 }

@@ -55,6 +55,11 @@ public class CfnApi {
         return client;
     }
 
+    /**
+     * Gets the status of the supplied stack. If there is no stack with this name a runtime exception will be
+     * thrown.
+     * @param stackName the name of the stack the get the status of
+     */
     public StackStatus getStatus(String stackName) {
         Optional<Stack> stack = getStack(stackName);
         if (!stack.isPresent()) {
