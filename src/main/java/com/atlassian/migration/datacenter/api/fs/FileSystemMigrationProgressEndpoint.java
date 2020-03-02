@@ -18,9 +18,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class FileSystemMigrationProgressEndpoint {
 
     private final FilesystemMigrationService migrationService;
+    private final ObjectMapper mapper;
 
     public FileSystemMigrationProgressEndpoint(FilesystemMigrationService migrationService) {
         this.migrationService = migrationService;
+        this.mapper = new ObjectMapper();
+        this.mapper.setVisibility(PropertyAccessor.ALL, Visibility.ANY);
     }
 
     @GET
@@ -33,8 +36,6 @@ public class FileSystemMigrationProgressEndpoint {
                     .entity("no file system migration exists")
                     .build();
         }
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, Visibility.ANY);
 
         try {
             return Response
