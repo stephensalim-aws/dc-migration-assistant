@@ -39,8 +39,11 @@ public class CloudFormationEndpoint {
             String stackId = migrationService.provisionInfrastructure(provisioningConfig);
             //Should be updated to URI location after get stack details Endpoint is built
             return Response.status(Response.Status.ACCEPTED).entity(stackId).build();
-        } catch (InvalidMigrationStageError | InfrastructureProvisioningError e) {
-            log.error("Unable to provision stack on cloud formation", e);
+        } catch (InvalidMigrationStageError e) {
+            log.error("Migration stage is not valid.", e);
+            return Response.status(Response.Status.CONFLICT).build();
+        } catch (InfrastructureProvisioningError e) {
+            log.error("Unable to provision cloud formation stack on AWS", e);
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }

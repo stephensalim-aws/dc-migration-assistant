@@ -1,6 +1,8 @@
 package com.atlassian.migration.datacenter.spi;
 
 import com.atlassian.activeobjects.tx.Transactional;
+import com.atlassian.migration.datacenter.core.exceptions.InfrastructureProvisioningError;
+import com.atlassian.migration.datacenter.core.exceptions.InvalidMigrationStageError;
 import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 
 import java.util.Optional;
@@ -30,7 +32,7 @@ public interface MigrationService {
      * @param provisioningConfig contains information required to provision a stack
      * @return a stack identifier of the created stack
      */
-    String provisionInfrastructure(ProvisioningConfig provisioningConfig);
+    String provisionInfrastructure(ProvisioningConfig provisioningConfig) throws InvalidMigrationStageError, InfrastructureProvisioningError;
 
     Optional<String> getInfrastructureProvisioningStatus(String stackId);
 

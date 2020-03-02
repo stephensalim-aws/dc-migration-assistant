@@ -95,7 +95,7 @@ public class AWSMigrationService implements MigrationService {
      * {@inheritDoc}
      */
     @Override
-    public String provisionInfrastructure(ProvisioningConfig config) {
+    public String provisionInfrastructure(ProvisioningConfig config) throws InvalidMigrationStageError, InfrastructureProvisioningError {
         //TODO: Refactor this to a state machine as part of https://aws-partner.atlassian.net/browse/CHET-101. This will be extracted to a different class then
         MigrationStage currentMigrationStage = getMigrationStage();
         if (currentMigrationStage != MigrationStage.STARTED) {

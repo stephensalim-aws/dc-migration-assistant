@@ -26,7 +26,7 @@ class CloudFormationEndpointTest {
     private CloudFormationEndpoint endpoint;
 
     @Test
-    public void shouldAcceptRequestToProvisionCloudFormationStack() {
+    public void shouldAcceptRequestToProvisionCloudFormationStack() throws Exception {
         ProvisioningConfig provisioningConfig = new ProvisioningConfig("url", "stack-name", new HashMap<>());
 
         String stackId = "stack-id";
@@ -38,14 +38,14 @@ class CloudFormationEndpointTest {
     }
 
     @Test
-    public void shouldBeBadRequestWhenCurrentMigrationStageIsNotValid() {
+    public void shouldBeConflictWhenCurrentMigrationStageIsNotValid() throws Exception {
         ProvisioningConfig provisioningConfig = new ProvisioningConfig("url", "stack-name", new HashMap<>());
 
         when(this.migrationService.provisionInfrastructure(provisioningConfig)).thenThrow(new InvalidMigrationStageError("error"));
 
         Response response = endpoint.provisionInfrastructure(provisioningConfig);
 
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
     }
 
     @Test
