@@ -1,6 +1,6 @@
 package com.atlassian.migration.datacenter.core.fs.reporting;
 
-import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport.FailedFileMigration;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
