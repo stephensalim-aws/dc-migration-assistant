@@ -73,6 +73,11 @@ public class AWSMigrationService implements MigrationService {
         return getMigration().getStage();
     }
 
+    @Override
+    public void setStage(MigrationStage appStackDeploy) {
+        // Update the migration in AO
+    }
+
     private Migration getMigration() {
         if (migration == null) {
             Migration[] migrations = ao.find(Migration.class);

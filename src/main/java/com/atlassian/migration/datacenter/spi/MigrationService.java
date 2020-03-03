@@ -27,6 +27,11 @@ public interface MigrationService {
     MigrationStage getMigrationStage();
 
     /**
+     * Updates the stage of the migration
+     * @param appStackDeploy
+     */
+    void setStage(MigrationStage appStackDeploy);
+    /**
      * Provisions a CloudFormation stack.
      *
      * @param provisioningConfig contains information required to provision a stack
@@ -37,4 +42,5 @@ public interface MigrationService {
     Optional<String> getInfrastructureProvisioningStatus(String stackId);
 
     boolean startFilesystemMigration();
+
 }
