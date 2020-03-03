@@ -9,20 +9,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.services.cloudformation.model.Stack;
+import software.amazon.awssdk.services.cloudformation.model.StackInstanceNotFoundException;
 import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_COMPLETE;
-import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_FAILED;
 import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_IN_PROGRESS;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,8 +61,7 @@ class DeployCloudformationTest {
         verify(mockCfnApi).provisionStack(templateUrl, stackName, params);
     }
 
-    @Test
-    @ParameterizedTest()
+    @ParameterizedTest
     @EnumSource(value = StackStatus.class, names = {"CREATE_COMPLETE", "CREATE_FAILED"})
     void shouldIndicateReadyToTransitionWhenStackHasFinishedDeploying(StackStatus status) {
         final String stackName = "stack-name";
@@ -76,11 +72,21 @@ class DeployCloudformationTest {
     }
 
     @Test
-    void shouldNotIndicateReadyToTransitionWhenStackIsNotDeploying() {
+    void shouldNotIndicateReadyToTransitionIfStackStillDeploying() {
         final String stackName = "stack-name";
         when(mockMigrationContext.getAppStackName()).thenReturn(stackName);
 
-        when(mockCfnApi.getStack(stackName)).thenReturn(Optional.empty());
+        when(mockCfnApi.getStatus(stackName)).thenReturn(CREATE_IN_PROGRESS);
+
+        assertFalse(sut.readyToTransition());
+    }
+
+    @Test
+    void shouldNotIndicateReadyToTransitionIfNoStackExists() {
+        final String stackName = "stack-name";
+        when(mockMigrationContext.getAppStackName()).thenReturn(stackName);
+
+        when(mockCfnApi.getStatus(stackName)).thenThrow(StackInstanceNotFoundException.builder().message("it ain't here fam").build());
 
         assertFalse(sut.readyToTransition());
     }
