@@ -1,15 +1,16 @@
 package com.atlassian.migration.datacenter.core.fs.reporting;
 
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationProgress;
+import com.google.common.collect.ImmutableSet;
 
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultFilesystemMigrationProgress implements FileSystemMigrationProgress {
 
-    private List<Path> migratedFiles = new LinkedList<>();
+    private ConcurrentHashMap<Path, Void> migratedFiles = new ConcurrentHashMap<>();
 
     private AtomicLong filesFound = new AtomicLong(0);
 
@@ -36,13 +37,13 @@ public class DefaultFilesystemMigrationProgress implements FileSystemMigrationPr
     }
 
     @Override
-    public List<Path> getMigratedFiles() {
-        return migratedFiles;
+    public Set<Path> getMigratedFiles() {
+        return ImmutableSet.copyOf(migratedFiles.keySet());
     }
 
     @Override
     public void reportFileMigrated(Path path) {
-        migratedFiles.add(path);
+        migratedFiles.put(path, null);
         filesInFlight.decrementAndGet();
     }
 }

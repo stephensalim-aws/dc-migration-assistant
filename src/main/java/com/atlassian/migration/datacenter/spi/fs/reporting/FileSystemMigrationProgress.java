@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Tracks the progress of the file system migration
@@ -28,7 +28,14 @@ public interface FileSystemMigrationProgress {
 
     void reportFileInFlight();
 
-    List<Path> getMigratedFiles();
+    /**
+     * Retrieves a Set containing the files which were successfully migrated
+     */
+    Set<Path> getMigratedFiles();
 
+    /**
+     * Reports that a file was migrated successfully. Implementers should be careful that the underlying
+     * collection is thread safe as this may be called from multiple file upload threads.
+     */
     void reportFileMigrated(Path path);
 }

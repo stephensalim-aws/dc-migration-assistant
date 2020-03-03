@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.DONE;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.FAILED;
@@ -65,7 +65,7 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     }
 
     @Override
-    public List<FailedFileMigration> getFailedFiles() {
+    public Set<FailedFileMigration> getFailedFiles() {
         return errorReport.getFailedFiles();
     }
 
@@ -95,7 +95,7 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     }
 
     @Override
-    public List<Path> getMigratedFiles() {
+    public Set<Path> getMigratedFiles() {
         return progress.getMigratedFiles();
     }
 
