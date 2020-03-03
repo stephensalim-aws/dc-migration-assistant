@@ -56,7 +56,7 @@ public class EncryptedCredentialsStorage implements ReadCredentialsService, Writ
             try (Stream<String> stream = Files.lines(Paths.get(passwordFile.getPath()), StandardCharsets.UTF_8)) {
                 stream.forEach(keyBuilder::append);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e.getLocalizedMessage());
             }
             String encoded = keyBuilder.toString();
             return encoded;
@@ -76,7 +76,7 @@ public class EncryptedCredentialsStorage implements ReadCredentialsService, Writ
             try (Stream<String> stream = Files.lines(Paths.get(saltFile.getPath()), StandardCharsets.UTF_8)) {
                 stream.forEach(saltBuilder::append);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getLocalizedMessage());
             }
             return saltBuilder.toString();
         } else {
