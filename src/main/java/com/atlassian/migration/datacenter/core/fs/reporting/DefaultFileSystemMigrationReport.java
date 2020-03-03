@@ -101,10 +101,11 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
 
     @Override
     public String toString() {
-        return String.format("Filesystem migration report = { status: %s, migratedFiles: %d, erroredFiles: %d}",
+        return String.format("Filesystem migration report = { status: %s, migratedFiles: %d, erroredFiles: %d }",
                 currentStatus,
                 progress.getMigratedFiles().size(),
-                errorReport.getFailedFiles().size());
+                errorReport.getFailedFiles().size()
+        );
     }
 }
 

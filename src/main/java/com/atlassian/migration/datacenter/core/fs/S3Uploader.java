@@ -67,7 +67,7 @@ public class S3Uploader implements Uploader {
         try {
             final PutObjectResponse evaluatedResponse = operation.response.get();
             if (!evaluatedResponse.sdkHttpResponse().isSuccessful()) {
-                final String errorMessage = String.format("Error when uploading to S3, %s", evaluatedResponse.sdkHttpResponse().statusText());
+                final String errorMessage = String.format("Error when uploading {} to S3, {}", operation.path, evaluatedResponse.sdkHttpResponse().statusText());
                 addFailedFile(operation.path, errorMessage);
             } else {
                 progress.reportFileMigrated(operation.path);
@@ -79,6 +79,7 @@ public class S3Uploader implements Uploader {
 
     private void addFailedFile(Path path, String reason) {
         report.reportFileNotMigrated(new FailedFileMigration(path, reason));
+        logger.error("File {} wasn't uploaded. Reason: {}", path, reason);
     }
 
     private static class S3UploadOperation {
