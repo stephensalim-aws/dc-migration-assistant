@@ -30,8 +30,7 @@ public class DefaultFileSystemMigrationProgressTest {
 
         assertEquals(1, sut.getMigratedFiles().size());
 
-        final Path migratedFile = sut.getMigratedFiles().get(0);
-        assertEquals(testFile, migratedFile);
+        assertTrue(sut.getMigratedFiles().contains(testFile));
     }
 
     @Test

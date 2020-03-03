@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultFilesystemMigrationProgress implements FileSystemMigrationProgress {
 
-    private ConcurrentHashMap<Path, Void> migratedFiles = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Path, Boolean> migratedFiles = new ConcurrentHashMap<>();
 
     private AtomicLong filesFound = new AtomicLong(0);
 
@@ -43,7 +43,7 @@ public class DefaultFilesystemMigrationProgress implements FileSystemMigrationPr
 
     @Override
     public void reportFileMigrated(Path path) {
-        migratedFiles.put(path, null);
+        migratedFiles.put(path, true);
         filesInFlight.decrementAndGet();
     }
 }

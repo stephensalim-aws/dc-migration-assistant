@@ -19,6 +19,8 @@ import javax.ws.rs.core.Response;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,11 +51,15 @@ public class FileSystemMigrationProgressEndpointTest {
         final String testReason = "test reason";
         final Path testFile = Paths.get("file");
         final FailedFileMigration failedFileMigration = new FailedFileMigration(testFile, testReason);
-        when(report.getFailedFiles()).thenReturn(Collections.singletonList(failedFileMigration));
+        final Set<FailedFileMigration> failedFiles = new HashSet<>();
+        failedFiles.add(failedFileMigration);
+        when(report.getFailedFiles()).thenReturn(failedFiles);
 
         final String successFileName = "success_file.txt";
         final Path successFile = Paths.get(successFileName);
-        when(report.getMigratedFiles()).thenReturn(Collections.singletonList(successFile));
+        final Set<Path> succeededFiles = new HashSet<>();
+        succeededFiles.add(successFile);
+        when(report.getMigratedFiles()).thenReturn(succeededFiles);
 
         final Response response = endpoint.getFilesystemMigrationStatus();
 

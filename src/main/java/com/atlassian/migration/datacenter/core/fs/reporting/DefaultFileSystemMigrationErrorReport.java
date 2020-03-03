@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class DefaultFileSystemMigrationErrorReport implements FileSystemMigrationErrorReport {
 
-    private final ConcurrentHashMap<FailedFileMigration, Void> failedMigrations;
+    private final ConcurrentHashMap<FailedFileMigration, Boolean> failedMigrations;
 
     public DefaultFileSystemMigrationErrorReport() {
         this.failedMigrations = new ConcurrentHashMap<>();
@@ -32,7 +32,7 @@ public class DefaultFileSystemMigrationErrorReport implements FileSystemMigratio
         if (failedMigrations.size() >= 100) {
             return;
         }
-        failedMigrations.put(failedFileMigration, null);
+        failedMigrations.put(failedFileMigration, true);
     }
 
     /**
