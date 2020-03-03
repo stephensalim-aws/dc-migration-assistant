@@ -5,9 +5,12 @@ import com.atlassian.migration.datacenter.spi.statemachine.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.cloudformation.model.Stack;
+import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_COMPLETE;
+import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_FAILED;
 import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_IN_PROGRESS;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,11 +65,12 @@ class DeployCloudformationTest {
     }
 
     @Test
-    void shouldIndicateReadyToTransitionWhenStackHasStartedToDeploy() {
+    @ParameterizedTest()
+    @EnumSource(value = StackStatus.class, names = {"CREATE_COMPLETE", "CREATE_FAILED"})
+    void shouldIndicateReadyToTransitionWhenStackHasFinishedDeploying(StackStatus status) {
         final String stackName = "stack-name";
         when(mockMigrationContext.getAppStackName()).thenReturn(stackName);
-
-        when(mockCfnApi.getStack(stackName)).thenReturn(Optional.of(Stack.builder().build()));
+        when(mockCfnApi.getStatus(stackName)).thenReturn(status);
 
         assertTrue(sut.readyToTransition());
     }
