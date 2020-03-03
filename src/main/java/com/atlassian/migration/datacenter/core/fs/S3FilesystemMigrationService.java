@@ -35,8 +35,8 @@ import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigr
 public class S3FilesystemMigrationService implements FilesystemMigrationService {
     private static final Logger logger = LoggerFactory.getLogger(S3FilesystemMigrationService.class);
 
-    private static final int NUM_UPLOAD_THREADS = Integer.getInteger("NUM_UPLOAD_THREADS", 2);
-    private static final String BUCKET_NAME = System.getProperty("S3_TARGET_BUCKET_NAME", "slingshot-test-2");
+    private static final int NUM_UPLOAD_THREADS = Integer.getInteger("NUM_UPLOAD_THREADS", 1);
+    private static final String BUCKET_NAME = System.getProperty("S3_TARGET_BUCKET_NAME", "trebuchet-abrokes");
 
     private final AwsCredentialsProvider credentialsProvider;
     private final RegionService regionService;

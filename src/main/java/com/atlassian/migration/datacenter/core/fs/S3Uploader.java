@@ -17,6 +17,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.atlassian.migration.datacenter.core.fs.S3Configuration.MAXIMUM_FILE_SIZE_TO_UPLOAD;
+
 public class S3Uploader implements Uploader {
     private static final Logger logger = LoggerFactory.getLogger(S3Uploader.class);
     private static final int MS_TO_WAIT_FOR_CRAWLER = 500;
@@ -46,6 +48,15 @@ public class S3Uploader implements Uploader {
             } else {
                 if (Files.exists(path)) {
                     String key = config.getSharedHome().relativize(path).toString();
+                    if (path.toFile().length() > MAXIMUM_FILE_SIZE_TO_UPLOAD) {
+                        logger.debug("File {} is larger than 5 GBs, running multipart upload", path);
+                        final S3MultiPartUploader multiPartUploader = new S3MultiPartUploader(config);
+                        try {
+                            multiPartUploader.multiPartUpload(path.toFile());
+                        } catch (InterruptedException | ExecutionException e) {
+                            logger.error("Error when running multi-part upload", e);
+                        }
+                    }
                     final PutObjectRequest putRequest = PutObjectRequest.builder()
                             .bucket(config.getBucketName())
                             .key(key)
