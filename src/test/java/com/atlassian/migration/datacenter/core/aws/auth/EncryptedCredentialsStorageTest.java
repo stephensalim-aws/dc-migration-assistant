@@ -1,10 +1,10 @@
 package com.atlassian.migration.datacenter.core.aws.auth;
 
+import com.atlassian.sal.api.pluginsettings.PluginSettings;
+import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,11 +13,25 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@ExtendWith(MockitoExtension.class)
 public class EncryptedCredentialsStorageTest {
 
-    @InjectMocks
+
     private EncryptedCredentialsStorage encryptedCredentialsStorage;
+
+    @BeforeEach
+    public void setup() {
+        this.encryptedCredentialsStorage = new EncryptedCredentialsStorage(new PluginSettingsFactory() {
+            @Override
+            public PluginSettings createSettingsForKey(String s) {
+                return null;
+            }
+
+            @Override
+            public PluginSettings createGlobalSettings() {
+                return null;
+            }
+        });
+    }
 
     @Test
     public void testEncryption() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
