@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.core.statemachine;
 
 import com.atlassian.migration.datacenter.core.aws.CfnApi;
+import com.atlassian.migration.datacenter.spi.statemachine.NoValidTransitionException;
 import com.atlassian.migration.datacenter.spi.statemachine.State;
 import software.amazon.awssdk.services.cloudformation.model.StackInstanceNotFoundException;
 import software.amazon.awssdk.services.cloudformation.model.StackStatus;
@@ -21,17 +22,35 @@ public class DeployCloudformation implements State {
     }
 
     @Override
-    public State nextState() {
-        return new WaitCloudformation();
+    public State nextState() throws NoValidTransitionException {
+        StackStatus status = safeGetStackStatus();
+
+        if (status == null) {
+            throw new NoValidTransitionException(this, "Can only transition when stack deployment has completed");
+        }
+
+        switch (status) {
+            case CREATE_COMPLETE:
+                return new DeployMigrationStack();
+            case CREATE_FAILED:
+                return new ErrorState();
+            default:
+                throw new NoValidTransitionException(this, "Can only transition when stack deployment has completed");
+        }
     }
 
     @Override
     public boolean readyToTransition() {
+        StackStatus status = safeGetStackStatus();
+        return status != null && isTerminalStackStatus(status);
+    }
+
+    private StackStatus safeGetStackStatus() {
         try {
             StackStatus status = cloudformationApi.getStatus(context.getAppStackName());
-            return status != null && isTerminalStackStatus(status);
+            return status;
         } catch (StackInstanceNotFoundException sinfe) {
-            return false;
+            return null;
         }
     }
 

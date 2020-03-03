@@ -12,7 +12,7 @@ public interface State {
      */
     void run();
 
-    State nextState();
+    State nextState() throws NoValidTransitionException;
 
     boolean readyToTransition();
 

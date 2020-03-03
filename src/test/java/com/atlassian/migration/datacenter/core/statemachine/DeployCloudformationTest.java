@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.core.statemachine;
 
 import com.atlassian.migration.datacenter.core.aws.CfnApi;
+import com.atlassian.migration.datacenter.spi.statemachine.NoValidTransitionException;
 import com.atlassian.migration.datacenter.spi.statemachine.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +18,12 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_COMPLETE;
+import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_FAILED;
 import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_IN_PROGRESS;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,10 +43,26 @@ class DeployCloudformationTest {
     }
 
     @Test
-    void shouldTransitionToCloudformationWaiting() {
-        State nextState = sut.nextState();
+    void shouldNotTransitionWhenStackNotDoneDeploying() {
+        assertThrows(NoValidTransitionException.class , () -> sut.nextState());
+    }
 
-        assertEquals(WaitCloudformation.class, nextState.getClass());
+    @Test
+    void shouldTransitionToErrorWhenStackDeployFailed() throws NoValidTransitionException {
+        final String stackName = "my-stack";
+        when(mockMigrationContext.getAppStackName()).thenReturn(stackName);
+        when(mockCfnApi.getStatus(stackName)).thenReturn(CREATE_FAILED);
+
+        assertEquals(ErrorState.class, sut.nextState().getClass());
+    }
+
+    @Test
+    void shouldTransitionToMigrationStackDeployWhenDeploySucceeded() throws NoValidTransitionException {
+        final String stackName = "my-stack";
+        when(mockMigrationContext.getAppStackName()).thenReturn(stackName);
+        when(mockCfnApi.getStatus(stackName)).thenReturn(CREATE_COMPLETE);
+
+        assertEquals(DeployMigrationStack.class, sut.nextState().getClass());
     }
 
     @Test
