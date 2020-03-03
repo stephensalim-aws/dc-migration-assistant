@@ -116,7 +116,7 @@ public class AWSMigrationServiceTest {
     }
 
     @Test
-    public void shouldProvisionInfrastructureUsingCloudFormationTemplate() {
+    public void shouldProvisionInfrastructureUsingCloudFormationTemplate() throws Exception {
         String templateUrl = "https://template.url", stackName = "test_provision";
         HashMap<String, String> params = new HashMap<>();
         String expectedStackId = "arn:stack:test_provision";
