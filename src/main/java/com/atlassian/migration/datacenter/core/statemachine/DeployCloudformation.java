@@ -25,9 +25,7 @@ public class DeployCloudformation implements State {
     public State nextState() throws NoValidTransitionException {
         StackStatus status = safeGetStackStatus();
 
-        if (status == null) {
-            throw new NoValidTransitionException(this, "Can only transition when stack deployment has completed");
-        }
+        throwNoValidTransitionIfStatusIsNull(status);
 
         switch (status) {
             case CREATE_COMPLETE:
@@ -36,6 +34,12 @@ public class DeployCloudformation implements State {
                 return new ErrorState();
             default:
                 throw new NoValidTransitionException(this, "Can only transition when stack deployment has completed");
+        }
+    }
+
+    private void throwNoValidTransitionIfStatusIsNull(StackStatus status) throws NoValidTransitionException {
+        if (status == null) {
+            throw new NoValidTransitionException(this, "Can only transition when stack deployment has completed");
         }
     }
 
