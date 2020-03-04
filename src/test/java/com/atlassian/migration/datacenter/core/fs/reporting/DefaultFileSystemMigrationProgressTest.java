@@ -33,4 +33,30 @@ public class DefaultFileSystemMigrationProgressTest {
         final Path migratedFile = sut.getMigratedFiles().get(0);
         assertEquals(testFile, migratedFile);
     }
+
+    @Test
+    void shouldCountMigratingFile() {
+        sut.reportFileFound();
+
+        assertEquals(1, sut.getNumberOfFilesFound());
+    }
+
+    @Test
+    void shouldCountInFlightFile() {
+        sut.reportFileInFlight();
+
+        assertEquals(1, sut.getNumberOfFilesInFlight());
+    }
+
+    @Test
+    void ShouldRemoveFileFromInFlightWhenItIsMigrated() {
+        sut.reportFileInFlight();
+        sut.reportFileInFlight();
+
+        assertEquals(2, sut.getNumberOfFilesInFlight());
+
+        sut.reportFileMigrated(Paths.get("test"));
+
+        assertEquals(1, sut.getNumberOfFilesInFlight());
+    }
 }

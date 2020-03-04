@@ -51,6 +51,7 @@ public class S3Uploader implements Uploader {
                             .key(key)
                             .build();
                     final CompletableFuture<PutObjectResponse> response = config.getS3AsyncClient().putObject(putRequest, path);
+                    progress.reportFileInFlight();
                     final S3UploadOperation uploadOperation = new S3UploadOperation(path, response);
 
                     responsesQueue.add(uploadOperation);

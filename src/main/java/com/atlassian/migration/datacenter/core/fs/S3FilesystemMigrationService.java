@@ -118,7 +118,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     }
 
     private void populateUploadQueue() {
-        Crawler homeCrawler = new DirectoryStreamCrawler(report);
+        Crawler homeCrawler = new DirectoryStreamCrawler(report, report);
         try {
             homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
         } catch (IOException e) {
