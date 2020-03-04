@@ -40,4 +40,11 @@ public class DefaultFileSystemMigrationProgressTest {
 
         assertEquals(1, sut.getNumberOfFilesFound());
     }
+
+    @Test
+    void shouldCountInFlightFile() {
+        sut.reportFileInFlight();
+
+        assertEquals(1, sut.getNumberOfFilesInFlight());
+    }
 }

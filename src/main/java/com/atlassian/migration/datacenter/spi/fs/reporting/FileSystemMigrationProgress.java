@@ -20,6 +20,14 @@ public interface FileSystemMigrationProgress {
 
     void reportFileFound();
 
+    /**
+     * Gets the number of files which are currently being uploaded but not yet confirmed to be uploaded successfully
+     */
+    @JsonProperty("filesInFlight")
+    Long getNumberOfFilesInFlight();
+
+    void reportFileInFlight();
+
     List<Path> getMigratedFiles();
 
     void reportFileMigrated(Path path);

@@ -13,6 +13,8 @@ public class DefaultFilesystemMigrationProgress implements FileSystemMigrationPr
 
     private AtomicLong filesFound = new AtomicLong(0);
 
+    private AtomicLong filesInFlight = new AtomicLong(0);
+
     @Override
     public Long getNumberOfFilesFound() {
         return filesFound.get();
@@ -21,6 +23,16 @@ public class DefaultFilesystemMigrationProgress implements FileSystemMigrationPr
     @Override
     public void reportFileFound() {
         filesFound.incrementAndGet();
+    }
+
+    @Override
+    public Long getNumberOfFilesInFlight() {
+        return filesInFlight.get();
+    }
+
+    @Override
+    public void reportFileInFlight() {
+        filesInFlight.incrementAndGet();
     }
 
     @Override
