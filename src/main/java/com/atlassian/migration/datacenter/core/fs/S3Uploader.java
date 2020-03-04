@@ -17,11 +17,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.atlassian.migration.datacenter.core.fs.S3Configuration.MAXIMUM_FILE_SIZE_TO_UPLOAD;
-
 public class S3Uploader implements Uploader {
     private static final Logger logger = LoggerFactory.getLogger(S3Uploader.class);
     private static final int MS_TO_WAIT_FOR_CRAWLER = 500;
+    private static final int MAX_OPEN_CONNECTIONS = 50;
+    private static final long MAXIMUM_FILE_SIZE_TO_UPLOAD = 5 * 1024 * 1024 * 1024L; // 5GB  https://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html
 
     private final FileSystemMigrationErrorReport report;
     private final FileSystemMigrationProgress progress;
@@ -45,6 +45,8 @@ public class S3Uploader implements Uploader {
                     logger.error("Interrupted S3 upload, adding all remaining files to failed collection");
                     queue.forEach(p -> addFailedFile(p, e.getMessage()));
                 }
+            } else if (responsesQueue.size() >= MAX_OPEN_CONNECTIONS) {
+                responsesQueue.forEach(this::handlePutObjectResponse);
             } else {
                 if (Files.exists(path)) {
                     String key = config.getSharedHome().relativize(path).toString();
@@ -54,7 +56,7 @@ public class S3Uploader implements Uploader {
                         try {
                             multiPartUploader.multiPartUpload(path.toFile());
                         } catch (InterruptedException | ExecutionException e) {
-                            logger.error("Error when running multi-part upload", e);
+                            logger.error("Error when running multi-part upload for file {} with exception {}", path, e.getMessage());
                         }
                     }
                     final PutObjectRequest putRequest = PutObjectRequest.builder()
@@ -79,7 +81,10 @@ public class S3Uploader implements Uploader {
         try {
             final PutObjectResponse evaluatedResponse = operation.response.get();
             if (!evaluatedResponse.sdkHttpResponse().isSuccessful()) {
-                final String errorMessage = String.format("Error when uploading {} to S3, {}", operation.path, evaluatedResponse.sdkHttpResponse().statusText());
+                final String errorMessage = String.format(
+                        "Error when uploading %s to S3, %s",
+                        operation.path,
+                        evaluatedResponse.sdkHttpResponse().statusText());
                 addFailedFile(operation.path, errorMessage);
             } else {
                 progress.reportFileMigrated();
