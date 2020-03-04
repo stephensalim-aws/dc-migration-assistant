@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,7 +26,6 @@ public class DefaultFileSystemMigrationProgressTest {
 
     @Test
     void shouldAddMigratedFileToMigratedFiles() {
-        final Path testFile = Paths.get("file");
         sut.reportFileMigrated();
 
         assertEquals(1, sut.getCountOfMigratedFiles());
@@ -52,8 +52,16 @@ public class DefaultFileSystemMigrationProgressTest {
 
         assertEquals(2, sut.getNumberOfFilesInFlight());
 
-        sut.reportFileMigrated(Paths.get("test"));
+        sut.reportFileMigrated();
 
         assertEquals(1, sut.getNumberOfFilesInFlight());
+    }
+
+    @Test
+    void shouldHandleLargeNumberOfMigratedFiles() {
+        int numFilesToMigrate = 1000000;
+        IntStream.range(0, numFilesToMigrate).forEach(i -> sut.reportFileMigrated());
+
+        assertEquals(numFilesToMigrate, sut.getCountOfMigratedFiles());
     }
 }

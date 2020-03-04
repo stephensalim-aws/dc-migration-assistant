@@ -23,6 +23,7 @@ import java.util.Set;
 
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -76,6 +77,47 @@ public class FileSystemMigrationProgressEndpointTest {
         assertEquals(testReason, responseReason);
         assertEquals(testFile.toUri().toString(), responseFailedFile);
         assertEquals(1, responseSuccessFileCount);
+    }
+
+    @Test
+    void shouldHandleVeryLargeReport() throws JsonProcessingException {
+        when(migrationService.getReport()).thenReturn(report);
+
+        when(report.getStatus()).thenReturn(RUNNING);
+
+        final Set<FailedFileMigration> failedFiles = new HashSet<>();
+
+        final String testReason = "test reason";
+        final Path testFile = Paths.get("file");
+        for (int i = 0; i < 100; i++) {
+            final FailedFileMigration failedFileMigration = new FailedFileMigration(testFile, testReason);
+            failedFiles.add(failedFileMigration);
+        }
+
+        when(report.getFailedFiles()).thenReturn(failedFiles);
+
+        when(report.getCountOfMigratedFiles()).thenReturn(1000000L);
+
+        final Response response = endpoint.getFilesystemMigrationStatus();
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.ALL, Visibility.ANY);
+
+        final String responseJson = (String) response.getEntity();
+        ObjectReader reader = mapper.reader();
+        JsonNode tree = reader.readTree(responseJson);
+
+        final String responseStatus = tree.at("/status").asText();
+
+        final String responseReason = tree.at("/failedFiles/99/reason").asText();
+        final String responseFailedFile = tree.at("/failedFiles/99/filePath").asText();
+
+        final Long responseSuccessFileCount = tree.at("/migratedFiles").asLong();
+
+        assertEquals(RUNNING.name(), responseStatus);
+        assertEquals(testReason, responseReason);
+        assertEquals(testFile.toUri().toString(), responseFailedFile);
+        assertEquals(1000000, responseSuccessFileCount);
     }
 
     @Test
