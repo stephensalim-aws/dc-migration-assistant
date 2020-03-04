@@ -138,6 +138,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>cloudformation</artifactId>
             <exclusions>
@@ -146,15 +152,39 @@
                     <artifactId>apache-client</artifactId>
                 </exclusion>
             </exclusions>
+            <version>${aws.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
+            <version>${aws.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>regions</artifactId>
+            <version>${aws.sdk.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+
 
         <!-- Test Dependencies follow -->
         <dependency>
@@ -239,6 +269,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!--
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
@@ -246,6 +277,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            -->
         </dependencies>
     </dependencyManagement>
 
@@ -259,6 +291,7 @@
                 <configuration>
                     <enableQuickReload>true</enableQuickReload>
                     <instructions>
+                        <Bundle-Activator>com.atlassian.migration.datacenter.BundleActivator</Bundle-Activator>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
                         <Spring-Context>*</Spring-Context>
@@ -270,6 +303,22 @@
                             com.atlassian.jira.*;resolution:="optional",
                             com.atlassian.analytics.api.annotations;resolution:="optional",
                             com.atlassian.confluence.*;resolution:="optional",
+                            com.sun.tools.javac.processing.*;resolution:="optional",
+                            com.sun.tools.javac.util.*;resolution:="optional",
+                            groovy.lang.*;resolution:="optional",
+                            org.apache.commons.cli.*;resolution:="optional",
+                            org.apache.tools.ant.*;resolution:="optional",
+                            org.codehaus.commons.compiler.*;resolution:="optional",
+                            org.codehaus.groovy.*;resolution:="optional",
+                            org.codehaus.janino.*;resolution:="optional",
+                            org.eclipse.*;resolution:="optional",
+                            org.mapstruct.ap.spi.*;resolution:="optional",
+                            org.springframework.security.crypto.*;resolution:="optional",
+                            sun.reflect.*;resolution:="optional",
+                            org.postgresql.*;resolution:="optional",
+                            com.sun.jna.*;resolution:="optional",
+                            org.osgi.service.jdbc.*;resolution:="optional",
+                            waffle.windows.auth.*;resolution:="optional",
                             org.slf4j,
                             !com.google.protobuf.*,
                             !com.jcraft.jzlib,
@@ -292,9 +341,15 @@
                             !org.apache.logging.log4j.core.async.*,
                             !org.joda.convert.*,
                             !com.sun.org.apache.xml.internal.resolver.*,
-                            *
+                            *;version="0";resolution:=optional
                         </Import-Package>
                     </instructions>
+                    <systemProperties>
+                        <property>
+                            <name>atlassian.org.osgi.framework.bootdelegation</name>
+                            <value>sun.*,com.sun.*</value>
+                        </property>
+                    </systemProperties>
                 </configuration>
             </plugin>
 
