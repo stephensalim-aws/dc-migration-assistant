@@ -118,7 +118,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
     }
 
     private void populateUploadQueue() {
-        Crawler homeCrawler = new DirectoryStreamCrawler(report);
+        Crawler homeCrawler = new DirectoryStreamCrawler(report, report);
         try {
             homeCrawler.crawlDirectory(getSharedHomeDir(), uploadQueue);
         } catch (IOException e) {
@@ -127,6 +127,7 @@ public class S3FilesystemMigrationService implements FilesystemMigrationService 
         } finally {
             // FIXME: the uploader will continue uploading until the queue is empty even though we probably need to abort in this scenario as it's indeterminate whether all files have been uploaded or not (should we try fix this now or create a bug and follow up?)
             isDoneCrawling.set(true);
+            logger.info("Finished traversing directory [{}], {} files are remaining to upload", config.getSharedHome(), uploadQueue.size());
         }
     }
 

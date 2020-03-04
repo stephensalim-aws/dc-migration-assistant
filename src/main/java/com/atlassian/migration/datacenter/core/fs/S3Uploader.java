@@ -51,6 +51,7 @@ public class S3Uploader implements Uploader {
                             .key(key)
                             .build();
                     final CompletableFuture<PutObjectResponse> response = config.getS3AsyncClient().putObject(putRequest, path);
+                    progress.reportFileInFlight();
                     final S3UploadOperation uploadOperation = new S3UploadOperation(path, response);
 
                     responsesQueue.add(uploadOperation);
@@ -60,13 +61,14 @@ public class S3Uploader implements Uploader {
             }
         }
         responsesQueue.forEach(this::handlePutObjectResponse);
+        logger.info("Finished uploading files to S3");
     }
 
     private void handlePutObjectResponse(S3UploadOperation operation) {
         try {
             final PutObjectResponse evaluatedResponse = operation.response.get();
             if (!evaluatedResponse.sdkHttpResponse().isSuccessful()) {
-                final String errorMessage = String.format("Error when uploading to S3, %s", evaluatedResponse.sdkHttpResponse().statusText());
+                final String errorMessage = String.format("Error when uploading {} to S3, {}", operation.path, evaluatedResponse.sdkHttpResponse().statusText());
                 addFailedFile(operation.path, errorMessage);
             } else {
                 progress.reportFileMigrated(operation.path);
@@ -78,6 +80,7 @@ public class S3Uploader implements Uploader {
 
     private void addFailedFile(Path path, String reason) {
         report.reportFileNotMigrated(new FailedFileMigration(path, reason));
+        logger.error("File {} wasn't uploaded. Reason: {}", path, reason);
     }
 
     private static class S3UploadOperation {

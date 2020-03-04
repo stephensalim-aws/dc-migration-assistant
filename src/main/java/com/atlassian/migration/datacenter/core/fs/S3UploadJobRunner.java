@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.core.fs;
 
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
+import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
 import com.atlassian.scheduler.JobRunner;
 import com.atlassian.scheduler.JobRunnerRequest;
 import com.atlassian.scheduler.JobRunnerResponse;
@@ -33,8 +34,12 @@ public class S3UploadJobRunner implements JobRunner {
             return JobRunnerResponse.aborted("S3 upload job is still running");
         }
 
-        log.debug("Starting S3 migration job");
+        log.info("Starting S3 migration job");
         s3Service.startMigration();
+
+        final FileSystemMigrationReport report = s3Service.getReport();
+        log.info("Finished S3 migration job: {}", report.toString());
+
         return JobRunnerResponse.success("S3 upload completed.");
     }
 

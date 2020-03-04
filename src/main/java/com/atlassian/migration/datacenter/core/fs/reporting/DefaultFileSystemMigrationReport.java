@@ -75,6 +75,26 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     }
 
     @Override
+    public Long getNumberOfFilesFound() {
+        return progress.getNumberOfFilesFound();
+    }
+
+    @Override
+    public void reportFileFound() {
+        progress.reportFileFound();
+    }
+
+    @Override
+    public Long getNumberOfFilesInFlight() {
+        return progress.getNumberOfFilesInFlight();
+    }
+
+    @Override
+    public void reportFileInFlight() {
+        progress.reportFileInFlight();
+    }
+
+    @Override
     public List<Path> getMigratedFiles() {
         return progress.getMigratedFiles();
     }
@@ -98,6 +118,15 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
 
     private boolean isTerminalState(FilesystemMigrationStatus toStatus) {
         return toStatus == DONE || toStatus == FAILED;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Filesystem migration report = { status: %s, migratedFiles: %d, erroredFiles: %d }",
+                currentStatus,
+                progress.getMigratedFiles().size(),
+                errorReport.getFailedFiles().size()
+        );
     }
 }
 
