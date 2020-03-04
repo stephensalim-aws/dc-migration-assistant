@@ -2,13 +2,10 @@ package com.atlassian.migration.datacenter.core.fs.reporting;
 
 import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Manages files which have had an error throughout the file migration
@@ -17,10 +14,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class DefaultFileSystemMigrationErrorReport implements FileSystemMigrationErrorReport {
 
-    private final ConcurrentHashMap<FailedFileMigration, Boolean> failedMigrations;
+    private final Set<FailedFileMigration> failedMigrations;
 
     public DefaultFileSystemMigrationErrorReport() {
-        this.failedMigrations = new ConcurrentHashMap<>();
+        this.failedMigrations = ConcurrentHashMap.newKeySet();
     }
 
     /**
@@ -32,7 +29,7 @@ public class DefaultFileSystemMigrationErrorReport implements FileSystemMigratio
         if (failedMigrations.size() >= 100) {
             return;
         }
-        failedMigrations.put(failedFileMigration, true);
+        failedMigrations.add(failedFileMigration);
     }
 
     /**
@@ -40,6 +37,6 @@ public class DefaultFileSystemMigrationErrorReport implements FileSystemMigratio
      * is not backed by the underlying collection so will not be updated as other producers add to it.
      */
     public Set<FailedFileMigration> getFailedFiles() {
-        return ImmutableSet.copyOf(failedMigrations.keySet());
+        return ImmutableSet.copyOf(failedMigrations);
     }
 }
