@@ -20,17 +20,15 @@ public class DefaultFileSystemMigrationProgressTest {
 
     @Test
     void shouldBeInitialisedWithNoCompleteFiles() {
-        assertTrue(sut.getMigratedFiles().isEmpty(), "expected migrated files list of new progress to be empty");
+        assertEquals(0, sut.getMigratedFiles());
     }
 
     @Test
     void shouldAddMigratedFileToMigratedFiles() {
         final Path testFile = Paths.get("file");
-        sut.reportFileMigrated(testFile);
+        sut.reportFileMigrated();
 
-        assertEquals(1, sut.getMigratedFiles().size());
-
-        assertTrue(sut.getMigratedFiles().contains(testFile));
+        assertEquals(1, sut.getMigratedFiles());
     }
 
     @Test

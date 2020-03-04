@@ -55,11 +55,7 @@ public class FileSystemMigrationProgressEndpointTest {
         failedFiles.add(failedFileMigration);
         when(report.getFailedFiles()).thenReturn(failedFiles);
 
-        final String successFileName = "success_file.txt";
-        final Path successFile = Paths.get(successFileName);
-        final Set<Path> succeededFiles = new HashSet<>();
-        succeededFiles.add(successFile);
-        when(report.getMigratedFiles()).thenReturn(succeededFiles);
+        when(report.getMigratedFiles()).thenReturn(1L);
 
         final Response response = endpoint.getFilesystemMigrationStatus();
 
@@ -75,12 +71,12 @@ public class FileSystemMigrationProgressEndpointTest {
         final String responseReason = tree.at("/failedFiles/0/reason").asText();
         final String responseFailedFile = tree.at("/failedFiles/0/filePath").asText();
 
-        final String responseSuccessFile = tree.at("/migratedFiles/0").asText();
+        final Long responseSuccessFileCount = tree.at("/migratedFiles").asLong();
 
         assertEquals(RUNNING.name(), responseStatus);
         assertEquals(testReason, responseReason);
         assertEquals(testFile.toUri().toString(), responseFailedFile);
-        assertEquals(successFile.toUri().toString(), responseSuccessFile);
+        assertEquals(1, responseSuccessFileCount);
     }
 
     @Test

@@ -6,7 +6,6 @@ import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationPr
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus;
 
-import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -95,13 +94,13 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     }
 
     @Override
-    public Set<Path> getMigratedFiles() {
+    public Long getMigratedFiles() {
         return progress.getMigratedFiles();
     }
 
     @Override
-    public void reportFileMigrated(Path path) {
-        progress.reportFileMigrated(path);
+    public void reportFileMigrated() {
+        progress.reportFileMigrated();
     }
 
     public void setClock(Clock clock) {
@@ -124,7 +123,7 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     public String toString() {
         return String.format("Filesystem migration report = { status: %s, migratedFiles: %d, erroredFiles: %d }",
                 currentStatus,
-                progress.getMigratedFiles().size(),
+                progress.getMigratedFiles(),
                 errorReport.getFailedFiles().size()
         );
     }

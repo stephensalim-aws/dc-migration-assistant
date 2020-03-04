@@ -75,9 +75,9 @@ public class DefaultFileSystemMigrationReportTest {
     @Test
     void shouldDelegateToWrappedProgress() {
         final Path path = Paths.get("file");
-        sut.reportFileMigrated(path);
+        sut.reportFileMigrated();
 
-        verify(progress).reportFileMigrated(path);
+        verify(progress).reportFileMigrated();
 
         sut.getMigratedFiles();
 
