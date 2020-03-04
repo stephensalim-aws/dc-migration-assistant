@@ -24,7 +24,6 @@ import java.util.Set;
 
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,7 +84,7 @@ public class FileSystemMigrationProgressEndpointTest {
 
     @Test
     void shouldHandleVeryLargeReport() throws JsonProcessingException {
-        when(migrationService.getReport()).thenReturn(report);
+        when(fsMigrationService.getReport()).thenReturn(report);
 
         when(report.getStatus()).thenReturn(RUNNING);
 
