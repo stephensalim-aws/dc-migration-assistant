@@ -71,7 +71,7 @@ public class S3Uploader implements Uploader {
                 final String errorMessage = String.format("Error when uploading {} to S3, {}", operation.path, evaluatedResponse.sdkHttpResponse().statusText());
                 addFailedFile(operation.path, errorMessage);
             } else {
-                progress.reportFileMigrated(operation.path);
+                progress.reportFileMigrated();
             }
         } catch (InterruptedException | ExecutionException e) {
             addFailedFile(operation.path, e.getMessage());

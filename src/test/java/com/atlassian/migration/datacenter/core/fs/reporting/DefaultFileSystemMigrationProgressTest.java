@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,18 +21,14 @@ public class DefaultFileSystemMigrationProgressTest {
 
     @Test
     void shouldBeInitialisedWithNoCompleteFiles() {
-        assertTrue(sut.getMigratedFiles().isEmpty(), "expected migrated files list of new progress to be empty");
+        assertEquals(0, sut.getCountOfMigratedFiles());
     }
 
     @Test
     void shouldAddMigratedFileToMigratedFiles() {
-        final Path testFile = Paths.get("file");
-        sut.reportFileMigrated(testFile);
+        sut.reportFileMigrated();
 
-        assertEquals(1, sut.getMigratedFiles().size());
-
-        final Path migratedFile = sut.getMigratedFiles().get(0);
-        assertEquals(testFile, migratedFile);
+        assertEquals(1, sut.getCountOfMigratedFiles());
     }
 
     @Test
@@ -55,8 +52,16 @@ public class DefaultFileSystemMigrationProgressTest {
 
         assertEquals(2, sut.getNumberOfFilesInFlight());
 
-        sut.reportFileMigrated(Paths.get("test"));
+        sut.reportFileMigrated();
 
         assertEquals(1, sut.getNumberOfFilesInFlight());
+    }
+
+    @Test
+    void shouldHandleLargeNumberOfMigratedFiles() {
+        int numFilesToMigrate = 1000000;
+        IntStream.range(0, numFilesToMigrate).forEach(i -> sut.reportFileMigrated());
+
+        assertEquals(numFilesToMigrate, sut.getCountOfMigratedFiles());
     }
 }
