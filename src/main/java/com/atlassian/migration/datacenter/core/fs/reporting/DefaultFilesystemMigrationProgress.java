@@ -43,5 +43,6 @@ public class DefaultFilesystemMigrationProgress implements FileSystemMigrationPr
     @Override
     public void reportFileMigrated(Path path) {
         migratedFiles.add(path);
+        filesInFlight.decrementAndGet();
     }
 }
