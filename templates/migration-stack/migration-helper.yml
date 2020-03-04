@@ -10,26 +10,26 @@ Parameters:
     Description: "Source bucket where you will place migration helper code."
     Type: String
     Default: "sssalim-mortha-code-bucket"
+  NetworkPrivateSubnets:
+    Description: "Private subnet to deploy the migration stack"
+    Type: "String"
+    Default: ""
   HelperSourceZipFile:
     Description: "Source migration helper zip file."
     Type: String
     Default: "MigrationHelper.zip"
-  NetworkPublicSubnet:
-    Description: "Public SubnetId where Migration helper will be placed - Must have connection to desitnation Storage"
-    Type: String
-    Default: "subnet-0d82a3a40a689b562"
   TrustedSourceIP:
     Description: "Trusted Source IP for Helper Instance"
     Type: String
-    Default: "121.200.5.142/32"
+    Default: ""
   EFSFileSystemId:
     Description: "The Elastic File System Id we will mount to the Migration Helper EC2 Instance"
     Type: String
-    Default: "fs-1d888924"
+    Default: ""
   EFSSecurityGroup:
     Description: "The Security Group attached to EFS, access to NFS port will be open from Migration Helper Security Group"
     Type: String
-    Default: "sg-0c4e900309b248970"
+    Default: ""
   HelperInstanceType:
     Description: "The Instance Type of Helper EC2 Instance"
     Type: String
@@ -37,7 +37,7 @@ Parameters:
   HelperVpcId:
     Description: "The VPC for Helper EC2 Instance"
     Type: String
-    Default: "vpc-039876f938d90c7a1"
+    Default: ""
 
 
 Outputs:
@@ -86,7 +86,7 @@ Resources:
       OptionSettings:
         - Namespace: 'aws:ec2:vpc'
           OptionName: Subnets
-          Value: !Ref NetworkPublicSubnet
+          Value: !Ref NetworkPrivateSubnets
         - Namespace: 'aws:elasticbeanstalk:environment'
           OptionName: EnvironmentType
           Value: SingleInstance
@@ -225,6 +225,7 @@ Resources:
             Action:
               - "sts:AssumeRole"
       Path: "/"
+      # TODO: Reduce to minimum required policy
       Policies:
         - PolicyName: "Policies"
           PolicyDocument:
@@ -303,6 +304,7 @@ Resources:
                       - ".amazonaws.com"
             Action:
               - "sts:AssumeRole"
+      # TODO: Set to minimum required permissions
       Path: "/"
       Policies:
         - PolicyName: "Policies"
