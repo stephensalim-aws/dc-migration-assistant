@@ -75,6 +75,16 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     }
 
     @Override
+    public Long getNumberOfFilesFound() {
+        return progress.getNumberOfFilesFound();
+    }
+
+    @Override
+    public void reportFileFound() {
+        progress.reportFileFound();
+    }
+
+    @Override
     public List<Path> getMigratedFiles() {
         return progress.getMigratedFiles();
     }

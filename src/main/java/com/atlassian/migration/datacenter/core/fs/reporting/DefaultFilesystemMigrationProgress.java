@@ -11,6 +11,16 @@ public class DefaultFilesystemMigrationProgress implements FileSystemMigrationPr
     private List<Path> migratedFiles = new LinkedList<>();
 
     @Override
+    public Long getNumberOfFilesFound() {
+        return null;
+    }
+
+    @Override
+    public void reportFileFound() {
+
+    }
+
+    @Override
     public List<Path> getMigratedFiles() {
         return migratedFiles;
     }
