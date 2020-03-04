@@ -6,11 +6,10 @@ import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationPr
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus;
 
-import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.DONE;
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.FAILED;
@@ -64,8 +63,37 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
         return currentStatus == RUNNING;
     }
 
+    public void setClock(Clock clock) {
+        this.clock = clock;
+    }
+
+    private boolean isStartingMigration(FilesystemMigrationStatus toStatus) {
+        return this.currentStatus != RUNNING && toStatus == RUNNING;
+    }
+
+    private boolean isEndingMigration(FilesystemMigrationStatus toStatus) {
+        return this.currentStatus == RUNNING && isTerminalState(toStatus);
+    }
+
+    private boolean isTerminalState(FilesystemMigrationStatus toStatus) {
+        return toStatus == DONE || toStatus == FAILED;
+    }
+
     @Override
-    public List<FailedFileMigration> getFailedFiles() {
+    public String toString() {
+        return String.format("Filesystem migration report = { status: %s, migratedFiles: %d, erroredFiles: %d }",
+                currentStatus,
+                progress.getCountOfMigratedFiles(),
+                errorReport.getFailedFiles().size()
+        );
+    }
+
+    /*
+    DELEGATED METHODS FOLLOW
+     */
+
+    @Override
+    public Set<FailedFileMigration> getFailedFiles() {
         return errorReport.getFailedFiles();
     }
 
@@ -95,38 +123,13 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     }
 
     @Override
-    public List<Path> getMigratedFiles() {
-        return progress.getMigratedFiles();
+    public Long getCountOfMigratedFiles() {
+        return progress.getCountOfMigratedFiles();
     }
 
     @Override
-    public void reportFileMigrated(Path path) {
-        progress.reportFileMigrated(path);
-    }
-
-    public void setClock(Clock clock) {
-        this.clock = clock;
-    }
-
-    private boolean isStartingMigration(FilesystemMigrationStatus toStatus) {
-        return this.currentStatus != RUNNING && toStatus == RUNNING;
-    }
-
-    private boolean isEndingMigration(FilesystemMigrationStatus toStatus) {
-        return this.currentStatus == RUNNING && isTerminalState(toStatus);
-    }
-
-    private boolean isTerminalState(FilesystemMigrationStatus toStatus) {
-        return toStatus == DONE || toStatus == FAILED;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Filesystem migration report = { status: %s, migratedFiles: %d, erroredFiles: %d }",
-                currentStatus,
-                progress.getMigratedFiles().size(),
-                errorReport.getFailedFiles().size()
-        );
+    public void reportFileMigrated() {
+        progress.reportFileMigrated();
     }
 }
 

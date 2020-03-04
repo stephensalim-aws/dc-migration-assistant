@@ -3,9 +3,6 @@ package com.atlassian.migration.datacenter.spi.fs.reporting;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.nio.file.Path;
-import java.util.List;
-
 /**
  * Tracks the progress of the file system migration
  */
@@ -28,7 +25,15 @@ public interface FileSystemMigrationProgress {
 
     void reportFileInFlight();
 
-    List<Path> getMigratedFiles();
+    /**
+     * Gets the number of files which have been successfully migrated
+     */
+    @JsonProperty("migratedFiles")
+    Long getCountOfMigratedFiles();
 
-    void reportFileMigrated(Path path);
+    /**
+     * Reports that a file was migrated successfully. Implementers should be careful that the underlying
+     * collection is thread safe as this may be called from multiple file upload threads.
+     */
+    void reportFileMigrated();
 }

@@ -109,7 +109,7 @@ class S3UploaderTest {
         });
 
         submit.get();
-        assertTrue(progress.getMigratedFiles().contains(testPath));
+        assertEquals(1, progress.getCountOfMigratedFiles());
     }
 
     @Test

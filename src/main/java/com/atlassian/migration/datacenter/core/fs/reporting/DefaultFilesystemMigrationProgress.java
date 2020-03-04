@@ -2,14 +2,11 @@ package com.atlassian.migration.datacenter.core.fs.reporting;
 
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationProgress;
 
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class DefaultFilesystemMigrationProgress implements FileSystemMigrationProgress {
 
-    private List<Path> migratedFiles = new LinkedList<>();
+    private AtomicLong numFilesMigrated = new AtomicLong(0);
 
     private AtomicLong filesFound = new AtomicLong(0);
 
@@ -36,13 +33,13 @@ public class DefaultFilesystemMigrationProgress implements FileSystemMigrationPr
     }
 
     @Override
-    public List<Path> getMigratedFiles() {
-        return migratedFiles;
+    public Long getCountOfMigratedFiles() {
+        return numFilesMigrated.get();
     }
 
     @Override
-    public void reportFileMigrated(Path path) {
-        migratedFiles.add(path);
+    public void reportFileMigrated() {
         filesInFlight.decrementAndGet();
+        numFilesMigrated.incrementAndGet();
     }
 }
