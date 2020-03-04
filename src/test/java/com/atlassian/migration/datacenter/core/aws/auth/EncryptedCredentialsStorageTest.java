@@ -1,36 +1,74 @@
 package com.atlassian.migration.datacenter.core.aws.auth;
 
+import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.After;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class EncryptedCredentialsStorageTest {
 
-
+    @InjectMocks
     private EncryptedCredentialsStorage encryptedCredentialsStorage;
+
+    @Mock
+    private JiraHome jiraHome;
+
+    @Mock
+    private PluginSettingsFactory pluginSettingsFactory;
+
+    @After
+    public void tearDown() {
+        File keyFile = new File(jiraHome.getHome().getAbsolutePath().concat("/").concat("keyFile"));
+        File saltFile = new File(jiraHome.getHome().getAbsolutePath().concat("/").concat("saltFile"));
+        if (keyFile.exists()) {
+            keyFile.delete();
+        }
+        if (saltFile.exists()) {
+            saltFile.delete();
+        }
+    }
 
     @BeforeEach
     public void setup() {
-        this.encryptedCredentialsStorage = new EncryptedCredentialsStorage(new PluginSettingsFactory() {
+        when(this.jiraHome.getHome()).thenReturn(new File("."));
+        when(this.pluginSettingsFactory.createGlobalSettings()).thenReturn(new PluginSettings() {
+            Map<String, Object> settings = new HashMap<>();
+
             @Override
-            public PluginSettings createSettingsForKey(String s) {
-                return null;
+            public Object get(String s) {
+                return this.settings.get(s);
             }
 
             @Override
-            public PluginSettings createGlobalSettings() {
-                return null;
+            public Object put(String s, Object o) {
+                return this.settings.put(s, o);
+            }
+
+            @Override
+            public Object remove(String s) {
+                return this.settings.remove(s);
             }
         });
+        this.encryptedCredentialsStorage.postConstruct();
     }
 
     @Test
@@ -48,6 +86,26 @@ public class EncryptedCredentialsStorageTest {
         assertNotNull(encrypted);
         assertNotNull(decrypted);
         assertEquals(decrypted, testString);
+    }
+
+    @Test
+    public void testSaveAccessKeyId() {
+        final String testAccessKeyId = RandomStringUtils.randomAlphanumeric(new Random().nextInt(50));
+
+        this.encryptedCredentialsStorage.setAccessKeyId(testAccessKeyId);
+
+        String retrievedValue = this.encryptedCredentialsStorage.getAccessKeyId();
+        assertEquals(testAccessKeyId, retrievedValue);
+    }
+
+    @Test
+    public void testSaveSecretKey() {
+        final String testSecretAccessKey = RandomStringUtils.randomAlphanumeric(new Random().nextInt(50));
+
+        this.encryptedCredentialsStorage.setSecretAccessKey(testSecretAccessKey);
+
+        String retrievedValue = this.encryptedCredentialsStorage.getSecretAccessKey();
+        assertEquals(testSecretAccessKey, retrievedValue);
     }
 
 }

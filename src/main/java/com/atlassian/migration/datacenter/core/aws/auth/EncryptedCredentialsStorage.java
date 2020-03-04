@@ -1,23 +1,24 @@
 package com.atlassian.migration.datacenter.core.aws.auth;
 
+import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import lombok.SneakyThrows;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
@@ -36,59 +37,58 @@ public class EncryptedCredentialsStorage implements ReadCredentialsService, Writ
     private static final String ENCRYPTION_KEY_FILE_NAME = "keyFile";
     private static final String ENCRYPTION_SALT_FILE_NAME = "saltFile";
     private static final Logger LOGGER = Logger.getLogger(EncryptedCredentialsStorage.class);
+    private final PluginSettingsFactory pluginSettingsFactory;
+    private final JiraHome jiraHome;
+    private TextEncryptor textEncryptor;
+    private PluginSettings pluginSettings;
 
-    private final TextEncryptor textEncryptor;
-    private final PluginSettings pluginSettings;
-
-    @Autowired
-    public EncryptedCredentialsStorage(@ComponentImport PluginSettingsFactory pluginSettingsFactory) {
-        this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String password = getPassword();
-        String salt = getSalt();
-        this.textEncryptor = Encryptors.text(password, salt);
+    @Inject
+    public EncryptedCredentialsStorage(@ComponentImport PluginSettingsFactory pluginSettingsFactory,
+                                       @ComponentImport JiraHome jiraHome) {
+        this.pluginSettingsFactory = pluginSettingsFactory;
+        this.jiraHome = jiraHome;
     }
 
     @SneakyThrows
-    private static String getPassword() {
-        File passwordFile = new File(ENCRYPTION_KEY_FILE_NAME);
-        if (passwordFile.exists()) {
-            StringBuilder keyBuilder = new StringBuilder();
-            try (Stream<String> stream = Files.lines(Paths.get(passwordFile.getPath()), StandardCharsets.UTF_8)) {
-                stream.forEach(keyBuilder::append);
-            } catch (Exception e) {
-                LOGGER.error(e.getLocalizedMessage());
-            }
-            String encoded = keyBuilder.toString();
-            return encoded;
+    private static String getEncryptionData(String fileName) {
+        File dataFile = new File(fileName);
+        if (dataFile.exists()) {
+            return readFileData(dataFile);
         } else {
-            String keyString = KeyGenerators.string().generateKey();
-            Path p = passwordFile.toPath();
-            Files.write(p, keyString.getBytes(StandardCharsets.UTF_8));
-            passwordFile.setWritable(false, true);
-            return keyString;
+            return generateAndWriteKey(dataFile);
         }
     }
 
-    private static String getSalt() {
-        File saltFile = new File(ENCRYPTION_SALT_FILE_NAME);
-        if (saltFile.exists()) {
-            StringBuilder saltBuilder = new StringBuilder();
-            try (Stream<String> stream = Files.lines(Paths.get(saltFile.getPath()), StandardCharsets.UTF_8)) {
-                stream.forEach(saltBuilder::append);
-            } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
-            }
-            return saltBuilder.toString();
-        } else {
-            String key = KeyGenerators.string().generateKey();
-            try (FileOutputStream outputStream = new FileOutputStream(saltFile)) {
-                outputStream.write(key.getBytes());
-            } catch (IOException ex) {
-                LOGGER.error(ex.getLocalizedMessage());
-            }
-            saltFile.setWritable(false, true);
-            return key;
+    private static String readFileData(File sourceFile) {
+        StringBuilder dataBuilder = new StringBuilder();
+        try (Stream<String> stream = Files.lines(Paths.get(sourceFile.getPath()), StandardCharsets.UTF_8)) {
+            stream.forEach(dataBuilder::append);
+        } catch (IOException e) {
+            LOGGER.error(e.getLocalizedMessage());
         }
+        return dataBuilder.toString();
+    }
+
+    private static String generateAndWriteKey(File file) {
+        String keyString = KeyGenerators.string().generateKey();
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(keyString.getBytes());
+        } catch (IOException ex) {
+            LOGGER.error(ex.getLocalizedMessage());
+        }
+        file.setWritable(false, true);
+        return keyString;
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        assert this.jiraHome != null;
+        String keyFilePath = this.jiraHome.getHome().getPath().concat("/").concat(ENCRYPTION_KEY_FILE_NAME);
+        String saltFilePath = this.jiraHome.getHome().getPath().concat("/").concat(ENCRYPTION_SALT_FILE_NAME);
+        String password = getEncryptionData(keyFilePath);
+        String salt = getEncryptionData(saltFilePath);
+        this.textEncryptor = Encryptors.text(password, salt);
+        this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
     }
 
     @Override
