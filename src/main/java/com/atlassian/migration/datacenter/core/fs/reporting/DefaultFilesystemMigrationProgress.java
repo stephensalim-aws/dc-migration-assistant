@@ -33,7 +33,7 @@ public class DefaultFilesystemMigrationProgress implements FileSystemMigrationPr
     }
 
     @Override
-    public Long getMigratedFiles() {
+    public Long getCountOfMigratedFiles() {
         return numFilesMigrated.get();
     }
 

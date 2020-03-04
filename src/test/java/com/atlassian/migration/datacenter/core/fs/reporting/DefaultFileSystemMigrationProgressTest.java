@@ -20,7 +20,7 @@ public class DefaultFileSystemMigrationProgressTest {
 
     @Test
     void shouldBeInitialisedWithNoCompleteFiles() {
-        assertEquals(0, sut.getMigratedFiles());
+        assertEquals(0, sut.getCountOfMigratedFiles());
     }
 
     @Test
@@ -28,7 +28,7 @@ public class DefaultFileSystemMigrationProgressTest {
         final Path testFile = Paths.get("file");
         sut.reportFileMigrated();
 
-        assertEquals(1, sut.getMigratedFiles());
+        assertEquals(1, sut.getCountOfMigratedFiles());
     }
 
     @Test

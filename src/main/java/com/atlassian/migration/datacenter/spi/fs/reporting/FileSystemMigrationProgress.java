@@ -28,7 +28,7 @@ public interface FileSystemMigrationProgress {
     /**
      * Gets the number of files which have been successfully migrated
      */
-    Long getMigratedFiles();
+    Long getCountOfMigratedFiles();
 
     /**
      * Reports that a file was migrated successfully. Implementers should be careful that the underlying

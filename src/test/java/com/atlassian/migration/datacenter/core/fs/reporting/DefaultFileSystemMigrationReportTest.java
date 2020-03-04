@@ -79,9 +79,9 @@ public class DefaultFileSystemMigrationReportTest {
 
         verify(progress).reportFileMigrated();
 
-        sut.getMigratedFiles();
+        sut.getCountOfMigratedFiles();
 
-        verify(progress).getMigratedFiles();
+        verify(progress).getCountOfMigratedFiles();
     }
 
     @Test

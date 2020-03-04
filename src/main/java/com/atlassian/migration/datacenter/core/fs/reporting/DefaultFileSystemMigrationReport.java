@@ -63,6 +63,35 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
         return currentStatus == RUNNING;
     }
 
+    public void setClock(Clock clock) {
+        this.clock = clock;
+    }
+
+    private boolean isStartingMigration(FilesystemMigrationStatus toStatus) {
+        return this.currentStatus != RUNNING && toStatus == RUNNING;
+    }
+
+    private boolean isEndingMigration(FilesystemMigrationStatus toStatus) {
+        return this.currentStatus == RUNNING && isTerminalState(toStatus);
+    }
+
+    private boolean isTerminalState(FilesystemMigrationStatus toStatus) {
+        return toStatus == DONE || toStatus == FAILED;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Filesystem migration report = { status: %s, migratedFiles: %d, erroredFiles: %d }",
+                currentStatus,
+                progress.getCountOfMigratedFiles(),
+                errorReport.getFailedFiles().size()
+        );
+    }
+
+    /*
+    DELEGATED METHODS FOLLOW
+     */
+
     @Override
     public Set<FailedFileMigration> getFailedFiles() {
         return errorReport.getFailedFiles();
@@ -94,38 +123,13 @@ public class DefaultFileSystemMigrationReport implements FileSystemMigrationRepo
     }
 
     @Override
-    public Long getMigratedFiles() {
-        return progress.getMigratedFiles();
+    public Long getCountOfMigratedFiles() {
+        return progress.getCountOfMigratedFiles();
     }
 
     @Override
     public void reportFileMigrated() {
         progress.reportFileMigrated();
-    }
-
-    public void setClock(Clock clock) {
-        this.clock = clock;
-    }
-
-    private boolean isStartingMigration(FilesystemMigrationStatus toStatus) {
-        return this.currentStatus != RUNNING && toStatus == RUNNING;
-    }
-
-    private boolean isEndingMigration(FilesystemMigrationStatus toStatus) {
-        return this.currentStatus == RUNNING && isTerminalState(toStatus);
-    }
-
-    private boolean isTerminalState(FilesystemMigrationStatus toStatus) {
-        return toStatus == DONE || toStatus == FAILED;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Filesystem migration report = { status: %s, migratedFiles: %d, erroredFiles: %d }",
-                currentStatus,
-                progress.getMigratedFiles(),
-                errorReport.getFailedFiles().size()
-        );
     }
 }
 

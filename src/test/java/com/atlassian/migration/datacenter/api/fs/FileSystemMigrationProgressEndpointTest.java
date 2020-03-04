@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import javax.ws.rs.core.Response;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -55,7 +54,7 @@ public class FileSystemMigrationProgressEndpointTest {
         failedFiles.add(failedFileMigration);
         when(report.getFailedFiles()).thenReturn(failedFiles);
 
-        when(report.getMigratedFiles()).thenReturn(1L);
+        when(report.getCountOfMigratedFiles()).thenReturn(1L);
 
         final Response response = endpoint.getFilesystemMigrationStatus();
 
