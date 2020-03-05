@@ -22,10 +22,20 @@ import org.mockito.junit.MockitoRule;
 import java.util.HashMap;
 import java.util.Optional;
 
-import static com.atlassian.migration.datacenter.spi.MigrationStage.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.AUTHENTICATION;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.ERROR;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.NOT_STARTED;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.PROVISION_APPLICATION;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.READY_FS_MIGRATION;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 // We have to use the JUnit 4 API because there is no JUnit 5 active objects extension :(
 @RunWith(ActiveObjectsJUnitRunner.class)
@@ -60,7 +70,7 @@ public class AWSMigrationServiceTest {
 
     @Test
     public void shouldGetCorrectMigrationStage() {
-        initializeAndCreateSingleMigrationWithStage(STARTED);
+        initializeAndCreateSingleMigrationWithStage(NOT_STARTED);
 
         assertNumberOfMigrations(1);
 
@@ -68,25 +78,25 @@ public class AWSMigrationServiceTest {
 
         MigrationStage currentStage = sut.getMigrationStage();
 
-        assertEquals(STARTED, currentStage);
+        assertEquals(NOT_STARTED, currentStage);
     }
 
 
     @Test
-    public void shouldTransitionStageToStartedWhenMigrationIsStarted() {
+    public void shouldTransitionStageToAuthenticationWhenCreated() {
         ao.migrate();
         assertNumberOfMigrations(0);
 
         assertTrue(sut.startMigration());
         MigrationStage currentStage = sut.getMigrationStage();
 
-        assertEquals(STARTED, currentStage);
+        assertEquals(AUTHENTICATION, currentStage);
         assertNumberOfMigrations(1);
     }
 
     @Test
     public void shouldNotStartMigrationWhenExistingStateIsNotUnStarted() {
-        initializeAndCreateSingleMigrationWithStage(STARTED);
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
 
         ao.flushAll();
         assertNumberOfMigrations(1);
@@ -121,7 +131,7 @@ public class AWSMigrationServiceTest {
         HashMap<String, String> params = new HashMap<>();
         String expectedStackId = "arn:stack:test_provision";
 
-        initializeAndCreateSingleMigrationWithStage(STARTED);
+        initializeAndCreateSingleMigrationWithStage(PROVISION_APPLICATION);
 
         when(this.cfnApi.provisionStack(templateUrl, stackName, params)).thenReturn(Optional.of(expectedStackId));
 
@@ -135,14 +145,14 @@ public class AWSMigrationServiceTest {
         String templateUrl = "https://template.url", stackName = "test_provision";
         HashMap<String, String> params = new HashMap<>();
 
-        initializeAndCreateSingleMigrationWithStage(STARTED);
+        initializeAndCreateSingleMigrationWithStage(PROVISION_APPLICATION);
         when(this.cfnApi.provisionStack(templateUrl, stackName, params)).thenReturn(Optional.empty());
 
         assertThrows(InfrastructureProvisioningError.class, () -> {
             sut.provisionInfrastructure(new ProvisioningConfig(templateUrl, stackName, params));
         });
         assertNumberOfMigrations(1);
-        assertEquals(MigrationStage.PROVISIONING_ERROR, ao.find(Migration.class)[0].getStage());
+        assertEquals(ERROR, ao.find(Migration.class)[0].getStage());
     }
 
 
@@ -155,6 +165,48 @@ public class AWSMigrationServiceTest {
         });
 
         verify(this.cfnApi, never()).provisionStack(any(), any(), any());
+    }
+
+
+    // MigrationServiceV2 Tests
+    @Test
+    public void shouldBeAbleToGetCurrentStage() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+
+        assertEquals(AUTHENTICATION, sut.getCurrentStage());
+    }
+
+    @Test
+    public void shouldTransitionToCurrentStagesNextStageOnChange() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+        assertEquals(AUTHENTICATION, sut.getCurrentStage());
+
+        sut.nextStage();
+
+        assertEquals(AUTHENTICATION.getNext(), sut.getCurrentStage());
+    }
+
+    @Test
+    public void shouldCreateMigrationInNotStarted() {
+        ao.migrate(Migration.class);
+        Migration migration = sut.createMigration();
+
+        assertEquals(NOT_STARTED, migration.getStage());
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenMigrationExistsAlready() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+        assertThrows(RuntimeException.class, () -> sut.createMigration());
+    }
+
+    @Test
+    public void errorShouldSetCurrentStageToError() {
+        initializeAndCreateSingleMigrationWithStage(PROVISION_APPLICATION);
+
+        sut.error();
+
+        assertEquals(ERROR, sut.getCurrentStage());
     }
 
     private void assertNumberOfMigrations(int i) {
