@@ -8,6 +8,6 @@ public interface MigrationServiceV2 {
 
     MigrationStage getCurrentStage();
 
-    void setCurrentStage(MigrationStage stage);
+    void nextStage();
 
 }

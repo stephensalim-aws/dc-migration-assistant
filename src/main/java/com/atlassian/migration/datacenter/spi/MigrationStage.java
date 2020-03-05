@@ -28,4 +28,8 @@ public enum MigrationStage {
     public String toString() {
         return key;
     }
+
+    public MigrationStage getNext() {
+        return nextStage;
+    }
 }
