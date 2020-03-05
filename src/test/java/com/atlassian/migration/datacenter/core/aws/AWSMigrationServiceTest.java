@@ -194,6 +194,12 @@ public class AWSMigrationServiceTest {
         assertEquals(NOT_STARTED, migration.getStage());
     }
 
+    @Test
+    public void shouldThrowExceptionWhenMigrationExistsAlready() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+        assertThrows(RuntimeException.class, () -> sut.createMigration());
+    }
+
 
     private void assertNumberOfMigrations(int i) {
         assertEquals(i, ao.find(Migration.class).length);
