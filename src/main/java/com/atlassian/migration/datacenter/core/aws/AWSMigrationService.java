@@ -71,10 +71,10 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
      */
     @Override
     public MigrationStage getMigrationStage() {
-        return getMigration().getStage();
+        return findOrCreateMigration().getStage();
     }
 
-    private Migration getMigration() {
+    private Migration findOrCreateMigration() {
         if (migration == null) {
             Migration[] migrations = ao.find(Migration.class);
             if (migrations.length == 1) {
@@ -129,7 +129,7 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
     }
 
     public boolean startFilesystemMigration() {
-        final Migration migration = getMigration();
+        final Migration migration = findOrCreateMigration();
         if (migration.getStage() == MigrationStage.NOT_STARTED) {
             return false;
         }
@@ -163,8 +163,17 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
     }
 
     @Override
+    public Migration createMigration() {
+        Migration migration = findOrCreateMigration();
+        if (migration.getStage().equals(MigrationStage.NOT_STARTED)) {
+            return migration;
+        }
+        throw new RuntimeException("Migration already exists");
+    }
+
+    @Override
     public MigrationStage getCurrentStage() {
-        return getMigration().getStage();
+        return findOrCreateMigration().getStage();
     }
 
     @Override

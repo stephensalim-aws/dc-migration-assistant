@@ -186,6 +186,14 @@ public class AWSMigrationServiceTest {
         assertEquals(PROVISION_APPLICATION, sut.getCurrentStage());
     }
 
+    @Test
+    public void shouldCreateMigrationInNotStarted() {
+        ao.migrate(Migration.class);
+        Migration migration = sut.createMigration();
+
+        assertEquals(NOT_STARTED, migration.getStage());
+    }
+
 
     private void assertNumberOfMigrations(int i) {
         assertEquals(i, ao.find(Migration.class).length);
