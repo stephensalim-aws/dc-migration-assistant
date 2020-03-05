@@ -6,6 +6,7 @@ import com.atlassian.migration.datacenter.core.exceptions.InvalidMigrationStageE
 import com.atlassian.migration.datacenter.core.fs.S3UploadJobRunner;
 import com.atlassian.migration.datacenter.dto.Migration;
 import com.atlassian.migration.datacenter.spi.MigrationService;
+import com.atlassian.migration.datacenter.spi.MigrationServiceV2;
 import com.atlassian.migration.datacenter.spi.MigrationStage;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
@@ -30,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  * Manages a migration from on-premise to self-hosted AWS.
  */
 @Component
-public class AWSMigrationService implements MigrationService {
+public class AWSMigrationService implements MigrationService, MigrationServiceV2 {
     private static final Logger log = LoggerFactory.getLogger(AWSMigrationService.class);
     private final FilesystemMigrationService fsService;
     private final SchedulerService schedulerService;
@@ -159,5 +160,15 @@ public class AWSMigrationService implements MigrationService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public MigrationStage getCurrentStage() {
+        return getMigration().getStage();
+    }
+
+    @Override
+    public void setCurrentStage(MigrationStage stage) {
+
     }
 }

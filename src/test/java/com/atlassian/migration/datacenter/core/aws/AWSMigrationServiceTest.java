@@ -158,6 +158,16 @@ public class AWSMigrationServiceTest {
         verify(this.cfnApi, never()).provisionStack(any(), any(), any());
     }
 
+
+    // MigrationServiceV2 Tests
+    @Test
+    public void shouldBeAbleToGetCurrentStage() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+
+        assertEquals(AUTHENTICATION, sut.getCurrentStage());
+    }
+
+
     private void assertNumberOfMigrations(int i) {
         assertEquals(i, ao.find(Migration.class).length);
     }
