@@ -54,7 +54,7 @@ public class S3Uploader implements Uploader {
                         logger.debug("File {} is larger than 5 GBs, running multipart upload", path);
                         final S3MultiPartUploader multiPartUploader = new S3MultiPartUploader(config);
                         try {
-                            multiPartUploader.multiPartUpload(path.toFile());
+                            multiPartUploader.multiPartUpload(path.toFile(), key);
                         } catch (InterruptedException | ExecutionException e) {
                             logger.error("Error when running multi-part upload for file {} with exception {}", path, e.getMessage());
                         }

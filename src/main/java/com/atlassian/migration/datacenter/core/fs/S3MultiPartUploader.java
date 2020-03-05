@@ -38,7 +38,8 @@ public class S3MultiPartUploader {
     private final int sizeToUpload = 50 * 1024 * 1024; // TODO tune this number 50MB
 
     private final S3UploadConfig config;
-    private final List<CompletedPart> completedParts = new ArrayList<>();
+
+    private List<CompletedPart> completedParts;
 
     public S3MultiPartUploader(S3UploadConfig config) {
         this.config = config;
@@ -50,8 +51,8 @@ public class S3MultiPartUploader {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public void multiPartUpload(File file) throws ExecutionException, InterruptedException {
-        final String key = file.getName();
+    public void multiPartUpload(File file, String key) throws ExecutionException, InterruptedException {
+        completedParts = new ArrayList<>();
         final S3AsyncClient s3AsyncClient = config.getS3AsyncClient();
 
         CreateMultipartUploadRequest createMultipartUploadRequest = CreateMultipartUploadRequest.builder()
@@ -88,7 +89,7 @@ public class S3MultiPartUploader {
         }
 
         completeUpload(key, uploadId).get();
-        logger.debug("Finished multipart upload for {} with {} parts", file.toPath(), completedParts.size());
+        logger.debug("Finished multipart upload for {} with {} parts", key, completedParts.size());
     }
 
     private CompletableFuture<CompleteMultipartUploadResponse> completeUpload(String key, String uploadId) {
