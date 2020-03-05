@@ -3,6 +3,7 @@ package com.atlassian.migration.datacenter.core.fs;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationErrorReport;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationProgress;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -51,7 +52,7 @@ public class S3Uploader implements Uploader {
                 if (Files.exists(path)) {
                     String key = config.getSharedHome().relativize(path).toString();
                     if (path.toFile().length() > MAXIMUM_FILE_SIZE_TO_UPLOAD) {
-                        logger.debug("File {} is larger than 5 GBs, running multipart upload", path);
+                        logger.debug("File {} is larger than {}, running multipart upload", path, FileUtils.byteCountToDisplaySize(MAXIMUM_FILE_SIZE_TO_UPLOAD));
                         final S3MultiPartUploader multiPartUploader = new S3MultiPartUploader(config);
                         try {
                             multiPartUploader.multiPartUpload(path.toFile(), key);

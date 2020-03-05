@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutionException;
 public class S3MultiPartUploader {
     private final static Logger logger = LoggerFactory.getLogger(S3MultiPartUploader.class);
 
-    private final int sizeToUpload = 50 * 1024 * 1024; // TODO tune this number 50MB
+    private final int sizeToUpload = 100 * 1024 * 1024; // Using the same chunk size as TransferManager from AWS SDK v1
 
     private final S3UploadConfig config;
 
@@ -48,6 +48,7 @@ public class S3MultiPartUploader {
     /**
      * Upload the file in multiple parts
      * @param file file to upload
+     * @param key S3 key for the file
      * @throws ExecutionException
      * @throws InterruptedException
      */
