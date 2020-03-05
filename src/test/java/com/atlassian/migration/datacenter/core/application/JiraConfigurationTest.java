@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -72,7 +71,6 @@ class JiraConfigurationTest
         Exception e = assertThrows(ApplicationConfiguration.ConfigurationReadException.class, () -> {
             jiraConfiguration.getDatabaseConfiguration();
         });
-        assertEquals(ApplicationConfiguration.ConfigurationReadException.class, e.getClass());
     }
 
     @Test
@@ -125,10 +123,9 @@ class JiraConfigurationTest
         final Path file = tempDir.resolve("dbconfig.xml");
         Files.write(file, xml.getBytes());
 
-        Exception e = assertThrows(ApplicationConfiguration.ConfigurationReadException.class, () -> {
+        Exception e = assertThrows(ApplicationConfiguration.UnsupportedPasswordEncoding.class, () -> {
             jiraConfiguration.getDatabaseConfiguration();
         });
-        assertEquals(ApplicationConfiguration.ConfigurationReadException.class, e.getClass());
     }
 
 
