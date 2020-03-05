@@ -68,7 +68,7 @@ public class EncryptedCredentialsStorageTest {
                 return this.settings.remove(s);
             }
         });
-        this.encryptedCredentialsStorage.postConstruct();
+        this.encryptedCredentialsStorage.afterPropertiesSet();
     }
 
     @Test
