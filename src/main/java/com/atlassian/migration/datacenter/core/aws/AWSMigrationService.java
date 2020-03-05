@@ -183,17 +183,17 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
 
     @Override
     public void nextStage() {
-        setCurrentStage(getCurrentStage().getNext());
+        Migration migration = loadMigration();
+        setCurrentStage(migration, migration.getStage().getNext());
     }
 
     @Override
     public void error() {
-        loadMigration();
-        setCurrentStage(ERROR);
+        Migration migration = loadMigration();
+        setCurrentStage(migration, ERROR);
     }
 
-    private void setCurrentStage(MigrationStage stage) {
-        Migration migration = loadMigration();
+    private void setCurrentStage(Migration migration, MigrationStage stage) {
         migration.setStage(stage);
         migration.save();
     }
