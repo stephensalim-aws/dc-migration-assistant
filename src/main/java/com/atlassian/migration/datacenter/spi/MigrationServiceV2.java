@@ -10,4 +10,6 @@ public interface MigrationServiceV2 {
 
     void nextStage();
 
+    void error();
+
 }

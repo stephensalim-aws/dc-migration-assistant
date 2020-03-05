@@ -186,6 +186,12 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
         setCurrentStage(getCurrentStage().getNext());
     }
 
+    @Override
+    public void error() {
+        findOrCreateMigration();
+        setCurrentStage(ERROR);
+    }
+
     private void setCurrentStage(MigrationStage stage) {
         migration.setStage(stage);
         migration.save();

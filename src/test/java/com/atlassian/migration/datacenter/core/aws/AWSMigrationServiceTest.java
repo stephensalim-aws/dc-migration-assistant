@@ -201,6 +201,14 @@ public class AWSMigrationServiceTest {
         assertThrows(RuntimeException.class, () -> sut.createMigration());
     }
 
+    @Test
+    public void errorShouldSetCurrentStageToError() {
+        initializeAndCreateSingleMigrationWithStage(PROVISION_APPLICATION);
+
+        sut.error();
+
+        assertEquals(ERROR, sut.getCurrentStage());
+    }
 
     private void assertNumberOfMigrations(int i) {
         assertEquals(i, ao.find(Migration.class).length);
