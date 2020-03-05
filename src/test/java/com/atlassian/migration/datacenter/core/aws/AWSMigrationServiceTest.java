@@ -11,6 +11,7 @@ import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 import com.atlassian.scheduler.SchedulerService;
 import net.java.ao.EntityManager;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
+import org.apache.http.auth.AUTH;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,7 +61,7 @@ public class AWSMigrationServiceTest {
 
     @Test
     public void shouldGetCorrectMigrationStage() {
-        initializeAndCreateSingleMigrationWithStage(STARTED);
+        initializeAndCreateSingleMigrationWithStage(NOT_STARTED);
 
         assertNumberOfMigrations(1);
 
@@ -68,25 +69,25 @@ public class AWSMigrationServiceTest {
 
         MigrationStage currentStage = sut.getMigrationStage();
 
-        assertEquals(STARTED, currentStage);
+        assertEquals(NOT_STARTED, currentStage);
     }
 
 
     @Test
-    public void shouldTransitionStageToStartedWhenMigrationIsStarted() {
+    public void shouldTransitionStageToAuthenticationWhenCreated() {
         ao.migrate();
         assertNumberOfMigrations(0);
 
         assertTrue(sut.startMigration());
         MigrationStage currentStage = sut.getMigrationStage();
 
-        assertEquals(STARTED, currentStage);
+        assertEquals(AUTHENTICATION, currentStage);
         assertNumberOfMigrations(1);
     }
 
     @Test
     public void shouldNotStartMigrationWhenExistingStateIsNotUnStarted() {
-        initializeAndCreateSingleMigrationWithStage(STARTED);
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
 
         ao.flushAll();
         assertNumberOfMigrations(1);
@@ -121,7 +122,7 @@ public class AWSMigrationServiceTest {
         HashMap<String, String> params = new HashMap<>();
         String expectedStackId = "arn:stack:test_provision";
 
-        initializeAndCreateSingleMigrationWithStage(STARTED);
+        initializeAndCreateSingleMigrationWithStage(PROVISION_APPLICATION);
 
         when(this.cfnApi.provisionStack(templateUrl, stackName, params)).thenReturn(Optional.of(expectedStackId));
 
@@ -135,14 +136,14 @@ public class AWSMigrationServiceTest {
         String templateUrl = "https://template.url", stackName = "test_provision";
         HashMap<String, String> params = new HashMap<>();
 
-        initializeAndCreateSingleMigrationWithStage(STARTED);
+        initializeAndCreateSingleMigrationWithStage(PROVISION_APPLICATION);
         when(this.cfnApi.provisionStack(templateUrl, stackName, params)).thenReturn(Optional.empty());
 
         assertThrows(InfrastructureProvisioningError.class, () -> {
             sut.provisionInfrastructure(new ProvisioningConfig(templateUrl, stackName, params));
         });
         assertNumberOfMigrations(1);
-        assertEquals(MigrationStage.PROVISIONING_ERROR, ao.find(Migration.class)[0].getStage());
+        assertEquals(ERROR, ao.find(Migration.class)[0].getStage());
     }
 
 

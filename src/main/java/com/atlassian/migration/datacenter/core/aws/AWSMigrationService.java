@@ -60,7 +60,7 @@ public class AWSMigrationService implements MigrationService {
             return false;
         }
 
-        updateMigrationStage(MigrationStage.STARTED);
+        updateMigrationStage(MigrationStage.AUTHENTICATION);
 
         return true;
     }
@@ -98,16 +98,16 @@ public class AWSMigrationService implements MigrationService {
     public String provisionInfrastructure(ProvisioningConfig config) throws InvalidMigrationStageError, InfrastructureProvisioningError {
         //TODO: Refactor this to a state machine as part of https://aws-partner.atlassian.net/browse/CHET-101. This will be extracted to a different class then
         MigrationStage currentMigrationStage = getMigrationStage();
-        if (currentMigrationStage != MigrationStage.STARTED) {
-            throw new InvalidMigrationStageError(String.format("Expected migration stage was %s, but found %s", MigrationStage.READY_TO_PROVISION, currentMigrationStage));
+        if (currentMigrationStage != MigrationStage.PROVISION_APPLICATION) {
+            throw new InvalidMigrationStageError(String.format("Expected migration stage was %s, but found %s", MigrationStage.PROVISION_APPLICATION, currentMigrationStage));
         }
 
         Optional<String> stackIdentifier = this.cfnApi.provisionStack(config.getTemplateUrl(), config.getStackName(), config.getParams());
         if (stackIdentifier.isPresent()) {
-            updateMigrationStage(MigrationStage.PROVISIONING_IN_PROGRESS);
+            updateMigrationStage(MigrationStage.WAIT_PROVISION_APPLICATION);
             return stackIdentifier.get();
         } else {
-            updateMigrationStage(MigrationStage.PROVISIONING_ERROR);
+            updateMigrationStage(MigrationStage.ERROR);
             throw new InfrastructureProvisioningError(String.format("Unable to provision stack (URL - %s) with name - %s", config.getTemplateUrl(), config.getStackName()));
         }
     }
