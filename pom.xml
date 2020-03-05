@@ -220,7 +220,7 @@
         <dependency>
             <groupId>cloud.localstack</groupId>
             <artifactId>localstack-utils</artifactId>
-            <version>0.2.0</version>
+            <version>${localstack.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -484,6 +484,7 @@
         <mockito.version>3.2.4</mockito.version>
         <junit.version>5.4.2</junit.version>
         <aws.sdk.version>2.10.61</aws.sdk.version>
+        <localstack.version>0.2.1</localstack.version>
     </properties>
 
 </project>
