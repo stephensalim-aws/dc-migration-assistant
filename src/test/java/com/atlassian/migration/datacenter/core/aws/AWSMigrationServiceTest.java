@@ -11,7 +11,6 @@ import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 import com.atlassian.scheduler.SchedulerService;
 import net.java.ao.EntityManager;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
-import org.apache.http.auth.AUTH;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

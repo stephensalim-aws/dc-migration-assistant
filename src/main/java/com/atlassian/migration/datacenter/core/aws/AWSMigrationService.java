@@ -42,7 +42,6 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
     private final SchedulerService schedulerService;
     private final CfnApi cfnApi;
     private ActiveObjects ao;
-    private Migration migration;
 
     /**
      * Creates a new, unstarted AWS Migration
@@ -76,24 +75,24 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
      */
     @Override
     public MigrationStage getMigrationStage() {
-        return findOrCreateMigration().getStage();
+        return loadMigration().getStage();
     }
 
-    private Migration findOrCreateMigration() {
-        if (migration == null) {
-            Migration[] migrations = ao.find(Migration.class);
-            if (migrations.length == 1) {
-                // In case we have interrupted migration (e.g. the node went down), we want to pick up where we've
-                // left off.
-                migration = migrations[0];
-            } else {
-                // We didn't start the migration, so we need to create record in the db
-                migration = ao.create(Migration.class);
-                migration.setStage(NOT_STARTED);
-                migration.save();
-            }
+    private Migration loadMigration() {
+        Migration[] migrations = ao.find(Migration.class);
+        if (migrations.length == 1) {
+            // In case we have interrupted migration (e.g. the node went down), we want to pick up where we've
+            // left off.
+            return migrations[0];
+        } else if (migrations.length == 0){
+            // We didn't start the migration, so we need to create record in the db
+            Migration migration = ao.create(Migration.class);
+            migration.setStage(NOT_STARTED);
+            migration.save();
+            return migration;
+        } else {
+            throw new RuntimeException("Invalid State - should only be 1 migration");
         }
-        return migration;
     }
 
 
@@ -129,12 +128,13 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
     }
 
     public void updateMigrationStage(MigrationStage stage) {
+        Migration migration = loadMigration();
         migration.setStage(stage);
         migration.save();
     }
 
     public boolean startFilesystemMigration() {
-        final Migration migration = findOrCreateMigration();
+        Migration migration = loadMigration();
         if (migration.getStage() == NOT_STARTED) {
             return false;
         }
@@ -169,7 +169,7 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
 
     @Override
     public Migration createMigration() {
-        Migration migration = findOrCreateMigration();
+        Migration migration = loadMigration();
         if (migration.getStage().equals(NOT_STARTED)) {
             return migration;
         }
@@ -178,7 +178,7 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
 
     @Override
     public MigrationStage getCurrentStage() {
-        return findOrCreateMigration().getStage();
+        return loadMigration().getStage();
     }
 
     @Override
@@ -188,11 +188,12 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
 
     @Override
     public void error() {
-        findOrCreateMigration();
+        loadMigration();
         setCurrentStage(ERROR);
     }
 
     private void setCurrentStage(MigrationStage stage) {
+        Migration migration = loadMigration();
         migration.setStage(stage);
         migration.save();
     }
