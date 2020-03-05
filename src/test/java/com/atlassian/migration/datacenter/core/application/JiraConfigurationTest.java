@@ -72,7 +72,7 @@ class JiraConfigurationTest
         Exception e = assertThrows(ApplicationConfiguration.ConfigurationReadException.class, () -> {
             jiraConfiguration.getDatabaseConfiguration();
         });
-        assertEquals(ApplicationConfiguration.ConfigurationReadException.class, e.getCause().getClass());
+        assertEquals(ApplicationConfiguration.ConfigurationReadException.class, e.getClass());
     }
 
     @Test
@@ -89,4 +89,47 @@ class JiraConfigurationTest
         assertEquals("dbhost", config.getHost());
         assertEquals("dbname", config.getName());
     }
+
+    @Test
+    void dbconfigValidBase64() throws Exception
+    {
+        String url = "jdbc:postgresql://dbhost:9876/dbname";
+        String xml = "<jira-database-config><jdbc-datasource>"+
+                     "<url>"+url+"</url>"+
+                     "<username>jdbc_user</username>"+
+                     "<atlassian-password-cipher-provider>com.atlassian.db.config.password.ciphers.base64.Base64Cipher</atlassian-password-cipher-provider>"+
+                     "<password>cGFzc3dvcmQ=</password>"+
+                     "</jdbc-datasource></jira-database-config>";
+
+        final Path file = tempDir.resolve("dbconfig.xml");
+        Files.write(file, xml.getBytes());
+
+        DatabaseConfiguration config = jiraConfiguration.getDatabaseConfiguration();
+        assertEquals("jdbc_user", config.getUsername());
+        assertEquals("password", config.getPassword());
+        assertEquals("dbhost", config.getHost());
+        assertEquals("dbname", config.getName());
+    }
+
+    @Test
+    void dbconfigUnsupportedDecoder() throws Exception
+    {
+        String url = "jdbc:postgresql://dbhost:9876/dbname";
+        String xml = "<jira-database-config><jdbc-datasource>"+
+                     "<url>"+url+"</url>"+
+                     "<username>jdbc_user</username>"+
+                     "<atlassian-password-cipher-provider>com.atlassian.db.config.password.ciphers.algorithm.AlgorithmCipher</atlassian-password-cipher-provider>"+
+                     "<password>cGFzc3dvcmQ=</password>"+
+                     "</jdbc-datasource></jira-database-config>";
+
+        final Path file = tempDir.resolve("dbconfig.xml");
+        Files.write(file, xml.getBytes());
+
+        Exception e = assertThrows(ApplicationConfiguration.ConfigurationReadException.class, () -> {
+            jiraConfiguration.getDatabaseConfiguration();
+        });
+        assertEquals(ApplicationConfiguration.ConfigurationReadException.class, e.getClass());
+    }
+
+
 }

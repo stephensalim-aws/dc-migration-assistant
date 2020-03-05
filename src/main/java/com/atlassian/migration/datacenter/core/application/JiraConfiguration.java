@@ -9,9 +9,9 @@ import javax.xml.xpath.XPathFactory;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Optional;
 
 /**
@@ -20,6 +20,9 @@ import java.util.Optional;
 @Component
 public class JiraConfiguration implements ApplicationConfiguration
 {
+    private static final String DATASOURCE_XPATH = "/jira-database-config/jdbc-datasource/";
+    private static final String BASE64_CLASS = "com.atlassian.db.config.password.ciphers.base64.Base64Cipher";
+
     private JiraHome jiraHome;
     private Optional<DatabaseConfiguration> databaseConfiguration = Optional.empty();
 
@@ -42,27 +45,49 @@ public class JiraConfiguration implements ApplicationConfiguration
         InputSource inputSource = new InputSource(reader);
         XPath xPath = XPathFactory.newInstance().newXPath();
         try {
-
-            String val = xPath.evaluate(path, inputSource);
-            // Note: XPath will return an empty string if not found;
-            // we assume retrieved values can never be empty.
-            if (val == null || val.equals(""))
-                throw new ConfigurationReadException("No value found for XPath: "+path);
-
-            return val;
-
+            return xPath.evaluate(path, inputSource);
         } catch (Exception e) {
             throw new ConfigurationReadException("Failed to parse dbconfig.xml, XPath: "+path, e);
         }
+    }
+
+    private String getParameter(String parameter, Path config) throws ConfigurationReadException
+    {
+        String path = DATASOURCE_XPATH + parameter;
+        String val = getXPath(path, config);
+
+        // Note: XPath will return an empty string if not found;
+        // we assume retrieved values can never be empty.
+        if (val == null || val.equals(""))
+            throw new ConfigurationReadException("No value found for XPath: "+path);
+
+        return val;
+    }
+
+    private String decodePassword(Path config) throws ConfigurationReadException
+    {
+        String password = getParameter("password", config);
+        String decoder = getXPath(DATASOURCE_XPATH+"atlassian-password-cipher-provider", config);
+
+        if (decoder == null || decoder.equals("")) {
+            return password;
+        }
+
+        if (!decoder.equals(BASE64_CLASS)) {
+            throw new ConfigurationReadException("Unsupported database password encryption in dbconfig.xml; see documentation for detail: "+decoder);
+        }
+
+        // Password is Base64 encoded. We don't have direct access to the bundled decoder, but this works fine...
+        return new String(Base64.getDecoder().decode(password));
     }
 
     private DatabaseConfiguration parseDbConfig() throws ConfigurationReadException
     {
         Path dbconfig = Paths.get(jiraHome.getLocalHomePath()).resolve("dbconfig.xml");
 
-        String username = getXPath("/jira-database-config/jdbc-datasource/username", dbconfig);
-        String password = getXPath("/jira-database-config/jdbc-datasource/password", dbconfig);
-        String urlStr = getXPath("/jira-database-config/jdbc-datasource/url", dbconfig);
+        String password = decodePassword(dbconfig);
+        String username = getParameter("username", dbconfig);
+        String urlStr = getParameter("url", dbconfig);
 
         try {
             // JDBC URIs are absolute, so we need to parse them in 2 steps.
