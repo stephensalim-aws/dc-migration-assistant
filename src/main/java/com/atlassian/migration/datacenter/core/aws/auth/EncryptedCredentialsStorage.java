@@ -6,13 +6,13 @@ import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import lombok.SneakyThrows;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,7 +29,7 @@ import java.util.stream.Stream;
  */
 @Component
 @Primary
-public class EncryptedCredentialsStorage implements ReadCredentialsService, WriteCredentialsService {
+public class EncryptedCredentialsStorage implements InitializingBean, ReadCredentialsService, WriteCredentialsService {
 
     private static final String AWS_CREDS_PLUGIN_STORAGE_KEY = "com.atlassian.migration.datacenter.core.aws.auth";
     private static final String ACCESS_KEY_ID_PLUGIN_STORAGE_SUFFIX = ".accessKeyId";
@@ -80,8 +80,7 @@ public class EncryptedCredentialsStorage implements ReadCredentialsService, Writ
         return keyString;
     }
 
-    @PostConstruct
-    public void postConstruct() {
+    public void afterPropertiesSet() {
         assert this.jiraHome != null;
         String keyFilePath = this.jiraHome.getHome().getPath().concat("/").concat(ENCRYPTION_KEY_FILE_NAME);
         String saltFilePath = this.jiraHome.getHome().getPath().concat("/").concat(ENCRYPTION_SALT_FILE_NAME);
