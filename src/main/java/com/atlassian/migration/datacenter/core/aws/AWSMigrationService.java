@@ -169,6 +169,7 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
 
     @Override
     public void setCurrentStage(MigrationStage stage) {
-
+        migration.setStage(stage);
+        migration.save();
     }
 }

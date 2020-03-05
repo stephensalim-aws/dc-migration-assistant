@@ -11,7 +11,6 @@ import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 import com.atlassian.scheduler.SchedulerService;
 import net.java.ao.EntityManager;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
-import org.apache.http.auth.AUTH;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,10 +22,20 @@ import org.mockito.junit.MockitoRule;
 import java.util.HashMap;
 import java.util.Optional;
 
-import static com.atlassian.migration.datacenter.spi.MigrationStage.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.AUTHENTICATION;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.ERROR;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.NOT_STARTED;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.PROVISION_APPLICATION;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.READY_FS_MIGRATION;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 // We have to use the JUnit 4 API because there is no JUnit 5 active objects extension :(
 @RunWith(ActiveObjectsJUnitRunner.class)
@@ -165,6 +174,16 @@ public class AWSMigrationServiceTest {
         initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
 
         assertEquals(AUTHENTICATION, sut.getCurrentStage());
+    }
+
+    @Test
+    public void shouldBeABleToSetCurrentStage() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+        assertEquals(AUTHENTICATION, sut.getCurrentStage());
+
+        sut.setCurrentStage(PROVISION_APPLICATION);
+
+        assertEquals(PROVISION_APPLICATION, sut.getCurrentStage());
     }
 
 
