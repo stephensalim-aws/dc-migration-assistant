@@ -16,5 +16,12 @@ public interface ApplicationConfiguration
         }
     }
 
+    class UnsupportedPasswordEncoding extends RuntimeException {
+        public UnsupportedPasswordEncoding(String message)
+        {
+            super(message);
+        }
+    }
+
     DatabaseConfiguration getDatabaseConfiguration() throws ConfigurationReadException;
 }

@@ -74,7 +74,7 @@ public class JiraConfiguration implements ApplicationConfiguration
         }
 
         if (!decoder.equals(BASE64_CLASS)) {
-            throw new ConfigurationReadException("Unsupported database password encryption in dbconfig.xml; see documentation for detail: "+decoder);
+            throw new UnsupportedPasswordEncoding("Unsupported database password encryption in dbconfig.xml; see documentation for detail: "+decoder);
         }
 
         // Password is Base64 encoded. We don't have direct access to the bundled decoder, but this works fine...
