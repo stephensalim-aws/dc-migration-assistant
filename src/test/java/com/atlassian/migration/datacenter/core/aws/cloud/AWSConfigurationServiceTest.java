@@ -15,7 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -76,7 +79,7 @@ class AWSConfigurationServiceTest {
     }
 
     @Test
-    void shouldTransitionToErrorWhenUnableToSetRegionSuccessfully() throws InvalidAWSRegionException, InvalidMigrationStageError {
+    void shouldThrowErrorAndNotTransitionWhenUnableToCompleteSuccessfully() throws InvalidAWSRegionException, InvalidMigrationStageError {
         mockValidMigration();
 
         final String testRegion = "region";
@@ -87,7 +90,7 @@ class AWSConfigurationServiceTest {
             fail();
         } catch (RuntimeException rte) {
             assertEquals(InvalidAWSRegionException.class, rte.getCause().getClass());
-            verify(mockMigrationService).error();
+            verify(mockMigrationService, never()).transition(any(), any());
         }
     }
 
