@@ -1,8 +1,5 @@
 package com.atlassian.migration.datacenter.core.aws;
 
-import com.atlassian.migration.datacenter.core.aws.auth.AtlassianPluginAWSCredentialsProvider;
-import com.atlassian.migration.datacenter.core.aws.region.InvalidAWSRegionException;
-import com.atlassian.migration.datacenter.core.aws.region.PluginSettingsRegionManager;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
