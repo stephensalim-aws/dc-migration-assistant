@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static com.atlassian.migration.datacenter.spi.MigrationStage.AUTHENTICATION;
 import static com.atlassian.migration.datacenter.spi.MigrationStage.ERROR;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.FS_MIGRATION_EXPORT;
 import static com.atlassian.migration.datacenter.spi.MigrationStage.NOT_STARTED;
 import static com.atlassian.migration.datacenter.spi.MigrationStage.PROVISION_APPLICATION;
 import static com.atlassian.migration.datacenter.spi.MigrationStage.READY_FS_MIGRATION;
@@ -177,13 +178,21 @@ public class AWSMigrationServiceTest {
     }
 
     @Test
-    public void shouldTransitionToCurrentStagesNextStageOnChange() {
+    public void shouldTransitionWhenSourceStageIsCurrentStage() throws InvalidMigrationStageError {
         initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
         assertEquals(AUTHENTICATION, sut.getCurrentStage());
 
-        sut.nextStage();
+        sut.transition(AUTHENTICATION, PROVISION_APPLICATION);
 
-        assertEquals(AUTHENTICATION.getNext(), sut.getCurrentStage());
+        assertEquals(PROVISION_APPLICATION, sut.getCurrentStage());
+    }
+
+    @Test
+    public void shouldNotTransitionWhenSourceStageIsNotCurrentStage() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+        assertEquals(AUTHENTICATION, sut.getCurrentStage());
+
+        assertThrows(InvalidMigrationStageError.class, () -> sut.transition(FS_MIGRATION_EXPORT, PROVISION_APPLICATION));
     }
 
     @Test

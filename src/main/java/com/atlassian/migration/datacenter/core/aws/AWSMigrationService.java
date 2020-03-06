@@ -182,9 +182,14 @@ public class AWSMigrationService implements MigrationService, MigrationServiceV2
     }
 
     @Override
-    public void nextStage() {
+    public void transition(MigrationStage from, MigrationStage to) throws InvalidMigrationStageError {
         Migration migration = loadMigration();
-        setCurrentStage(migration, migration.getStage().getNext());
+        final MigrationStage currentStage = migration.getStage();
+        if (!currentStage.equals(from)) {
+            throw new InvalidMigrationStageError(String.format("expected to be in %s but was in %s", from.toString(), currentStage.toString()));
+        }
+
+        setCurrentStage(migration, to);
     }
 
     @Override
