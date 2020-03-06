@@ -37,7 +37,7 @@ public class S3MultiPartUploader {
     private final static Logger logger = LoggerFactory.getLogger(S3MultiPartUploader.class);
     private final S3UploadConfig config;
 
-    private int sizeToUpload = 100 * 1024 * 1024; // Using the same chunk size as TransferManager from AWS SDK v1
+    private int sizeToUpload = 50 * 1024 * 1024; // 50MB
     private List<CompletedPart> completedParts;
 
     public S3MultiPartUploader(S3UploadConfig config) {
