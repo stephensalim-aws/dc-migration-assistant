@@ -26,7 +26,7 @@ class AWSConfigurationServiceTest {
     RegionService mockRegionService;
 
     @Mock
-    MigrationServiceV2  migrationService;
+    MigrationServiceV2 mockMigrationService;
 
     @InjectMocks
     AWSConfigurationService sut;
@@ -55,12 +55,21 @@ class AWSConfigurationServiceTest {
 
     @Test
     void shouldStoreCredentialsOnlyWhenStateIsAuthentication() {
-        when(migrationService.getCurrentStage()).thenReturn(MigrationStage.FS_MIGRATION_EXPORT);
+        when(mockMigrationService.getCurrentStage()).thenReturn(MigrationStage.FS_MIGRATION_EXPORT);
         assertThrows(InvalidMigrationStageError.class, () -> sut.configureCloudProvider("garbage", "garbage", "garbage"));
     }
 
     private void mockValidMigration() {
-        when(migrationService.getCurrentStage()).thenReturn(MigrationStage.AUTHENTICATION);
+        when(mockMigrationService.getCurrentStage()).thenReturn(MigrationStage.AUTHENTICATION);
+    }
+
+    @Test
+    void shouldTransitionToProvisionApplicationStageWhenSuccessful() throws InvalidMigrationStageError {
+        mockValidMigration();
+
+        sut.configureCloudProvider("garbage", "garbage", "garbage");
+
+        verify(mockMigrationService).transition(MigrationStage.AUTHENTICATION, MigrationStage.PROVISION_APPLICATION);
     }
 
 }

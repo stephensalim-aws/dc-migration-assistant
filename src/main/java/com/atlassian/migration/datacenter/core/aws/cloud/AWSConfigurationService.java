@@ -36,5 +36,7 @@ public class AWSConfigurationService implements CloudConfigurationService {
         logger.info("Storing AWS credentials");
         writeCredentialsService.storeAccessKeyId(entity);
         writeCredentialsService.storeSecretAccessKey(secret);
+
+        migrationService.transition(MigrationStage.AUTHENTICATION, MigrationStage.PROVISION_APPLICATION);
     }
 }
