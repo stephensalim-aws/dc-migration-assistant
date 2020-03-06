@@ -18,8 +18,6 @@ public class DirectoryStreamCrawler implements Crawler {
     private FileSystemMigrationErrorReport report;
     private FileSystemMigrationProgress progress;
 
-    private long totalFilesCrawled = 0L;
-
     public DirectoryStreamCrawler(FileSystemMigrationErrorReport report, FileSystemMigrationProgress progress) {
         this.report = report;
         this.progress = progress;
@@ -30,7 +28,7 @@ public class DirectoryStreamCrawler implements Crawler {
         final DirectoryStream<Path> paths;
         paths = Files.newDirectoryStream(start);
         listDirectories(queue, paths);
-        logger.info("Crawled and added {} files for upload.", totalFilesCrawled);
+        logger.info("Crawled and added {} files for upload.", progress.getNumberOfFilesFound());
     }
 
     private void listDirectories(ConcurrentLinkedQueue<Path> queue, DirectoryStream<Path> paths) {
@@ -45,7 +43,6 @@ public class DirectoryStreamCrawler implements Crawler {
             } else {
                 queue.add(p);
                 progress.reportFileFound();
-                totalFilesCrawled++;
             }
         });
     }
