@@ -1,5 +1,6 @@
 package com.atlassian.migration.datacenter.api.fs;
 
+import com.atlassian.migration.datacenter.spi.MigrationService;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FailedFileMigration;
 import com.atlassian.migration.datacenter.spi.fs.reporting.FileSystemMigrationReport;
@@ -23,28 +24,30 @@ import java.util.Set;
 
 import static com.atlassian.migration.datacenter.spi.fs.reporting.FilesystemMigrationStatus.RUNNING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class FileSystemMigrationProgressEndpointTest {
 
     @Mock
-    private FilesystemMigrationService migrationService;
+    private MigrationService migrationService;
+
+    @Mock
+    private FilesystemMigrationService fsMigrationService;
 
     @Mock
     private FileSystemMigrationReport report;
 
-    private FileSystemMigrationProgressEndpoint endpoint;
+    private FileSystemMigrationEndpoint endpoint;
 
     @BeforeEach
     void setUp() {
-        endpoint = new FileSystemMigrationProgressEndpoint(migrationService);
+        endpoint = new FileSystemMigrationEndpoint(migrationService, fsMigrationService);
     }
 
     @Test
     void shouldReturnReportWhenMigrationExists() throws JsonProcessingException {
-        when(migrationService.getReport()).thenReturn(report);
+        when(fsMigrationService.getReport()).thenReturn(report);
 
         when(report.getStatus()).thenReturn(RUNNING);
 
@@ -81,7 +84,7 @@ public class FileSystemMigrationProgressEndpointTest {
 
     @Test
     void shouldHandleVeryLargeReport() throws JsonProcessingException {
-        when(migrationService.getReport()).thenReturn(report);
+        when(fsMigrationService.getReport()).thenReturn(report);
 
         when(report.getStatus()).thenReturn(RUNNING);
 
@@ -122,7 +125,7 @@ public class FileSystemMigrationProgressEndpointTest {
 
     @Test
     void shouldReturnBadRequestWhenNoReportExists() {
-        when(migrationService.getReport()).thenReturn(null);
+        when(fsMigrationService.getReport()).thenReturn(null);
 
         final Response response = endpoint.getFilesystemMigrationStatus();
 
