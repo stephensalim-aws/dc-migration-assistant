@@ -1,6 +1,7 @@
 package com.atlassian.migration.datacenter.core.aws.cloud;
 
 import com.atlassian.migration.datacenter.core.aws.auth.WriteCredentialsService;
+import com.atlassian.migration.datacenter.core.aws.region.InvalidAWSRegionException;
 import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,7 @@ class AWSConfigurationServiceTest {
 
     @InjectMocks
     AWSConfigurationService sut;
-    
+
     @Test
     void shouldStoreCredentials() {
         final String username = "username";
@@ -30,6 +31,14 @@ class AWSConfigurationServiceTest {
 
         verify(mockCredentialsWriter).storeAccessKeyId(username);
         verify(mockCredentialsWriter).storeSecretAccessKey(password);
+    }
+
+    @Test
+    void shouldStoreRegion() throws InvalidAWSRegionException {
+        final String region = "region";
+        sut.configureCloudProvider("username", "password", region);
+
+        verify(mockRegionService).storeRegion(region);
     }
 
 }
