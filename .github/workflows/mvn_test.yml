@@ -33,4 +33,4 @@ jobs:
       - name: Test with maven
         run: mvn -B verify
       - name: Test with maven
-        run: mvn -B verify -Pintegration
+        run: mvn -B clean verify -Pintegration
