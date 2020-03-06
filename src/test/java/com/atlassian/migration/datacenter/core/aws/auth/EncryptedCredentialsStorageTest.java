@@ -4,7 +4,7 @@ import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.After;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,16 +27,16 @@ import static org.mockito.Mockito.when;
 public class EncryptedCredentialsStorageTest {
 
     @InjectMocks
-    private EncryptedCredentialsStorage encryptedCredentialsStorage;
+    EncryptedCredentialsStorage encryptedCredentialsStorage;
 
     @Mock
-    private JiraHome jiraHome;
+    static JiraHome jiraHome;
 
     @Mock
-    private PluginSettingsFactory pluginSettingsFactory;
+    PluginSettingsFactory pluginSettingsFactory;
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    static void tearDown() {
         File keyFile = new File(jiraHome.getHome().getAbsolutePath().concat("/").concat("keyFile"));
         File saltFile = new File(jiraHome.getHome().getAbsolutePath().concat("/").concat("saltFile"));
         if (keyFile.exists()) {
@@ -48,8 +48,8 @@ public class EncryptedCredentialsStorageTest {
     }
 
     @BeforeEach
-    public void setup() {
-        when(this.jiraHome.getHome()).thenReturn(new File("."));
+    void setup() {
+        when(jiraHome.getHome()).thenReturn(new File("."));
         when(this.pluginSettingsFactory.createGlobalSettings()).thenReturn(new PluginSettings() {
             Map<String, Object> settings = new HashMap<>();
 
@@ -72,7 +72,7 @@ public class EncryptedCredentialsStorageTest {
     }
 
     @Test
-    public void testEncryption() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    void testEncryption() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         final String testString = RandomStringUtils.randomAlphanumeric(new Random().nextInt(50));
 
         Method encryptMethod = encryptedCredentialsStorage.getClass().getDeclaredMethod("encryptString", String.class);
@@ -89,7 +89,7 @@ public class EncryptedCredentialsStorageTest {
     }
 
     @Test
-    public void testSaveAccessKeyId() {
+    void testSaveAccessKeyId() {
         final String testAccessKeyId = RandomStringUtils.randomAlphanumeric(new Random().nextInt(50));
 
         this.encryptedCredentialsStorage.setAccessKeyId(testAccessKeyId);
@@ -99,7 +99,7 @@ public class EncryptedCredentialsStorageTest {
     }
 
     @Test
-    public void testSaveSecretKey() {
+    void testSaveSecretKey() {
         final String testSecretAccessKey = RandomStringUtils.randomAlphanumeric(new Random().nextInt(50));
 
         this.encryptedCredentialsStorage.setSecretAccessKey(testSecretAccessKey);
