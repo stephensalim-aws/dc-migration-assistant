@@ -30,6 +30,7 @@ public class AWSConfigurationService implements CloudConfigurationService {
             logger.info("stored aws region");
         } catch (InvalidAWSRegionException e) {
             logger.error("error storing AWS region", e);
+            migrationService.error();
             throw new RuntimeException(e);
         }
 

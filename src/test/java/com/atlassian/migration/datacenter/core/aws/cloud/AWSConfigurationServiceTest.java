@@ -12,7 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -70,6 +73,22 @@ class AWSConfigurationServiceTest {
         sut.configureCloudProvider("garbage", "garbage", "garbage");
 
         verify(mockMigrationService).transition(MigrationStage.AUTHENTICATION, MigrationStage.PROVISION_APPLICATION);
+    }
+
+    @Test
+    void shouldTransitionToErrorWhenUnableToSetRegionSuccessfully() throws InvalidAWSRegionException, InvalidMigrationStageError {
+        mockValidMigration();
+
+        final String testRegion = "region";
+        doThrow(new InvalidAWSRegionException()).when(mockRegionService).storeRegion(testRegion);
+
+        try {
+            sut.configureCloudProvider("garbage", "garbage", testRegion);
+            fail();
+        } catch (RuntimeException rte) {
+            assertEquals(InvalidAWSRegionException.class, rte.getCause().getClass());
+            verify(mockMigrationService).error();
+        }
     }
 
 }
