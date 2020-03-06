@@ -9,13 +9,21 @@ import com.atlassian.migration.datacenter.spi.MigrationStage;
 import com.atlassian.migration.datacenter.spi.cloud.CloudConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AWSConfigurationService implements CloudConfigurationService {
     private static final Logger logger = LoggerFactory.getLogger(AWSConfigurationService.class);
 
-    private WriteCredentialsService writeCredentialsService;
-    private RegionService regionService;
-    private MigrationServiceV2 migrationService;
+    private final WriteCredentialsService writeCredentialsService;
+    private final RegionService regionService;
+    private final MigrationServiceV2 migrationService;
+
+    public AWSConfigurationService(WriteCredentialsService writeCredentialsService, RegionService regionService, MigrationServiceV2 migrationService) {
+        this.writeCredentialsService = writeCredentialsService;
+        this.regionService = regionService;
+        this.migrationService = migrationService;
+    }
 
     @Override
     public void configureCloudProvider(String entity, String secret, String geography) throws InvalidMigrationStageError {
