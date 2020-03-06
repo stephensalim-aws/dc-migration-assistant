@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,6 +33,8 @@ class AWSConfigurationServiceTest {
 
     @Test
     void shouldStoreCredentials() throws InvalidMigrationStageError {
+        mockValidMigration();
+
         final String username = "username";
         final String password = "password";
         sut.configureCloudProvider(username, password, "garbage");
@@ -44,6 +45,8 @@ class AWSConfigurationServiceTest {
 
     @Test
     void shouldStoreRegion() throws InvalidAWSRegionException, InvalidMigrationStageError {
+        mockValidMigration();
+
         final String region = "region";
         sut.configureCloudProvider("username", "password", region);
 
@@ -54,6 +57,10 @@ class AWSConfigurationServiceTest {
     void shouldStoreCredentialsOnlyWhenStateIsAuthentication() {
         when(migrationService.getCurrentStage()).thenReturn(MigrationStage.FS_MIGRATION_EXPORT);
         assertThrows(InvalidMigrationStageError.class, () -> sut.configureCloudProvider("garbage", "garbage", "garbage"));
+    }
+
+    private void mockValidMigration() {
+        when(migrationService.getCurrentStage()).thenReturn(MigrationStage.AUTHENTICATION);
     }
 
 }
