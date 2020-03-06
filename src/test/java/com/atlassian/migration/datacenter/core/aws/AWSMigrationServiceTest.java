@@ -5,13 +5,13 @@ import com.atlassian.activeobjects.test.TestActiveObjects;
 import com.atlassian.migration.datacenter.core.exceptions.InfrastructureProvisioningError;
 import com.atlassian.migration.datacenter.core.exceptions.InvalidMigrationStageError;
 import com.atlassian.migration.datacenter.dto.Migration;
+import com.atlassian.migration.datacenter.dto.MigrationContext;
 import com.atlassian.migration.datacenter.spi.MigrationStage;
 import com.atlassian.migration.datacenter.spi.fs.FilesystemMigrationService;
 import com.atlassian.migration.datacenter.spi.infrastructure.ProvisioningConfig;
 import com.atlassian.scheduler.SchedulerService;
 import net.java.ao.EntityManager;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
-import org.apache.http.auth.AUTH;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,10 +23,21 @@ import org.mockito.junit.MockitoRule;
 import java.util.HashMap;
 import java.util.Optional;
 
-import static com.atlassian.migration.datacenter.spi.MigrationStage.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.AUTHENTICATION;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.ERROR;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.FS_MIGRATION_EXPORT;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.NOT_STARTED;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.PROVISION_APPLICATION;
+import static com.atlassian.migration.datacenter.spi.MigrationStage.READY_FS_MIGRATION;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 // We have to use the JUnit 4 API because there is no JUnit 5 active objects extension :(
 @RunWith(ActiveObjectsJUnitRunner.class)
@@ -52,7 +63,7 @@ public class AWSMigrationServiceTest {
 
     @Test
     public void shouldBeInUnStartedStageWhenNoMigrationExists() {
-        ao.migrate(Migration.class);
+        setupEntities();
 
         MigrationStage initialStage = sut.getMigrationStage();
 
@@ -75,7 +86,8 @@ public class AWSMigrationServiceTest {
 
     @Test
     public void shouldTransitionStageToAuthenticationWhenCreated() {
-        ao.migrate();
+        setupEntities();
+
         assertNumberOfMigrations(0);
 
         assertTrue(sut.startMigration());
@@ -158,15 +170,73 @@ public class AWSMigrationServiceTest {
         verify(this.cfnApi, never()).provisionStack(any(), any(), any());
     }
 
+
+    // MigrationServiceV2 Tests
+
+    @Test
+    public void shouldBeAbleToGetCurrentStage() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+
+        assertEquals(AUTHENTICATION, sut.getCurrentStage());
+    }
+    @Test
+    public void shouldTransitionWhenSourceStageIsCurrentStage() throws InvalidMigrationStageError {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+        assertEquals(AUTHENTICATION, sut.getCurrentStage());
+
+        sut.transition(AUTHENTICATION, PROVISION_APPLICATION);
+
+        assertEquals(PROVISION_APPLICATION, sut.getCurrentStage());
+    }
+
+    @Test
+    public void shouldNotTransitionWhenSourceStageIsNotCurrentStage() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+        assertEquals(AUTHENTICATION, sut.getCurrentStage());
+
+        assertThrows(InvalidMigrationStageError.class, () -> sut.transition(FS_MIGRATION_EXPORT, PROVISION_APPLICATION));
+        assertEquals(sut.getCurrentStage(), AUTHENTICATION);
+    }
+
+    @Test
+    public void shouldCreateMigrationInNotStarted() {
+        ao.migrate(Migration.class);
+        Migration migration = sut.createMigration();
+
+        assertEquals(NOT_STARTED, migration.getStage());
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenMigrationExistsAlready() {
+        initializeAndCreateSingleMigrationWithStage(AUTHENTICATION);
+        assertThrows(RuntimeException.class, () -> sut.createMigration());
+    }
+
+    @Test
+    public void errorShouldSetCurrentStageToError() {
+        initializeAndCreateSingleMigrationWithStage(PROVISION_APPLICATION);
+
+        sut.error();
+
+        assertEquals(ERROR, sut.getCurrentStage());
+    }
+
     private void assertNumberOfMigrations(int i) {
         assertEquals(i, ao.find(Migration.class).length);
     }
 
     private Migration initializeAndCreateSingleMigrationWithStage(MigrationStage stage) {
-        ao.migrate(Migration.class);
+        setupEntities();
+
         Migration migration = ao.create(Migration.class);
         migration.setStage(stage);
         migration.save();
+
         return migration;
+    }
+
+    private void setupEntities() {
+        ao.migrate(Migration.class);
+        ao.migrate(MigrationContext.class);
     }
 }
