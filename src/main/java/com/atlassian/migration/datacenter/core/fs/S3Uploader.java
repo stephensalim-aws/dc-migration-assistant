@@ -39,6 +39,9 @@ public class S3Uploader implements Uploader {
     public void upload(ConcurrentLinkedQueue<Path> queue, AtomicBoolean isCrawlDone) {
         Path path;
         while (!((path = queue.poll()) == null) || !isCrawlDone.get()) {
+            if (responsesQueue.size() >= MAX_OPEN_CONNECTIONS) {
+                responsesQueue.forEach(this::handlePutObjectResponse);
+            }
             if (path == null) {
                 try {
                     Thread.sleep(MS_TO_WAIT_FOR_CRAWLER);
@@ -46,8 +49,6 @@ public class S3Uploader implements Uploader {
                     logger.error("Interrupted S3 upload, adding all remaining files to failed collection");
                     queue.forEach(p -> addFailedFile(p, e.getMessage()));
                 }
-            } else if (responsesQueue.size() >= MAX_OPEN_CONNECTIONS) {
-                responsesQueue.forEach(this::handlePutObjectResponse);
             } else {
                 if (Files.exists(path)) {
                     String key = config.getSharedHome().relativize(path).toString();
