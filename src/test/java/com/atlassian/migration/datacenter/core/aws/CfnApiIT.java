@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -18,13 +17,9 @@ import software.amazon.awssdk.services.cloudformation.model.Stack;
 import software.amazon.awssdk.services.cloudformation.model.StackInstanceNotFoundException;
 import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.Bucket;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
-import software.amazon.awssdk.services.s3.model.CreateBucketResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ListBucketsRequest;
-import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -47,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Tag("integration")
 @ExtendWith({LocalstackDockerExtension.class})
-@LocalstackDockerProperties(services = {"cloudformation", "s3"}, imageTag = "0.10.6")
+@LocalstackDockerProperties(services = {"cloudformation", "s3"}, imageTag = "0.10.8")
 class CfnApiIT {
 
     private CfnApi cfnApi;
@@ -62,7 +57,11 @@ class CfnApiIT {
 
     @BeforeAll
     static void beforeAll() throws IOException {
-        S3Client s3Client = S3Client.builder().region(Region.AP_SOUTHEAST_2).endpointOverride(LOCALSTACK_S3_URI).build();
+        S3Client s3Client = S3Client.builder()
+                .region(Region.AP_SOUTHEAST_2)
+                .endpointOverride(LOCALSTACK_S3_URI)
+                .credentialsProvider(new StubAwsCredentialsProvider())
+                .build();
 
         s3Client.createBucket(CreateBucketRequest.builder().bucket(S3_BUCKET_NAME).build());
 
@@ -81,13 +80,12 @@ class CfnApiIT {
 
     @BeforeEach
     void setUp() {
-        cfnApi = new CfnApi(
-                CloudFormationAsyncClient.builder()
-                        .credentialsProvider(DefaultCredentialsProvider.create())
-                        .region(Region.AP_SOUTHEAST_2)
-                        .endpointOverride(LOCALSTACK_CLOUDFORMATION_URI)
-                        .build()
-        );
+        CloudFormationAsyncClient client = CloudFormationAsyncClient.builder()
+                .credentialsProvider(new StubAwsCredentialsProvider())
+                .region(Region.AP_SOUTHEAST_2)
+                .endpointOverride(LOCALSTACK_CLOUDFORMATION_URI)
+                .build();
+        cfnApi = new CfnApi(client);
     }
 
     @Test
