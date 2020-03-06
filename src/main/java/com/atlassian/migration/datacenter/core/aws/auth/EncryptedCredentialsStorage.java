@@ -4,7 +4,6 @@ import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import lombok.SneakyThrows;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Primary;
@@ -36,7 +35,8 @@ public class EncryptedCredentialsStorage implements InitializingBean, ReadCreden
     private static final String SECRET_ACCESS_KEY_PLUGIN_STORAGE_SUFFIX = ".secretAccessKey";
     private static final String ENCRYPTION_KEY_FILE_NAME = "keyFile";
     private static final String ENCRYPTION_SALT_FILE_NAME = "saltFile";
-    private static final Logger LOGGER = Logger.getLogger(EncryptedCredentialsStorage.class);
+    private static final Logger logger = Logger.getLogger(EncryptedCredentialsStorage.class);
+
     private final PluginSettingsFactory pluginSettingsFactory;
     private final JiraHome jiraHome;
     private TextEncryptor textEncryptor;
@@ -49,7 +49,6 @@ public class EncryptedCredentialsStorage implements InitializingBean, ReadCreden
         this.jiraHome = jiraHome;
     }
 
-    @SneakyThrows
     private static String getEncryptionData(String fileName) {
         File dataFile = new File(fileName);
         if (dataFile.exists()) {
@@ -64,7 +63,7 @@ public class EncryptedCredentialsStorage implements InitializingBean, ReadCreden
         try (Stream<String> stream = Files.lines(Paths.get(sourceFile.getPath()), StandardCharsets.UTF_8)) {
             stream.forEach(dataBuilder::append);
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage());
+            logger.error(e.getLocalizedMessage());
         }
         return dataBuilder.toString();
     }
@@ -74,7 +73,7 @@ public class EncryptedCredentialsStorage implements InitializingBean, ReadCreden
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             outputStream.write(keyString.getBytes());
         } catch (IOException ex) {
-            LOGGER.error(ex.getLocalizedMessage());
+            logger.error(ex.getLocalizedMessage());
         }
         file.setWritable(false, true);
         return keyString;
@@ -130,7 +129,7 @@ public class EncryptedCredentialsStorage implements InitializingBean, ReadCreden
         try {
             return this.textEncryptor.encrypt(raw);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            logger.error(e.getLocalizedMessage());
             return null;
         }
     }
@@ -145,7 +144,7 @@ public class EncryptedCredentialsStorage implements InitializingBean, ReadCreden
         try {
             return this.textEncryptor.decrypt(encrypted);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            logger.error(e.getLocalizedMessage());
             return null;
         }
     }
