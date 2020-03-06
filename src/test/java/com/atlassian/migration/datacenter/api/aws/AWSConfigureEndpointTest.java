@@ -8,6 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.ws.rs.core.Response;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,9 +32,10 @@ class AWSConfigureEndpointTest {
         payload.setSecretAccessKey(secretKey);
         payload.setRegion(region);
 
-        sut.storeAWSCredentials(payload);
+        Response response = sut.storeAWSCredentials(payload);
 
         verify(configurationService).configureCloudProvider(accessKeyId, secretKey, region);
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
 }
