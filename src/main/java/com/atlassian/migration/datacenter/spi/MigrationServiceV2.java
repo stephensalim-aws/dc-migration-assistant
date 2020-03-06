@@ -18,6 +18,12 @@ public interface MigrationServiceV2 {
      */
     MigrationStage getCurrentStage();
 
+    /**
+     * Tries to transition the migration state from one to another
+     * @param from the state you are expected to be in currently when beginning the transition
+     * @param to the state you want to transition to
+     * @throws InvalidMigrationStageError when the transition is invalid
+     */
     void transition(MigrationStage from, MigrationStage to) throws InvalidMigrationStageError;
 
     /**
