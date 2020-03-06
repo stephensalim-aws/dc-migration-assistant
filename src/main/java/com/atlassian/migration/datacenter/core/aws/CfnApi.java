@@ -31,11 +31,19 @@ public class CfnApi {
 
     private Optional<CloudFormationAsyncClient> client;
 
-    public CfnApi(AwsCredentialsProvider credentialsProvider, RegionService regionManager)
-    {
+    public CfnApi(AwsCredentialsProvider credentialsProvider, RegionService regionManager) {
         this.credentialsProvider = credentialsProvider;
         this.regionManager = regionManager;
         this.client = Optional.empty();
+    }
+
+    /**
+     * Package private constructor to consume a CFn Async Client. Currently used for testing. This will not be called by spring as no injectable <code>CloudFormationAsyncClient</code> instance exists in the container.
+     *
+     * @param client An async CloudFormation client
+     */
+    CfnApi(CloudFormationAsyncClient client) {
+        this.client = Optional.of(client);
     }
 
     /**
