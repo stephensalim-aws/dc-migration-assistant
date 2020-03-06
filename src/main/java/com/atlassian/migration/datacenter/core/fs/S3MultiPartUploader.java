@@ -16,6 +16,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -34,11 +35,9 @@ import java.util.concurrent.ExecutionException;
  */
 public class S3MultiPartUploader {
     private final static Logger logger = LoggerFactory.getLogger(S3MultiPartUploader.class);
-
-    private final int sizeToUpload = 100 * 1024 * 1024; // Using the same chunk size as TransferManager from AWS SDK v1
-
     private final S3UploadConfig config;
 
+    private int sizeToUpload = 100 * 1024 * 1024; // Using the same chunk size as TransferManager from AWS SDK v1
     private List<CompletedPart> completedParts;
 
     public S3MultiPartUploader(S3UploadConfig config) {
@@ -47,8 +46,9 @@ public class S3MultiPartUploader {
 
     /**
      * Upload the file in multiple parts
+     *
      * @param file file to upload
-     * @param key S3 key for the file
+     * @param key  S3 key for the file
      * @throws ExecutionException
      * @throws InterruptedException
      */
@@ -57,40 +57,66 @@ public class S3MultiPartUploader {
         final S3AsyncClient s3AsyncClient = config.getS3AsyncClient();
 
         CreateMultipartUploadRequest createMultipartUploadRequest = CreateMultipartUploadRequest.builder()
-                .bucket(config.getBucketName()).key(key)
+                .bucket(config.getBucketName())
+                .key(key)
                 .build();
         CreateMultipartUploadResponse response = s3AsyncClient.createMultipartUpload(createMultipartUploadRequest).get();
         String uploadId = response.uploadId();
 
-        int partNo = 1;
+        final ByteBuffer buffer = ByteBuffer.allocate(getSizeToUpload());
+        int uploadPartNumber = 1;
 
-        byte[] buf = new byte[sizeToUpload];
         try (FileInputStream fileInputStream = new FileInputStream(file);
              BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
-            while (bufferedInputStream.read(buf) > 0) {
+
+            while (bufferedInputStream.read(buffer.array()) > 0) {
 
                 UploadPartRequest uploadPartRequest = UploadPartRequest.builder()
                         .bucket(config.getBucketName())
                         .key(key)
                         .uploadId(uploadId)
-                        .partNumber(partNo)
+                        .partNumber(uploadPartNumber)
                         .build();
-                String etag = s3AsyncClient.uploadPart(uploadPartRequest, AsyncRequestBody.fromBytes(buf)).get().eTag();
+                String etag = s3AsyncClient
+                        .uploadPart(uploadPartRequest, AsyncRequestBody.fromByteBuffer(buffer))
+                        .get()
+                        .eTag();
+
+                logger.debug("Uploaded part {} with etag {}", uploadPartNumber, etag);
 
                 CompletedPart part = CompletedPart.builder()
-                        .partNumber(partNo)
+                        .partNumber(uploadPartNumber)
                         .eTag(etag)
                         .build();
                 completedParts.add(part);
 
-                partNo++;
+                uploadPartNumber++;
             }
         } catch (IOException e) {
             logger.error("Cannot open file for the multi-part upload", e);
         }
+        buffer.clear();
 
         completeUpload(key, uploadId).get();
         logger.debug("Finished multipart upload for {} with {} parts", key, completedParts.size());
+    }
+
+    /**
+     * Size of each chunk into which the file is split into
+     *
+     * @return size of the chunk
+     */
+    public int getSizeToUpload() {
+        return sizeToUpload;
+    }
+
+    /**
+     * Changes the default chunk size for multipart upload
+     *
+     * @param sizeToUpload chunk size
+     */
+    public void setSizeToUpload(int sizeToUpload) {
+        this.sizeToUpload = sizeToUpload;
     }
 
     private CompletableFuture<CompleteMultipartUploadResponse> completeUpload(String key, String uploadId) {

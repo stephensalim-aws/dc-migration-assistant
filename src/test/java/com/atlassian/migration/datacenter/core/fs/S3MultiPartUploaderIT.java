@@ -14,31 +14,34 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @Tag("integration")
 @ExtendWith({LocalstackDockerExtension.class, MockitoExtension.class})
 @LocalstackDockerProperties(services = {"s3"}, imageTag = "0.10.8")
-class S3MultiUploaderIT {
+class S3MultiPartUploaderIT {
     private static final String LOCALSTACK_S3_ENDPOINT = "http://localhost:4572";
     private static final String TREBUCHET_LOCALSTACK_BUCKET = "trebuchet-localstack-bucket";
-    private S3MultiPartUploader uploader;
-
-    @Mock
-    private AwsCredentialsProvider mockCredentialsProvider;
-
     @TempDir
     Path tempDir;
+    private S3MultiPartUploader uploader;
+    @Mock
+    private AwsCredentialsProvider mockCredentialsProvider;
 
     @BeforeEach
     void setup() {
@@ -65,12 +68,12 @@ class S3MultiUploaderIT {
     }
 
     @Test
-    void uploadShouldUploadPathsFromQueueToS3() throws Exception {
+    void multiuploadShouldUploadFileToS3() throws Exception {
         final String filename = "file_to_upload.txt";
         // we use subfolder to verify we are writing the correct key
         final Path file = createFile("subfolder", filename);
         final String key = tempDir.relativize(file).toString();
-        Files.write(file, "content".getBytes());
+        Files.write(file, "123456789".getBytes());
 
         AmazonS3 s3Client = TestUtils.getClientS3();
         s3Client.createBucket(TREBUCHET_LOCALSTACK_BUCKET);
@@ -80,6 +83,23 @@ class S3MultiUploaderIT {
         final List<S3ObjectSummary> objectSummaries = s3Client.listObjects(TREBUCHET_LOCALSTACK_BUCKET).getObjectSummaries();
         assertEquals(1, objectSummaries.size(), "Bucket should contain only one file");
         assertEquals(key, objectSummaries.get(0).getKey(), "Object key is different to the filename");
+    }
+
+    @Test
+    void uploadFileInMultipleParts() throws Exception {
+        final String filename = "file_to_upload.txt";
+        // we use subfolder to verify we are writing the correct key
+        final Path file = createFile("subfolder", filename);
+        final String key = tempDir.relativize(file).toString();
+        Files.write(file, "123456789".getBytes());
+        uploader.setSizeToUpload(1);
+
+        AmazonS3 s3Client = TestUtils.getClientS3();
+        s3Client.createBucket(TREBUCHET_LOCALSTACK_BUCKET);
+
+        final Exception ex = assertThrows(ExecutionException.class, () -> uploader.multiPartUpload(file.toFile(), key));
+        assertTrue(ex.getCause() instanceof S3Exception);
+        ex.getCause().getMessage().contains("Your proposed upload is smaller than the minimum allowed object size");
     }
 
     Path createFile(String subfolder, String fileName) throws IOException {
