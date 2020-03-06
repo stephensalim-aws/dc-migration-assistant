@@ -27,19 +27,7 @@ public class AWSCredentialsEndpoint {
     }
 
     @POST
-    @Consumes(APPLICATION_JSON)
-    @Produces(APPLICATION_JSON)
-    public Response storeAWSCredentials(AWSCredentialsWebObject credentials) {
-        writeCredentialsService.storeAccessKeyId(credentials.getAccessKeyId());
-        writeCredentialsService.storeSecretAccessKey(credentials.getSecretAccessKey());
-
-        return Response
-                .noContent()
-                .build();
-    }
-
-    @POST
-    @Path("v2/test")
+    @Path("/test")
     @Produces(APPLICATION_JSON)
     public Response testCredentialsSDKV2() {
         try {
@@ -54,37 +42,4 @@ public class AWSCredentialsEndpoint {
             throw cfne;
         }
     }
-
-    @JsonAutoDetect
-    static class AWSCredentialsWebObject {
-
-        private String accessKeyId;
-        private String secretAccessKey;
-        private String region;
-
-        public String getAccessKeyId() {
-            return accessKeyId;
-        }
-
-        public String getSecretAccessKey() {
-            return secretAccessKey;
-        }
-
-        public String getRegion() {
-            return region;
-        }
-
-        public void setAccessKeyId(String accessKeyId) {
-            this.accessKeyId = accessKeyId;
-        }
-
-        public void setSecretAccessKey(String secretAccessKey) {
-            this.secretAccessKey = secretAccessKey;
-        }
-
-        public void setRegion(String region) {
-            this.region = region;
-        }
-    }
-
 }
