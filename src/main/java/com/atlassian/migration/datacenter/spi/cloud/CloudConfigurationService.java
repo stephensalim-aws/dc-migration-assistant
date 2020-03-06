@@ -1,5 +1,7 @@
 package com.atlassian.migration.datacenter.spi.cloud;
 
+import com.atlassian.migration.datacenter.core.exceptions.InvalidMigrationStageError;
+
 public interface CloudConfigurationService {
 
     /**
@@ -8,6 +10,6 @@ public interface CloudConfigurationService {
      * @param secret the secret to authenticate the entity to the cloud provider e.g. secret access key
      * @param geography the geography to use for deployment of resources e.g. AWS region
      */
-    void configureCloudProvider(String entity, String secret, String geography);
+    void configureCloudProvider(String entity, String secret, String geography) throws InvalidMigrationStageError;
 
 }
