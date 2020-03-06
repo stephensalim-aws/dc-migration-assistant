@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import javax.ws.rs.core.Response;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +38,20 @@ class AWSConfigureEndpointTest {
 
         verify(configurationService).configureCloudProvider(accessKeyId, secretKey, region);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    void shouldReturnFailedWhenInvalidMigrationStage() throws InvalidMigrationStageError {
+        AWSConfigureEndpoint.AWSConfigureWebObject payload = new AWSConfigureEndpoint.AWSConfigureWebObject();
+        payload.setAccessKeyId("accessKeyId");
+        payload.setSecretAccessKey("secretKey");
+        payload.setRegion("us-east-1");
+
+        doThrow(new InvalidMigrationStageError("")).when(configurationService).configureCloudProvider(anyString(), anyString(), anyString());
+
+        Response response = sut.storeAWSCredentials(payload);
+
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
     }
 
 }
