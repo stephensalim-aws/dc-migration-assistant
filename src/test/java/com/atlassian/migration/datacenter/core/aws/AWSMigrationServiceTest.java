@@ -193,6 +193,7 @@ public class AWSMigrationServiceTest {
         assertEquals(AUTHENTICATION, sut.getCurrentStage());
 
         assertThrows(InvalidMigrationStageError.class, () -> sut.transition(FS_MIGRATION_EXPORT, PROVISION_APPLICATION));
+        assertEquals(sut.getCurrentStage(), AUTHENTICATION);
     }
 
     @Test
