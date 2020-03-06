@@ -15,13 +15,13 @@ import javax.ws.rs.core.Response;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("aws/credentials")
-public class AWSCredentialsEndpoint {
+public class TestAWSCredentialsEndpoint {
 
     private final WriteCredentialsService writeCredentialsService;
     private final ProbeAWSAuth probe;
 
     @Autowired
-    public AWSCredentialsEndpoint(WriteCredentialsService writeCredentialsService, ProbeAWSAuth probe) {
+    public TestAWSCredentialsEndpoint(WriteCredentialsService writeCredentialsService, ProbeAWSAuth probe) {
         this.writeCredentialsService = writeCredentialsService;
         this.probe = probe;
     }
