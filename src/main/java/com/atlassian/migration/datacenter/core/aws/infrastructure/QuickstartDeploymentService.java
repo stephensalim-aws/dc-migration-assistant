@@ -8,6 +8,8 @@ import com.atlassian.migration.datacenter.spi.MigrationServiceV2;
 import com.atlassian.migration.datacenter.spi.MigrationStage;
 import com.atlassian.migration.datacenter.spi.infrastructure.ApplicationDeploymentService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 
 import java.util.Map;
@@ -19,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class QuickstartDeploymentService implements ApplicationDeploymentService {
 
+    private final Logger logger = LoggerFactory.getLogger(QuickstartDeploymentService.class);
     private static final String QUICKSTART_TEMPLATE_URL = "https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-jira/templates/quickstart-jira-dc-with-vpc.template.yaml";
 
     private final CfnApi cfnApi;
@@ -41,13 +44,11 @@ public class QuickstartDeploymentService implements ApplicationDeploymentService
      */
     @Override
     public void deployApplication(String deploymentId, Map<String, String> params) throws InvalidMigrationStageError {
-        if(!migrationService.getCurrentStage().equals(MigrationStage.PROVISION_APPLICATION)) {
-            throw new InvalidMigrationStageError("must be in " + MigrationStage.PROVISION_APPLICATION.toString() + " to deploy application");
-        }
+        logger.info("received request to deploy application");
+        migrationService.transition(MigrationStage.PROVISION_APPLICATION, MigrationStage.WAIT_PROVISION_APPLICATION);
 
+        logger.info("deploying application stack");
         cfnApi.provisionStack(QUICKSTART_TEMPLATE_URL, deploymentId, params);
-
-        migrationService.nextStage();
 
         addDeploymentIdToMigrationContext(deploymentId);
 
@@ -73,6 +74,8 @@ public class QuickstartDeploymentService implements ApplicationDeploymentService
     }
 
     private void addDeploymentIdToMigrationContext(String deploymentId) {
+        logger.info("Storing stack name in migration context");
+
         MigrationContext context = getMigrationContext();
         context.setApplicationDeploymentId(deploymentId);
         context.save();
@@ -88,22 +91,29 @@ public class QuickstartDeploymentService implements ApplicationDeploymentService
     }
 
     private void scheduleMigrationServiceTransition(String deploymentId) {
+        logger.info("scheduling transition of migration status when application stack deployment is completed");
         CompletableFuture<String> stackCompleteFuture = new CompletableFuture<>();
 
         final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         ScheduledFuture<?> ticker = scheduledExecutorService.scheduleAtFixedRate(() -> {
             final StackStatus status = cfnApi.getStatus(deploymentId);
             if (status.equals(StackStatus.CREATE_COMPLETE)) {
-                migrationService.nextStage();
+                try {
+                    migrationService.transition(MigrationStage.WAIT_PROVISION_APPLICATION, MigrationStage.PROVISION_MIGRATION_STACK);
+                } catch (InvalidMigrationStageError invalidMigrationStageError) {
+                    logger.error("tried to transition migration from {} but got error: {}.", MigrationStage.WAIT_PROVISION_APPLICATION, invalidMigrationStageError.getMessage());
+                }
                 stackCompleteFuture.complete("");
             }
             if (status.equals(StackStatus.CREATE_FAILED)) {
+                logger.error("application stack deployment failed");
                 migrationService.error();
                 stackCompleteFuture.complete("");
             }
         }, 0, 30, TimeUnit.SECONDS);
 
         ScheduledFuture<?> canceller = scheduledExecutorService.scheduleAtFixedRate(() -> {
+            logger.error("timed out while waiting for application stack to deploy");
             migrationService.error();
             ticker.cancel(true);
             // Need to have non-zero period otherwise we get illegal argument exception

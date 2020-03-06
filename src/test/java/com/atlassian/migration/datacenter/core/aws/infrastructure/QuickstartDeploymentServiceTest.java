@@ -18,7 +18,9 @@ import java.util.HashMap;
 import static com.atlassian.migration.datacenter.spi.infrastructure.ApplicationDeploymentService.ApplicationDeploymentStatus.CREATE_IN_PROGRESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,6 +68,18 @@ class QuickstartDeploymentServiceTest {
     }
 
     @Test
+    void shouldTransitionToWaitingForDeploymentWhileDeploymentIsCompleting() throws InvalidMigrationStageError, InterruptedException {
+        initialiseValidMigration();
+        when(mockCfnApi.getStatus(STACK_NAME)).thenReturn(StackStatus.CREATE_IN_PROGRESS);
+
+        deploySimpleStack();
+
+        Thread.sleep(100);
+
+        verify(mockMigrationService).transition(MigrationStage.PROVISION_APPLICATION, MigrationStage.WAIT_PROVISION_APPLICATION);
+    }
+
+    @Test
     void shouldTransitionMigrationServiceStateWhenDeploymentFinishes() throws InterruptedException, InvalidMigrationStageError {
         initialiseValidMigration();
         when(mockCfnApi.getStatus(STACK_NAME)).thenReturn(StackStatus.CREATE_COMPLETE);
@@ -74,7 +88,7 @@ class QuickstartDeploymentServiceTest {
 
         Thread.sleep(100);
 
-        verify(mockMigrationService, times(2)).nextStage();
+        verify(mockMigrationService).transition(MigrationStage.WAIT_PROVISION_APPLICATION, MigrationStage.PROVISION_MIGRATION_STACK);
     }
 
     @Test
@@ -90,20 +104,8 @@ class QuickstartDeploymentServiceTest {
     }
 
     @Test
-    void shouldTransitionToWaitingForDeploymentWhileDeploymentIsCompleting() throws InvalidMigrationStageError, InterruptedException {
-        initialiseValidMigration();
-        when(mockCfnApi.getStatus(STACK_NAME)).thenReturn(StackStatus.CREATE_IN_PROGRESS);
-
-        deploySimpleStack();
-
-        Thread.sleep(100);
-
-        verify(mockMigrationService).nextStage();
-    }
-
-    @Test
-    void shouldNotInitiateDeploymentIfNotInProvisionApplicationStage() {
-        when(mockMigrationService.getCurrentStage()).thenReturn(MigrationStage.FS_MIGRATION_EXPORT);
+    void shouldNotInitiateDeploymentIfNotInProvisionApplicationStage() throws InvalidMigrationStageError {
+        doThrow(new InvalidMigrationStageError("")).when(mockMigrationService).transition(argThat(argument -> argument.equals(MigrationStage.PROVISION_APPLICATION)), any(MigrationStage.class));
 
         assertThrows(InvalidMigrationStageError.class, this::deploySimpleStack);
     }
@@ -113,7 +115,6 @@ class QuickstartDeploymentServiceTest {
     }
 
     private void initialiseValidMigration() {
-        when(mockMigrationService.getCurrentStage()).thenReturn(MigrationStage.PROVISION_APPLICATION);
         when(mockAo.find(MigrationContext.class)).thenReturn(new MigrationContext[]{mockContext});
     }
 }
