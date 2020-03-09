@@ -86,6 +86,23 @@ class JiraConfigurationTest
         assertEquals("password", config.getPassword());
         assertEquals("dbhost", config.getHost());
         assertEquals("dbname", config.getName());
+        assertEquals(9876, config.getPort());
+    }
+
+    @Test
+    void dbconfigValidNoPort() throws Exception
+    {
+        String url = "jdbc:postgresql://dbhost/dbname";
+        String xml = "<jira-database-config><jdbc-datasource><url>"+url+"</url><username>jdbc_user</username><password>password</password></jdbc-datasource></jira-database-config>";
+        final Path file = tempDir.resolve("dbconfig.xml");
+        Files.write(file, xml.getBytes());
+
+        DatabaseConfiguration config = jiraConfiguration.getDatabaseConfiguration();
+        assertEquals("jdbc_user", config.getUsername());
+        assertEquals("password", config.getPassword());
+        assertEquals("dbhost", config.getHost());
+        assertEquals("dbname", config.getName());
+        assertEquals(9876, config.getPort());
     }
 
     @Test
