@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class S3Uploader implements Uploader {
     private static final Logger logger = LoggerFactory.getLogger(S3Uploader.class);
     private static final int MS_TO_WAIT_FOR_CRAWLER = 500;
-    private static final int MAX_OPEN_CONNECTIONS = 50;
+    private static final int MAX_OPEN_CONNECTIONS = 100;
     private static final long MAXIMUM_FILE_SIZE_TO_UPLOAD = 5 * 1024 * 1024 * 1024L; // 5GB  https://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html
 
     private final FileSystemMigrationErrorReport report;
@@ -54,22 +54,26 @@ public class S3Uploader implements Uploader {
                     String key = config.getSharedHome().relativize(path).toString();
                     if (path.toFile().length() > MAXIMUM_FILE_SIZE_TO_UPLOAD) {
                         logger.debug("File {} is larger than {}, running multipart upload", path, FileUtils.byteCountToDisplaySize(MAXIMUM_FILE_SIZE_TO_UPLOAD));
+
                         final S3MultiPartUploader multiPartUploader = new S3MultiPartUploader(config);
                         try {
                             multiPartUploader.multiPartUpload(path.toFile(), key);
                         } catch (InterruptedException | ExecutionException e) {
                             logger.error("Error when running multi-part upload for file {} with exception {}", path, e.getMessage());
                         }
-                    }
-                    final PutObjectRequest putRequest = PutObjectRequest.builder()
-                            .bucket(config.getBucketName())
-                            .key(key)
-                            .build();
-                    final CompletableFuture<PutObjectResponse> response = config.getS3AsyncClient().putObject(putRequest, path);
-                    progress.reportFileInFlight();
-                    final S3UploadOperation uploadOperation = new S3UploadOperation(path, response);
 
-                    responsesQueue.add(uploadOperation);
+                        progress.reportFileMigrated();
+                    } else {
+                        final PutObjectRequest putRequest = PutObjectRequest.builder()
+                                .bucket(config.getBucketName())
+                                .key(key)
+                                .build();
+                        final CompletableFuture<PutObjectResponse> response = config.getS3AsyncClient().putObject(putRequest, path);
+                        final S3UploadOperation uploadOperation = new S3UploadOperation(path, response);
+                        responsesQueue.add(uploadOperation);
+
+                        progress.reportFileInFlight();
+                    }
                 } else {
                     addFailedFile(path, String.format("File doesn't exist: %s", path));
                 }

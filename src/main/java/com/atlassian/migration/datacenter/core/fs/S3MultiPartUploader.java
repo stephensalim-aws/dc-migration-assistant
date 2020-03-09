@@ -69,8 +69,9 @@ public class S3MultiPartUploader {
         try (FileInputStream fileInputStream = new FileInputStream(file);
              BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
 
-            while (bufferedInputStream.read(buffer.array()) > 0) {
-
+            long readBytes = 0L;
+            while ((readBytes = bufferedInputStream.read(buffer.array())) > 0) {
+                logger.trace("Read {} bytes from file {}", readBytes, file);
                 UploadPartRequest uploadPartRequest = UploadPartRequest.builder()
                         .bucket(config.getBucketName())
                         .key(key)
@@ -97,8 +98,13 @@ public class S3MultiPartUploader {
         }
         buffer.clear();
 
-        completeUpload(key, uploadId).get();
-        logger.debug("Finished multipart upload for {} with {} parts", key, completedParts.size());
+        logger.trace("Finished uploading parts, sending complete request.");
+        try {
+            completeUpload(key, uploadId).get();
+            logger.debug("Finished multipart upload for {} with {} parts", key, completedParts.size());
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Encountered error when uploading multipart file.", e);
+        }
     }
 
     /**
