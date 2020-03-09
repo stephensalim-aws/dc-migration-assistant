@@ -238,7 +238,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.10</version>
+            <version>${postgres.driver.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -511,6 +511,7 @@
         <aws.sdk.version>2.10.61</aws.sdk.version>
         <localstack.version>0.2.1</localstack.version>
         <testcontainers.version>1.13.0</testcontainers.version>
+        <postgres.driver.version>42.2.10</postgres.driver.version>
     </properties>
 
 </project>
