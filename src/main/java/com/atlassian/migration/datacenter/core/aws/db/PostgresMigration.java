@@ -46,6 +46,7 @@ public class PostgresMigration
         ProcessBuilder builder = new ProcessBuilder(pgdump,
                                                     "--create",
                                                     "--no-owner",
+                                                    "--no-acl",
                                                     "--compress=9",
                                                     "--dbname", config.getName(),
                                                     "--host", config.getHost(),
