@@ -6,13 +6,13 @@ import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import com.atlassian.migration.datacenter.core.exceptions.InvalidMigrationStageError;
 import com.atlassian.migration.datacenter.spi.MigrationServiceV2;
 import com.atlassian.migration.datacenter.spi.MigrationStage;
-import com.atlassian.migration.datacenter.spi.cloud.CloudConfigurationService;
+import com.atlassian.migration.datacenter.spi.cloud.CloudProviderConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AWSConfigurationService implements CloudConfigurationService {
+public class AWSConfigurationService implements CloudProviderConfigurationService {
     private static final Logger logger = LoggerFactory.getLogger(AWSConfigurationService.class);
 
     private final WriteCredentialsService writeCredentialsService;

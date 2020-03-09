@@ -2,7 +2,7 @@ package com.atlassian.migration.datacenter.spi.cloud;
 
 import com.atlassian.migration.datacenter.core.exceptions.InvalidMigrationStageError;
 
-public interface CloudConfigurationService {
+public interface CloudProviderConfigurationService {
 
     /**
      * Configures access to a cloud provider to facilitate the migration
