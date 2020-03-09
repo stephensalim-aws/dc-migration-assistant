@@ -26,9 +26,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class PostgresMigrationIT
 {
     @Container
-    public PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:9.6")
+    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:9.6")
         .withDatabaseName("jira")
         .withCopyFileToContainer(MountableFile.forClasspathResource("jira.sql"), "/docker-entrypoint-initdb.d/");
+
     private Connection conn;
 
     @BeforeEach
