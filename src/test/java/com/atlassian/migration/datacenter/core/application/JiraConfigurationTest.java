@@ -102,7 +102,7 @@ class JiraConfigurationTest
         assertEquals("password", config.getPassword());
         assertEquals("dbhost", config.getHost());
         assertEquals("dbname", config.getName());
-        assertEquals(9876, config.getPort());
+        assertEquals(5432, config.getPort());
     }
 
     @Test
