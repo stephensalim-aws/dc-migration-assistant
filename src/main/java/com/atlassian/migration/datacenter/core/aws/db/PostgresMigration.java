@@ -44,7 +44,6 @@ public class PostgresMigration
         DatabaseConfiguration config = applicationConfiguration.getDatabaseConfiguration();
 
         ProcessBuilder builder = new ProcessBuilder(pgdump,
-                                                    "--create",
                                                     "--no-owner",
                                                     "--no-acl",
                                                     "--compress=9",
