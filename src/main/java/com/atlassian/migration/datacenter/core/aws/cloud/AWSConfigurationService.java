@@ -25,6 +25,13 @@ public class AWSConfigurationService implements CloudConfigurationService {
         this.migrationService = migrationService;
     }
 
+    /**
+     * Configures the app to be able to authenticate with AWS.
+     * @param entity the AWS access key ID
+     * @param secret the AWS secret access key
+     * @param geography the AWS region
+     * @throws InvalidMigrationStageError when not in {@link MigrationStage#AUTHENTICATION}
+     */
     @Override
     public void configureCloudProvider(String entity, String secret, String geography) throws InvalidMigrationStageError {
         final MigrationStage currentStage = migrationService.getCurrentStage();
