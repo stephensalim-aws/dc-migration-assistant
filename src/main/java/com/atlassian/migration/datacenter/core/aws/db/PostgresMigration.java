@@ -36,7 +36,7 @@ public class PostgresMigration
         return Optional.empty();
     }
 
-    private Process dumpDatabase(File to) throws DatabaseMigrationFailure
+    public Process dumpDatabase(File to) throws DatabaseMigrationFailure
     {
         String pgdump = getPgdumpPath()
             .orElseThrow(() -> new DatabaseMigrationFailure("Failed to find appropriate pg_dump executable."));
@@ -49,7 +49,9 @@ public class PostgresMigration
                                                     "--compress=9",
                                                     "--dbname", config.getName(),
                                                     "--host", config.getHost(),
+                                                    "--port", config.getPort().toString(),
                                                     "--username", config.getUsername())
+            .inheritIO()
             .redirectOutput(Redirect.to(to));
         builder.environment().put("PGPASSWORD", config.getPassword());
 

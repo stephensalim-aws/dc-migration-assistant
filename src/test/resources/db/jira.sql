@@ -25,7 +25,7 @@ SET row_security = off;
 -- CREATE DATABASE jira WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'C' LC_CTYPE = 'C';
 
 
-\connect jira
+-- \connect jira
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;

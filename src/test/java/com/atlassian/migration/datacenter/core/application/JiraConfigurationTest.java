@@ -1,14 +1,11 @@
 package com.atlassian.migration.datacenter.core.application;
 
 import com.atlassian.jira.config.util.JiraHome;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.xml.xpath.XPathExpressionException;
@@ -27,7 +24,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class JiraConfigurationTest
 {
-    @Rule MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock JiraHome jiraHome;
     @TempDir Path tempDir;
 
