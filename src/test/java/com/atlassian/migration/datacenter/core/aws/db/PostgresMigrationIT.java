@@ -90,9 +90,8 @@ class PostgresMigrationIT
     {
         PostgresMigration migration = new PostgresMigration(configuration);
         Path dumpFile = tempDir.resolve("dump.sql.gz");
-        Process proc = migration.dumpDatabase(dumpFile.toFile());
-        proc.waitFor(60, TimeUnit.SECONDS);
 
+        migration.dumpDatabase(dumpFile.toFile());
         assertTrue(dumpFile.toFile().exists());
 
         InputStream stream = new GZIPInputStream(new FileInputStream(dumpFile.toFile()));

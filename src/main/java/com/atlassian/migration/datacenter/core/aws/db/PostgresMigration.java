@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * Copyright Atlassian: 03/03/2020
  */
-public class PostgresMigration
+public class PostgresMigration implements DatabaseMigration
 {
     private ApplicationConfiguration applicationConfiguration;
 
@@ -26,17 +26,31 @@ public class PostgresMigration
         this.applicationConfiguration = applicationConfiguration;
     }
 
-    private Optional<String> getPgdumpPath() {
+    private Optional<String> getPgdumpPath()
+    {
         for (String path : pddumpPaths) {
             Path p = Paths.get(path);
-            if (Files.isReadable(p) &&Files.isExecutable(p)) {
+            if (Files.isReadable(p) && Files.isExecutable(p)) {
                 return Optional.of(path);
             }
         }
         return Optional.empty();
     }
 
-    public Process dumpDatabase(File to) throws DatabaseMigrationFailure
+    /**
+     * Invoke `pg_dump` against the database details store in the supplied ApplicationConfiguration. Some important notes:
+     *
+     * <ul>
+     * <li>It is the responsibility of the caller to ensure that the filesystems the target resides on has sufficient space.</li>
+     * <li>stdout is redirected to the stdout of the calling process.</li>
+     * </ul>
+     *
+     * @param to - The file to dump the compressed database export to.
+     * @return The underlying process object.
+     * @throws DatabaseMigrationFailure on failure.
+     */
+    @Override
+    public Process startDatabaseDump(File to) throws DatabaseMigrationFailure
     {
         String pgdump = getPgdumpPath()
             .orElseThrow(() -> new DatabaseMigrationFailure("Failed to find appropriate pg_dump executable."));
@@ -56,10 +70,35 @@ public class PostgresMigration
         builder.environment().put("PGPASSWORD", config.getPassword());
 
         try {
-            return builder.start();
+            return  builder.start();
         } catch (IOException e) {
             String command = String.join(" ", builder.command());
-            throw new DatabaseMigrationFailure("Failed to start pg_dump process with commandline: "+command, e);
+            throw new DatabaseMigrationFailure("Failed to start pg_dump process with commandline: " + command, e);
+        }
+
+
+    }
+
+    /**
+     * This is a blocking version of startDatabaseDump(); this may take some time, so should be called from a thread.
+     *
+     * @param to - The file to dump the compressed database export to.
+     * @throws DatabaseMigrationFailure on failure, including a non-zero exit code.
+     */
+    @Override
+    public void dumpDatabase(File to) throws DatabaseMigrationFailure
+    {
+        Process proc = startDatabaseDump(to);
+
+        int exit;
+        try {
+            exit = proc.waitFor();
+        } catch (InterruptedException e) {
+            throw new DatabaseMigrationFailure("The pg_dump process was interrupted. Check logs for more information.", e);
+        }
+
+        if (exit != 0) {
+            throw new DatabaseMigrationFailure("pg_dump process exited with non-zero status: " + exit);
         }
     }
 }
