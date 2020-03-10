@@ -14,6 +14,8 @@ import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ssm.SsmClient;
+import software.amazon.awssdk.services.ssm.model.CommandInvocationStatus;
+import software.amazon.awssdk.services.ssm.model.CommandStatus;
 import software.amazon.awssdk.services.ssm.model.GetCommandInvocationRequest;
 import software.amazon.awssdk.services.ssm.model.GetCommandInvocationResponse;
 import software.amazon.awssdk.services.ssm.model.SendCommandRequest;
@@ -23,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Tag("integration")
@@ -50,18 +53,34 @@ public class SSMApiIT {
     }
 
     @Test
-    @Disabled("Requires true authentication to AWS and a specific EC2 instance to be running")
+//    @Disabled("Requires true authentication to AWS and a specific EC2 instance to be running")
     void shouldSendSsmCommandToAWS() {
         final String documentName = "AWS-RunShellScript";
         // Node ID of ConfluenceGiveMeAllTheData Confluence Node in us-east-1
         final String targetEc2InstanceId = "i-0d536acd983bade05";
         final HashMap<String, List<String>> commandParameters = new HashMap<String, List<String>>() {{
-           put("commands", Collections.singletonList("echo 'hello, world'"));
+            put("commands", Collections.singletonList("echo 'hello, world'"));
         }};
 
         String commandId = sut.runSSMDocument(documentName, targetEc2InstanceId, commandParameters);
 
         assertNotNull(commandId);
+    }
+
+    @Test
+    @Disabled("Requires true authentication to AWS")
+    void shouldGetCommand() {
+        // Command run by an earlier run of shouldSendSsmCommandToAWS
+        final String commandID = "5c45181c-ed0a-45db-9fb7-3a4cd1edef9d";
+        // Node ID of ConfluenceGiveMeAllTheData Confluence Node in us-east-1
+        final String targetEc2InstanceId = "i-0d536acd983bade05";
+
+        GetCommandInvocationResponse command = sut.getSSMCommand(commandID, targetEc2InstanceId);
+
+        assertNotNull(command);
+
+        assertEquals(CommandInvocationStatus.SUCCESS, command.status());
+        assertEquals("hello, world\n", command.standardOutputContent());
     }
 
     @Test

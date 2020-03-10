@@ -4,11 +4,15 @@ import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ssm.SsmClient;
+import software.amazon.awssdk.services.ssm.model.Command;
+import software.amazon.awssdk.services.ssm.model.GetCommandInvocationRequest;
+import software.amazon.awssdk.services.ssm.model.GetCommandInvocationResponse;
 import software.amazon.awssdk.services.ssm.model.SendCommandRequest;
 import software.amazon.awssdk.services.ssm.model.SendCommandResponse;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class SSMApi {
 
@@ -45,6 +49,31 @@ public class SSMApi {
         SendCommandResponse response = getClient().sendCommand(request);
 
         return response.command().commandId();
+    }
+
+    /**
+     * Gets the invocation of the specified command on the specified EC2 instance. You will want
+     * to check the details of the command yourself. Noteworthy response fields include {@link GetCommandInvocationResponse#status()},
+     * {@link GetCommandInvocationResponse#standardOutputContent()}
+     *
+     * @param commandId The id of the command from calling {@link SSMApi#runSSMDocument(String, String, Map)}
+     * @param targetEc2InstanceId the EC2 instance the command is running on. Should be the same as the targetEc2InstanceId from calling {@link SSMApi#runSSMDocument(String, String, Map)}
+     * @return The response from the AWS SDK v2
+     *
+     * @throws software.amazon.awssdk.services.ssm.model.InvalidCommandIdException (RuntimeException) - when the command ID is not a valid SSM Command ID
+     * @throws software.amazon.awssdk.services.ssm.model.InvocationDoesNotExistException (RuntimeException) - when the command invocation (combination of command ID and instance ID) does not exist
+     *
+     * @see SsmClient#getCommandInvocation(GetCommandInvocationRequest) for other exception details
+     */
+    public GetCommandInvocationResponse getSSMCommand(String commandId, String targetEc2InstanceId) {
+        GetCommandInvocationRequest request = GetCommandInvocationRequest.builder()
+                .commandId(commandId)
+                .instanceId(targetEc2InstanceId)
+                .build();
+
+        GetCommandInvocationResponse response = getClient().getCommandInvocation(request);
+
+        return response;
     }
 
     // Lazily instantiates the ssm client
