@@ -53,7 +53,7 @@ public class S3MultiPartUploader {
         // lazily loaded to save memory
         buffer = ByteBuffer.allocate(getSizeToUpload());
 
-        String uploadId = initiate();
+        String uploadId = initiateUpload();
 
         try (FileInputStream fileInputStream = new FileInputStream(file);
              BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
@@ -99,7 +99,7 @@ public class S3MultiPartUploader {
         this.sizeToUpload = sizeToUpload;
     }
 
-    private String initiate() throws InterruptedException, ExecutionException {
+    private String initiateUpload() throws InterruptedException, ExecutionException {
         CreateMultipartUploadRequest createMultipartUploadRequest = CreateMultipartUploadRequest.builder()
                 .bucket(config.getBucketName())
                 .key(key)
