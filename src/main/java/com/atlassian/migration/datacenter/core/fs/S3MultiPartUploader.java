@@ -37,7 +37,7 @@ public class S3MultiPartUploader {
     private final static Logger logger = LoggerFactory.getLogger(S3MultiPartUploader.class);
     private final S3UploadConfig config;
 
-    private int sizeToUpload = 50 * 1024 * 1024; // 50MB
+    private int sizeToUpload = 100 * 1024 * 1024; // 100 MB
     private List<CompletedPart> completedParts;
 
     public S3MultiPartUploader(S3UploadConfig config) {
@@ -69,7 +69,7 @@ public class S3MultiPartUploader {
         try (FileInputStream fileInputStream = new FileInputStream(file);
              BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
 
-            long readBytes = 0L;
+            int readBytes = 0;
             while ((readBytes = bufferedInputStream.read(buffer.array())) > 0) {
                 logger.trace("Read {} bytes from file {}", readBytes, file);
                 UploadPartRequest uploadPartRequest = UploadPartRequest.builder()
@@ -78,8 +78,15 @@ public class S3MultiPartUploader {
                         .uploadId(uploadId)
                         .partNumber(uploadPartNumber)
                         .build();
+
+                AsyncRequestBody body;
+                if (readBytes < buffer.limit()) {
+                    body = AsyncRequestBody.fromByteBuffer((ByteBuffer) buffer.limit(readBytes));
+                } else {
+                    body = AsyncRequestBody.fromByteBuffer(buffer);
+                }
                 String etag = s3AsyncClient
-                        .uploadPart(uploadPartRequest, AsyncRequestBody.fromByteBuffer(buffer))
+                        .uploadPart(uploadPartRequest, body)
                         .get()
                         .eTag();
 
