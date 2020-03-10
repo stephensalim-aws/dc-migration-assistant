@@ -42,7 +42,7 @@ public class PostgresMigration implements DatabaseMigration
      *
      * <ul>
      * <li>It is the responsibility of the caller to ensure that the filesystems the target resides on has sufficient space.</li>
-     * <li>stdout is redirected to the stdout of the calling process.</li>
+     * <li>stderr is redirected to the stderr of the calling process.</li>
      * </ul>
      *
      * @param to - The file to dump the compressed database export to.
