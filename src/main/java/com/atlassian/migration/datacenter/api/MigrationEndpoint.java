@@ -2,6 +2,7 @@ package com.atlassian.migration.datacenter.api;
 
 import com.atlassian.migration.datacenter.spi.MigrationService;
 import com.atlassian.migration.datacenter.spi.MigrationStage;
+import com.google.common.collect.ImmutableMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -37,7 +38,7 @@ public class MigrationEndpoint {
                     .build();
         } else {
             return Response
-                    .ok(migrationService.getMigrationStage().toString())
+                    .ok(ImmutableMap.of("stage", migrationService.getMigrationStage().toString()))
                     .build();
         }
     }
@@ -58,7 +59,7 @@ public class MigrationEndpoint {
         } else {
             return Response
                     .status(Response.Status.CONFLICT)
-                    .entity("migration already exists")
+                    .entity(ImmutableMap.of("error", "migration already exists"))
                     .build();
         }
     }
