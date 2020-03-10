@@ -61,8 +61,6 @@ public class S3Uploader implements Uploader {
                         } catch (InterruptedException | ExecutionException e) {
                             logger.error("Error when running multi-part upload for file {} with exception {}", path, e.getMessage());
                         }
-
-                        progress.reportFileMigrated();
                     } else {
                         final PutObjectRequest putRequest = PutObjectRequest.builder()
                                 .bucket(config.getBucketName())
@@ -72,7 +70,7 @@ public class S3Uploader implements Uploader {
                         final S3UploadOperation uploadOperation = new S3UploadOperation(path, response);
                         responsesQueue.add(uploadOperation);
 
-                        progress.reportFileInFlight();
+                        progress.reportFileUploadCommenced();
                     }
                 } else {
                     addFailedFile(path, String.format("File doesn't exist: %s", path));
