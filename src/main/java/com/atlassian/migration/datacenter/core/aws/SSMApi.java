@@ -31,7 +31,9 @@ public class SSMApi {
      * Runs an SSM automatiom document against a specific EC2 instance with the specified parameters.
      * @param documentName The name of the document to run. The latest version will be used.
      * @param targetEc2InstanceId The instance ID of the EC2 instance to run this command on
-     * @param commandParameters
+     * @param commandParameters The parameters for the command. The key should be the parameter name and the value should
+     *                          be a list filled with the lines to be used as the parameter value. If the parameter-type
+     *                          is a plain string then the list only have one element in it.
      * @return the command ID of the invoked command.
      */
     public String runSSMDocument(String documentName, String targetEc2InstanceId, Map<String, List<String>> commandParameters) {
@@ -42,8 +44,10 @@ public class SSMApi {
                 .parameters(commandParameters)
                 .timeoutSeconds(600)
                 .comment("command run by Jira DC Migration Assistant")
+                // FIXME: Pending migration stack
                 .outputS3BucketName("migration-bucket")
                 .outputS3KeyPrefix("fs-copy-down-log")
+                // END FIXME
                 .build();
 
         SendCommandResponse response = getClient().sendCommand(request);
