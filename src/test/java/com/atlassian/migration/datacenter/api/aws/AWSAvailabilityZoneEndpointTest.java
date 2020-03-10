@@ -39,6 +39,28 @@ public class AWSAvailabilityZoneEndpointTest {
     }
 
     @Test
+    public void testAvailabilityZoneEndpointWithRegion() throws InvalidAWSRegionException {
+        Region mockRegion = Region.of("eu-central-1");
+        when(this.regionService.getRegion()).thenReturn("eu-central-1");
+        when(this.availabilityZoneService.getAZForRegion(mockRegion)).thenReturn(buildAZList());
+
+        Response response = this.availabilityZoneEndpoint.getAvailabilityZoneList(mockRegion.toString());
+        List<String> responseList = (List<String>) response.getEntity();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(3, responseList.size());
+    }
+
+    @Test
+    public void testAvailabilityZoneEndpointWithInvalidRegion() throws InvalidAWSRegionException {
+        Region mockRegion = Region.of("eu-central-2");
+        when(this.regionService.getRegion()).thenReturn("eu-central-2");
+        when(this.availabilityZoneService.getAZForRegion(mockRegion)).thenThrow(new InvalidAWSRegionException());
+
+        Response response = this.availabilityZoneEndpoint.getAvailabilityZoneList(mockRegion.toString());
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+    @Test
     public void testAvailabilityZoneEndpoint() throws InvalidAWSRegionException {
         Region mockRegion = Region.of("eu-central-1");
         when(this.regionService.getRegion()).thenReturn("eu-central-1");
