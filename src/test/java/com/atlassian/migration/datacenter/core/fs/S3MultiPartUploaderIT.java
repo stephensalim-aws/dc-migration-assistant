@@ -23,10 +23,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -98,9 +96,12 @@ class S3MultiPartUploaderIT {
         AmazonS3 s3Client = TestUtils.getClientS3();
         s3Client.createBucket(TREBUCHET_LOCALSTACK_BUCKET);
 
-        final Exception ex = assertThrows(ExecutionException.class, uploader::upload);
-        assertTrue(ex.getCause() instanceof S3Exception);
-        ex.getCause().getMessage().contains("Your proposed upload is smaller than the minimum allowed object size");
+        try {
+            uploader.upload();
+        } catch (Exception e) {
+            assertTrue(e.getCause() instanceof S3Exception);
+            e.getCause().getMessage().contains("Your proposed upload is smaller than the minimum allowed object size");
+        }
     }
 
     Path createFile(String subfolder, String fileName) throws IOException {
