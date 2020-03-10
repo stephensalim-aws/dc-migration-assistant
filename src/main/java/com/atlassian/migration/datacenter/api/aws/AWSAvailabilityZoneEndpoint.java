@@ -31,7 +31,7 @@ public class AWSAvailabilityZoneEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAvailabilityZoneList() {
         Region currentRegion = Region.of(this.regionService.getRegion());
-        return this.findAZListforRegion(currentRegion);
+        return this.findAZListForRegion(currentRegion);
     }
 
     @GET
@@ -39,10 +39,10 @@ public class AWSAvailabilityZoneEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAvailabilityZoneList(@PathParam("region") String region) {
         Region searchRegion = Region.of(this.regionService.getRegion());
-        return this.findAZListforRegion(searchRegion);
+        return this.findAZListForRegion(searchRegion);
     }
 
-    private Response findAZListforRegion(Region region) {
+    private Response findAZListForRegion(Region region) {
         try {
             List<AvailabilityZone> zonesList = this.availabilityZoneService.getAZForRegion(region);
 
