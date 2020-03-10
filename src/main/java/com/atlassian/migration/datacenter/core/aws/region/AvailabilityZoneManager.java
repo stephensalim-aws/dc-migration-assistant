@@ -23,7 +23,11 @@ public class AvailabilityZoneManager implements AvailabilityZoneService {
         this.globalInfrastructure = globalInfrastructure;
     }
 
-
+    /**
+     * @param region
+     * @return a list of {@link software.amazon.awssdk.services.ec2.model.AvailabilityZone AvailabilityZone} for a region
+     * @throws InvalidAWSRegionException
+     */
     @Override
     public List<AvailabilityZone> getAZForRegion(Region region) throws InvalidAWSRegionException {
         if (this.isValidRegion(region.toString())) {
