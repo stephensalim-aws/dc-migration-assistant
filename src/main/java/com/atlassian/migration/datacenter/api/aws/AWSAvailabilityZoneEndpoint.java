@@ -8,6 +8,7 @@ import software.amazon.awssdk.services.ec2.model.AvailabilityZone;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,8 +30,21 @@ public class AWSAvailabilityZoneEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAvailabilityZoneList() {
+        Region currentRegion = Region.of(this.regionService.getRegion());
+        return this.findAZListforRegion(currentRegion);
+    }
+
+    @GET
+    @Path("/{region}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAvailabilityZoneList(@PathParam("region") String region) {
+        Region searchRegion = Region.of(this.regionService.getRegion());
+        return this.findAZListforRegion(searchRegion);
+    }
+
+    private Response findAZListforRegion(Region region) {
         try {
-            List<AvailabilityZone> zonesList = this.availabilityZoneService.getAZForRegion(Region.of(this.regionService.getRegion()));
+            List<AvailabilityZone> zonesList = this.availabilityZoneService.getAZForRegion(region);
 
             try (Stream<AvailabilityZone> azStream = zonesList.parallelStream()) {
                 List<String> nameList = azStream.map(AvailabilityZone::zoneName).sorted().collect(Collectors.toList());
@@ -40,7 +54,7 @@ public class AWSAvailabilityZoneEndpoint {
         } catch (InvalidAWSRegionException ex) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-    }
 
+    }
 
 }
