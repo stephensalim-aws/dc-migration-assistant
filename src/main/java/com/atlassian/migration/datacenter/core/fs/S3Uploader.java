@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class S3Uploader implements Uploader {
     private static final Logger logger = LoggerFactory.getLogger(S3Uploader.class);
     private static final int MS_TO_WAIT_FOR_CRAWLER = 500;
-    private static final int MAX_OPEN_CONNECTIONS = 100;
-    private static final long MAXIMUM_FILE_SIZE_TO_UPLOAD = 5 * 1024 * 1024 * 1024L; // 5GB  https://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html
+    private static final int MAX_OPEN_CONNECTIONS = 50;
+    private static final long MAXIMUM_FILE_SIZE_TO_UPLOAD = 50 * 1024 * 1024L; // 5GB  https://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html
 
     private final FileSystemMigrationErrorReport report;
     private final FileSystemMigrationProgress progress;
@@ -55,9 +55,9 @@ public class S3Uploader implements Uploader {
                     if (path.toFile().length() > MAXIMUM_FILE_SIZE_TO_UPLOAD) {
                         logger.debug("File {} is larger than {}, running multipart upload", path, FileUtils.byteCountToDisplaySize(MAXIMUM_FILE_SIZE_TO_UPLOAD));
 
-                        final S3MultiPartUploader multiPartUploader = new S3MultiPartUploader(config);
+                        final S3MultiPartUploader multiPartUploader = new S3MultiPartUploader(config, path.toFile(), key);
                         try {
-                            multiPartUploader.multiPartUpload(path.toFile(), key);
+                            multiPartUploader.upload();
                         } catch (InterruptedException | ExecutionException e) {
                             logger.error("Error when running multi-part upload for file {} with exception {}", path, e.getMessage());
                         }
