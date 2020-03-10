@@ -22,7 +22,7 @@ public class S3Uploader implements Uploader {
     private static final Logger logger = LoggerFactory.getLogger(S3Uploader.class);
     private static final int MS_TO_WAIT_FOR_CRAWLER = 500;
     private static final int MAX_OPEN_CONNECTIONS = 50;
-    private static final long MAXIMUM_FILE_SIZE_TO_UPLOAD = 50 * 1024 * 1024L; // 5GB  https://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html
+    private static final long MAXIMUM_FILE_SIZE_TO_UPLOAD = 5 * 1024 * 1024 * 1024L; // 5GB  https://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html
 
     private final FileSystemMigrationErrorReport report;
     private final FileSystemMigrationProgress progress;
