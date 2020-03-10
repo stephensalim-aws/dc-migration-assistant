@@ -53,7 +53,7 @@ public class SSMApiIT {
     }
 
     @Test
-//    @Disabled("Requires true authentication to AWS and a specific EC2 instance to be running")
+    @Disabled("Requires true authentication to AWS and a specific EC2 instance to be running")
     void shouldSendSsmCommandToAWS() {
         final String documentName = "AWS-RunShellScript";
         // Node ID of ConfluenceGiveMeAllTheData Confluence Node in us-east-1
