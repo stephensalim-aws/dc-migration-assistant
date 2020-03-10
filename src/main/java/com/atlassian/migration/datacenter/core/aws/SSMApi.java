@@ -4,7 +4,6 @@ import com.atlassian.migration.datacenter.core.aws.region.RegionService;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ssm.SsmClient;
-import software.amazon.awssdk.services.ssm.model.Command;
 import software.amazon.awssdk.services.ssm.model.GetCommandInvocationRequest;
 import software.amazon.awssdk.services.ssm.model.GetCommandInvocationResponse;
 import software.amazon.awssdk.services.ssm.model.SendCommandRequest;
@@ -12,7 +11,6 @@ import software.amazon.awssdk.services.ssm.model.SendCommandResponse;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class SSMApi {
 
@@ -45,8 +43,8 @@ public class SSMApi {
                 .timeoutSeconds(600)
                 .comment("command run by Jira DC Migration Assistant")
                 // FIXME: Pending migration stack
-                .outputS3BucketName("migration-bucket")
-                .outputS3KeyPrefix("fs-copy-down-log")
+                .outputS3BucketName(System.getProperty("ssmDocumentLoggingBucket", "migration-bucket"))
+                .outputS3KeyPrefix("trebuchet-ssm-document-logs")
                 // END FIXME
                 .build();
 
