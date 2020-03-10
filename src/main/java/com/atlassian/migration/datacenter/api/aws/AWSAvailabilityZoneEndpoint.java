@@ -45,7 +45,6 @@ public class AWSAvailabilityZoneEndpoint {
     private Response findAZListForRegion(Region region) {
         try {
             List<AvailabilityZone> zonesList = this.availabilityZoneService.getAZForRegion(region);
-
             try (Stream<AvailabilityZone> azStream = zonesList.parallelStream()) {
                 List<String> nameList = azStream.map(AvailabilityZone::zoneName).sorted().collect(Collectors.toList());
                 return Response.status(Response.Status.OK).entity(nameList).build();
