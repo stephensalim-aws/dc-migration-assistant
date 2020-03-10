@@ -118,6 +118,8 @@ public class S3MultiPartUploader {
 
         AsyncRequestBody body;
         if (readBytes < buffer.limit()) {
+            // We need to limit the buffer if the rest of the file is smaller than the allocated size.
+            // If don't do this, the size of the sent part will be always equal to the buffer size.
             body = AsyncRequestBody.fromByteBuffer((ByteBuffer) buffer.limit(readBytes));
         } else {
             body = AsyncRequestBody.fromByteBuffer(buffer);
