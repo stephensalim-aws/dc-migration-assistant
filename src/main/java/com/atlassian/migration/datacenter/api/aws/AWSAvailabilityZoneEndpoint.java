@@ -47,7 +47,7 @@ public class AWSAvailabilityZoneEndpoint {
             List<AvailabilityZone> zonesList = this.availabilityZoneService.getAZForRegion(region);
             try (Stream<AvailabilityZone> azStream = zonesList.stream()) {
                 List<String> nameList = azStream.map(AvailabilityZone::zoneName).sorted().collect(Collectors.toList());
-                return Response.status(Response.Status.OK).entity(nameList).build();
+                return Response.ok(nameList).build();
             }
 
         } catch (InvalidAWSRegionException ex) {
