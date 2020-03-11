@@ -43,8 +43,8 @@ public class AvailabilityZoneManager implements AvailabilityZoneService {
     }
 
     private boolean isValidRegion(String testRegion) {
-        return this.globalInfrastructure.
-                getRegions()
+        return this.globalInfrastructure
+                .getRegions()
                 .stream()
                 .anyMatch(region -> region.equals(testRegion));
     }
