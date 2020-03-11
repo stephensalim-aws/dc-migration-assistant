@@ -2,8 +2,7 @@ package com.atlassian.migration.datacenter.core.aws.region;
 
 import com.atlassian.migration.datacenter.core.aws.GlobalInfrastructure;
 import com.atlassian.migration.datacenter.core.aws.auth.AtlassianPluginAWSCredentialsProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.AvailabilityZone;
@@ -11,13 +10,12 @@ import software.amazon.awssdk.services.ec2.model.DescribeAvailabilityZonesRespon
 
 import java.util.List;
 
-@Service
+@Component
 public class AvailabilityZoneManager implements AvailabilityZoneService {
 
     private final AtlassianPluginAWSCredentialsProvider credentialsProvider;
     private final GlobalInfrastructure globalInfrastructure;
 
-    @Autowired
     public AvailabilityZoneManager(AtlassianPluginAWSCredentialsProvider credentialsProvider, GlobalInfrastructure globalInfrastructure) {
         this.credentialsProvider = credentialsProvider;
         this.globalInfrastructure = globalInfrastructure;
