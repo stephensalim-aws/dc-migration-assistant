@@ -3,12 +3,9 @@ package com.atlassian.migration.datacenter.core.fs.reporting;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultFileSystemMigrationProgressTest {
 
@@ -39,22 +36,10 @@ public class DefaultFileSystemMigrationProgressTest {
     }
 
     @Test
-    void shouldCountInFlightFile() {
-        sut.reportFileInFlight();
+    void shouldCountCommencedFileUploads() {
+        sut.reportFileUploadCommenced();
 
-        assertEquals(1, sut.getNumberOfFilesInFlight());
-    }
-
-    @Test
-    void ShouldRemoveFileFromInFlightWhenItIsMigrated() {
-        sut.reportFileInFlight();
-        sut.reportFileInFlight();
-
-        assertEquals(2, sut.getNumberOfFilesInFlight());
-
-        sut.reportFileMigrated();
-
-        assertEquals(1, sut.getNumberOfFilesInFlight());
+        assertEquals(1, sut.getNumberOfCommencedFileUploads());
     }
 
     @Test

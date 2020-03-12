@@ -159,7 +159,15 @@
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ec2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
             <artifactId>regions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ssm</artifactId>
         </dependency>
 
         <!-- Test Dependencies follow -->
@@ -227,6 +235,24 @@
             <groupId>cloud.localstack</groupId>
             <artifactId>localstack-utils</artifactId>
             <version>${localstack.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgres.driver.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -492,6 +518,8 @@
         <junit.version>5.4.2</junit.version>
         <aws.sdk.version>2.10.61</aws.sdk.version>
         <localstack.version>0.2.1</localstack.version>
+        <testcontainers.version>1.13.0</testcontainers.version>
+        <postgres.driver.version>42.2.10</postgres.driver.version>
     </properties>
 
 </project>
