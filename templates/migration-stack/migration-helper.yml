@@ -17,6 +17,9 @@ Parameters:
   HelperVpcId:
     Description: "The VPC for Helper EC2 Instance"
     Type: String
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
 Resources:
 
@@ -103,7 +106,7 @@ Resources:
               01_mount:
                 command: /tmp/mount-efs.sh
     Properties:
-      ImageId: "ami-0f767afb799f45102"
+      ImageId: !Ref LatestAmiId
       InstanceType: !Ref "HelperInstanceType"
       IamInstanceProfile: !Ref "HelperInstanceProfile"
       SecurityGroups:
@@ -122,10 +125,10 @@ Resources:
         Count: '1'
     UpdatePolicy:
       AutoScalingRollingUpdate:
-        MaxBatchSize: '2'
-        MinInstancesInService: '1'
+        MaxBatchSize: 2
+        MinInstancesInService: 1
         PauseTime: PT15M
-        WaitOnResourceSignals: 'true'
+        WaitOnResourceSignals: true
     Properties:
       VPCZoneIdentifier:
         - !Ref 'NetworkPrivateSubnet'
